@@ -70,9 +70,6 @@ class AppDrawer extends StatelessWidget {
               ),
               onTap: () {
                 signUserOut();
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => const LoginOrRegisterPage()),
-                );
               }
             ),
           ],
