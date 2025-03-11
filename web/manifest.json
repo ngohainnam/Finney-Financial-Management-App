@@ -1,6 +1,6 @@
 {
-    "name": "finney",
-    "short_name": "finney",
+    "name": "visualize_infinance",
+    "short_name": "visualize_infinance",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
