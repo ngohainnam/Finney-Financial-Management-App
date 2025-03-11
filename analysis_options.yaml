@@ -7,9 +7,6 @@
 
 # The following line activates a set of recommended lints for Flutter apps,
 # packages, and plugins designed to encourage good coding practices.
-analyzer:
-  errors:
-    use_build_context_synchronously: ignore
 include: package:flutter_lints/flutter.yaml
 
 linter:
@@ -24,6 +21,21 @@ linter:
   # `// ignore_for_file: name_of_lint` syntax on the line or in the file
   # producing the lint.
   rules:
+    - avoid_print: true
+    - avoid_unnecessary_containers: true
+    - avoid_web_libraries_in_flutter: true
+    - no_logic_in_create_state: true
+    - prefer_const_constructors: true
+    - prefer_const_declarations: true
+    - prefer_final_fields: true
+    - sized_box_for_whitespace: true
+    - use_full_hex_values_for_flutter_colors: true
+    - use_key_in_widget_constructors: true
+analyzer:
+  errors:
+    missing_required_param: error
+    missing_return: error
+    must_be_immutable: error
     # avoid_print: false  # Uncomment to disable the `avoid_print` rule
     # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
 

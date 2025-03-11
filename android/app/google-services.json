@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "560045957556",
-    "project_id": "finneyauth",
-    "storage_bucket": "finneyauth.firebasestorage.app"
+    "project_number": "1090013028172",
+    "project_id": "visualize-infinance",
+    "storage_bucket": "visualize-infinance.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:560045957556:android:1f6142223ecb63968052e1",
+        "mobilesdk_app_id": "1:1090013028172:android:b60701270915bdc8c779e9",
         "android_client_info": {
-          "package_name": "com.example.finney"
+          "package_name": "com.example.visualize_infinance"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAlDrqMlG3kUWXmG3PgWe2eIWcFy__MfJI"
+          "current_key": "AIzaSyBNh_4kZ1YZJYM3eZtC4A-sMYQdNv9FwcQ"
         }
       ],
       "services": {
