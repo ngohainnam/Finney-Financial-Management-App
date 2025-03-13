@@ -7,4 +7,5 @@ class AppColors {
   static const darkBlue = Color(0xff0A2342);
   static const blurGray = Color.fromARGB(255, 131, 146, 172);
   static const softGray = Color.fromARGB(255, 225, 228, 234);
+  static const userChatColor = Color.fromARGB(255, 85, 147, 234);
 }

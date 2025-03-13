@@ -1,5 +1,4 @@
 import 'package:finney/assets/path/app_images.dart';
-import 'package:finney/pages/1-auth/login_or_register_page.dart';
 import 'package:finney/pages/2-chatbot/chatbot.dart';
 import 'package:finney/pages/3-dashboard/dashboard.dart';
 import 'package:finney/pages/4-report/report.dart';

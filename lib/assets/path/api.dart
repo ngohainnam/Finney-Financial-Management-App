@@ -1,0 +1,1 @@
+const geminiApiKey  ='AIzaSyDShw6bWxIQIv8gc3y8Ekr9DmqRYqWoJgc';
