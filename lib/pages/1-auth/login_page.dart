@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:finney/assets/path/app_images.dart';
 import 'package:finney/assets/theme/app_color.dart';
 import 'package:finney/assets/widgets/error_message.dart';
@@ -52,7 +54,6 @@ void signUserIn() async {
     if (storedUser != null) {
       print('User details fetched from Hive: UID = ${storedUser.uid}, Email = ${storedUser.email}');
       Navigator.pop(context);  // Close loading circle
-      Navigator.pushReplacementNamed(context, '/home');  // Replace '/home' with your actual route
     } else {
       print('User details not found in Hive');
       Navigator.pop(context);  // Close loading circle
@@ -86,12 +87,9 @@ void signUserIn() async {
         await box.put('user', userModel);  // Save UserModel object using 'user' as the key
         
         print('User signed in successfully and details saved to Hive: UID = ${user.uid}, Email = ${user.email}');
-        
-        // Navigate to the home page or dashboard after successful login
-        Navigator.pushReplacementNamed(context, '/home');  // Replace '/home' with your actual route
       }
 
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException {
       if (mounted) {
         Navigator.pop(context); // Pop the loading circle
       }
