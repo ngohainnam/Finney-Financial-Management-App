@@ -6,6 +6,7 @@ import 'package:finney/assets/widgets/my_textfield.dart';
 import 'package:finney/assets/widgets/square_tile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class RegisterPage extends StatefulWidget {
   final Function()? onTap;
@@ -36,18 +37,51 @@ void signUserUp() async {
   );
 
   //Sign up process with Firebase
+  // Sign up process with Firebase
   if (passwordController.text == confirmedController.text) {
-    await FirebaseAuth.instance.createUserWithEmailAndPassword(
-    email: emailController.text,
-    password: passwordController.text,
-  );
-  if (mounted) {
-    Navigator.pop(context); //Pop the loading circle
-  }
+    try {
+      // Create user with Firebase
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: emailController.text,
+        password: passwordController.text,
+      );
+
+      // If user is successfully created, save to Hive
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        // Open Hive box
+        var box = await Hive.openBox('userBox'); // Open or create a Hive box
+        // Save user's UID and email to Hive
+        await box.put('uid', user.uid);
+        await box.put('email', user.email);
+
+        // Fetch the stored user data from Hive
+        var storedUid = box.get('uid');
+        var storedEmail = box.get('email');
+        
+        if (storedUid != null && storedEmail != null) {
+          print('User stored in Hive: UID = $storedUid, Email = $storedEmail');
+        } else {
+          print('Failed to store user in Hive.');
+        }
+      }
+
+      if (mounted) {
+        Navigator.pop(context); // Pop the loading circle
+      }
+
+    } catch (e) {
+      // Handle error
+      if (mounted) {
+        Navigator.pop(context); // Pop the loading circle
+      }
+      showErrorMessage(context, 'Error: $e');
+    }
   } else {
-    Navigator.pop(context); //Pop the loading circle
-    //show if the password and confirm password is not the same
-    showErrorMessage(context, 'Password do not match.');
+    Navigator.pop(context); // Pop the loading circle
+    // Show if the password and confirm password are not the same
+    showErrorMessage(context, 'Passwords do not match.');
   }
 }
 

@@ -3,13 +3,21 @@ import 'package:finney/assets/path/api.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'firebase_options.dart';
+import 'models/user_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  await Hive.initFlutter();
+  Hive.registerAdapter(UserModelAdapter());
+  await Hive.openBox<UserModel>('userBox');
+
   Gemini.init(
     apiKey: geminiApiKey,
   );
