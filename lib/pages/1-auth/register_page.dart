@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print
-
 import 'package:finney/assets/path/app_images.dart';
 import 'package:finney/assets/theme/app_color.dart';
 import 'package:finney/assets/widgets/error_message.dart';
@@ -63,9 +61,9 @@ void signUserUp() async {
         var storedEmail = box.get('email');
         
         if (storedUid != null && storedEmail != null) {
-          print('User stored in Hive: UID = $storedUid, Email = $storedEmail');
+      
         } else {
-          print('Failed to store user in Hive.');
+          showErrorMessage(context,'Failed to store user in Hive.');
         }
       }
 
