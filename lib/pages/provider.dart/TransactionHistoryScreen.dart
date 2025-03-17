@@ -1,9 +1,17 @@
+import 'package:finney/assets/theme/app_color.dart';
+import 'package:finney/assets/widgets/app_drawer.dart';
+import 'package:flutter/material.dart';
+import 'ExpenseProvider.dart';
+import 'package:provider/provider.dart';
+
 class AddExpenseScreen extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
   final _amountController = TextEditingController();
   final _categoryController = TextEditingController();
   final _dateController = TextEditingController();
   final _descriptionController = TextEditingController();
+
+  AddExpenseScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
