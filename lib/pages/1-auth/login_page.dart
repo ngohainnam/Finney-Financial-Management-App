@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:finney/assets/path/app_images.dart';
 import 'package:finney/assets/theme/app_color.dart';
 import 'package:finney/assets/widgets/error_message.dart';
@@ -6,6 +8,9 @@ import 'package:finney/assets/widgets/my_textfield.dart';
 import 'package:finney/assets/widgets/square_tile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+
+import '../../models/user_model.dart';
 
 class LoginPage extends StatefulWidget {
   final Function()? onTap;
@@ -23,34 +28,74 @@ class _LoginPageState extends State<LoginPage> {
 
   //sign user in method
 void signUserIn() async {
-  //Show loading circle
+  // Show loading circle
   showDialog(
     context: context,
     builder: (context) {
-      return Center(
+      return const Center(
         child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Colors.blue), 
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
         ),
       );
     },
   );
 
-  //Sign in process with Firebase
-  try {
-    await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: emailController.text,
-      password: passwordController.text,
-    );
-    if (mounted){
-      Navigator.pop(context); //Pop the loading circle
-    }
+  // Check if the user is already signed in
+  User? user = FirebaseAuth.instance.currentUser;
 
-  } on FirebaseAuthException {
-    if (mounted){
-      Navigator.pop(context); //Pop the loading circle
+  if (user != null) {
+    // If the user is already signed in, log their details and navigate accordingly
+    print('User already signed in: UID = ${user.uid}, Email = ${user.email}');
+    
+    // You can retrieve the stored user details from Hive
+    var box = await Hive.openBox<UserModel>('userBox');  // Open the box for UserModel
+    var storedUser = box.get('user');  // Assuming you store the full user object
+    
+    if (storedUser != null) {
+      print('User details fetched from Hive: UID = ${storedUser.uid}, Email = ${storedUser.email}');
+      Navigator.pop(context);  // Close loading circle
+    } else {
+      print('User details not found in Hive');
+      Navigator.pop(context);  // Close loading circle
+      showErrorMessage(context, 'User details not found in local storage.');
     }
-    //Handle Firebase error
-    showErrorMessage(context, 'Incorrect email/password.\n\nPlease check again');
+  } else {
+    // If the user is not signed in, proceed with the sign-in process
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
+
+      if (mounted) {
+        Navigator.pop(context); // Pop the loading circle
+      }
+
+      // Get the signed-in user's details
+      user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        // Create UserModel instance
+        var userModel = UserModel(
+          uid: user.uid,
+          email: user.email ?? '',  // Handle the case where email is null
+          name: user.displayName ?? 'Unknown',  // Handle null display name
+        );
+
+        // Open Hive box
+        var box = await Hive.openBox<UserModel>('userBox');  // Open or create a Hive box
+        await box.put('user', userModel);  // Save UserModel object using 'user' as the key
+        
+        print('User signed in successfully and details saved to Hive: UID = ${user.uid}, Email = ${user.email}');
+      }
+
+    } on FirebaseAuthException {
+      if (mounted) {
+        Navigator.pop(context); // Pop the loading circle
+      }
+      // Handle Firebase error
+      showErrorMessage(context, 'Incorrect email/password.\n\nPlease check again');
+    }
   }
 }
 
