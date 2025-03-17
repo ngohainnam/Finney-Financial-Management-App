@@ -43,7 +43,7 @@ class AppDrawer extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.chat),
               title: const Text(
-                'Provider Dart',
+                'Expense Shortcuts',
                 style: TextStyle(fontSize: 20),
               ),
               onTap: () {
