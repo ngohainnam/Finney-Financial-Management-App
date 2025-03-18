@@ -1,5 +1,10 @@
 import 'package:finney/pages/1-auth/login_or_register_page.dart';
 import 'package:finney/pages/3-dashboard/dashboard.dart';
+import 'package:finney/pages/provider/ExpenseProvider.dart';
+import 'package:finney/pages/provider/BudgetProvider.dart';
+import 'package:finney/pages/provider/BudgetProvider.dart';
+import 'package:finney/pages/provider/expense_screen.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -20,8 +25,8 @@ class AuthPage extends StatelessWidget {
           else {
             return LoginOrRegisterPage();
           }
-        }
-      )
+        },
+      ),
     );
   }
 }
