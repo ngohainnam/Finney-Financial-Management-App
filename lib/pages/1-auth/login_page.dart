@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print
-
 import 'package:finney/assets/path/app_images.dart';
 import 'package:finney/assets/theme/app_color.dart';
 import 'package:finney/assets/widgets/error_message.dart';
@@ -45,17 +43,15 @@ void signUserIn() async {
 
   if (user != null) {
     // If the user is already signed in, log their details and navigate accordingly
-    print('User already signed in: UID = ${user.uid}, Email = ${user.email}');
     
     // You can retrieve the stored user details from Hive
     var box = await Hive.openBox<UserModel>('userBox');  // Open the box for UserModel
     var storedUser = box.get('user');  // Assuming you store the full user object
     
     if (storedUser != null) {
-      print('User details fetched from Hive: UID = ${storedUser.uid}, Email = ${storedUser.email}');
       Navigator.pop(context);  // Close loading circle
     } else {
-      print('User details not found in Hive');
+      showErrorMessage(context,'User details not found in Hive');
       Navigator.pop(context);  // Close loading circle
       showErrorMessage(context, 'User details not found in local storage.');
     }
@@ -85,8 +81,6 @@ void signUserIn() async {
         // Open Hive box
         var box = await Hive.openBox<UserModel>('userBox');  // Open or create a Hive box
         await box.put('user', userModel);  // Save UserModel object using 'user' as the key
-        
-        print('User signed in successfully and details saved to Hive: UID = ${user.uid}, Email = ${user.email}');
       }
 
     } on FirebaseAuthException {
