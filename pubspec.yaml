@@ -46,6 +46,7 @@ dependencies:
   build_runner: ^2.1.11
   hive_ui: ^1.0.14
   fl_chart: ^0.65.0
+  intl: ^0.19.0
   
 dev_dependencies:
   flutter_test:
