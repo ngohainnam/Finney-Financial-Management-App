@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:finney/assets/theme/app_color.dart';
-import 'package:finney/pages/3-dashboard/models/transaction_data.dart';
+import 'package:finney/services/transaction_services.dart';
 import 'package:intl/intl.dart';
 
 class SpendingChart extends StatelessWidget {
-  final List<WeeklyExpense> weeklyExpenses;
+  final List<WeeklyExpenseData> weeklyExpenses;
 
   const SpendingChart({
     super.key,
@@ -15,8 +15,10 @@ class SpendingChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currencyFormat = NumberFormat.currency(symbol: '\$');
-    final totalSpending = weeklyExpenses.fold(
-        0.0, (sum, expense) => sum + expense.amount);
+    // Calculate total, handling empty data case
+    final totalSpending = weeklyExpenses.isEmpty
+        ? 0.0
+        : weeklyExpenses.fold(0.0, (sum, expense) => sum + expense.amount);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -25,7 +27,7 @@ class SpendingChart extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha(13),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -54,91 +56,144 @@ class SpendingChart extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          SizedBox(
-            height: 200,
-            child: BarChart(
-              BarChartData(
-                alignment: BarChartAlignment.spaceAround,
-                maxY: _calculateMaxY(),
-                titlesData: FlTitlesData(
-                  show: true,
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      getTitlesWidget: (value, meta) {
-                        final index = value.toInt();
-                        if (index >= 0 && index < weeklyExpenses.length) {
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Text(
-                              weeklyExpenses[index].day,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
-                              ),
-                            ),
-                          );
-                        }
-                        return const SizedBox();
-                      },
-                      reservedSize: 30,
-                    ),
-                  ),
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      getTitlesWidget: (value, meta) {
-                        if (value == 0) return const SizedBox();
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
-                          child: Text(
-                            '\$${value.toInt()}',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 10,
-                            ),
-                          ),
-                        );
-                      },
-                      interval: _calculateInterval(),
-                      reservedSize: 40,
-                    ),
-                  ),
-                  topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                ),
-                gridData: FlGridData(
-                  show: true,
-                  drawVerticalLine: false,
-                  horizontalInterval: _calculateInterval(),
-                  getDrawingHorizontalLine: (value) {
-                    return FlLine(
-                      color: Colors.grey.withOpacity(0.2),
-                      strokeWidth: 1,
-                      dashArray: [5, 5],
-                    );
-                  },
-                ),
-                borderData: FlBorderData(show: false),
-                barGroups: List.generate(
-                  weeklyExpenses.length,
-                      (index) => _createBarGroup(index, weeklyExpenses[index].amount),
+          if (weeklyExpenses.isEmpty)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(40.0),
+                child: Text(
+                  'No expense data for this week yet',
+                  style: TextStyle(color: Colors.grey),
                 ),
               ),
-            ),
-          ),
+            )
+          else
+            _buildBarChart(),
         ],
       ),
     );
   }
 
+  Widget _buildBarChart() {
+    // Ensure we have valid data
+    if (weeklyExpenses.isEmpty) {
+      return const SizedBox(
+        height: 200,
+        child: Center(
+          child: Text("No data to display"),
+        ),
+      );
+    }
+
+    // Get maximum value for chart scaling
+    final maxValue = _calculateMaxY();
+
+    return SizedBox(
+      height: 200,
+      child: BarChart(
+        BarChartData(
+          alignment: BarChartAlignment.spaceAround,
+          maxY: maxValue,
+          titlesData: FlTitlesData(
+            show: true,
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: (value, meta) {
+                  final index = value.toInt();
+                  if (index >= 0 && index < weeklyExpenses.length) {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        weeklyExpenses[index].day,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    );
+                  }
+                  return const SizedBox();
+                },
+                reservedSize: 30,
+              ),
+            ),
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: (value, meta) {
+                  if (value == 0) return const SizedBox();
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Text(
+                      '\$${value.toInt()}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 10,
+                      ),
+                    ),
+                  );
+                },
+                interval: _calculateInterval(),
+                reservedSize: 40,
+              ),
+            ),
+            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          ),
+          gridData: FlGridData(
+            show: true,
+            drawVerticalLine: false,
+            horizontalInterval: _calculateInterval(),
+            getDrawingHorizontalLine: (value) {
+              return FlLine(
+                color: Colors.grey.withAlpha(51),
+                strokeWidth: 1,
+                dashArray: [5, 5],
+              );
+            },
+          ),
+          borderData: FlBorderData(show: false),
+          barGroups: _createBarGroups(),
+          barTouchData: BarTouchData(
+            enabled: true,
+            touchTooltipData: BarTouchTooltipData(
+              tooltipBgColor: Colors.blueGrey,
+              getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                return BarTooltipItem(
+                  '\$${rod.toY.toStringAsFixed(2)}',
+                  const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Create all bar groups for the chart
+  List<BarChartGroupData> _createBarGroups() {
+    return List.generate(
+      weeklyExpenses.length,
+          (index) => _createBarGroup(index, weeklyExpenses[index].amount),
+    );
+  }
+
   double _calculateMaxY() {
     if (weeklyExpenses.isEmpty) return 100;
+
     final maxAmount = weeklyExpenses
         .map((expense) => expense.amount)
         .reduce((a, b) => a > b ? a : b);
-    // Round up to the nearest 50
-    return ((maxAmount / 50).ceil() * 50).toDouble();
+
+    // If max amount is 0, return a default value
+    if (maxAmount == 0) return 100;
+
+    // Round up to the nearest 25
+    return ((maxAmount / 25).ceil() * 25).toDouble();
   }
 
   double _calculateInterval() {
@@ -150,6 +205,9 @@ class SpendingChart extends StatelessWidget {
   }
 
   BarChartGroupData _createBarGroup(int x, double value) {
+    final Color primaryColor = AppColors.primary;
+    final Color primaryColorLight = primaryColor.withOpacity(0.7);
+
     return BarChartGroupData(
       x: x,
       barRods: [
@@ -157,8 +215,8 @@ class SpendingChart extends StatelessWidget {
           toY: value,
           gradient: LinearGradient(
             colors: [
-              AppColors.primary.withOpacity(0.7),
-              AppColors.primary,
+              primaryColorLight,
+              primaryColor,
             ],
             begin: Alignment.bottomCenter,
             end: Alignment.topCenter,

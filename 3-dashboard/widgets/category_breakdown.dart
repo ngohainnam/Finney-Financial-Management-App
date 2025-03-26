@@ -14,8 +14,11 @@ class CategoryBreakdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currencyFormat = NumberFormat.currency(symbol: '\$');
-    final total = categoryExpenses.fold(
-        0.0, (sum, category) => sum + category.amount);
+
+    // Handle empty data case
+    final total = categoryExpenses.isEmpty
+        ? 0.0
+        : categoryExpenses.fold(0.0, (sum, category) => sum + category.amount);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -53,46 +56,80 @@ class CategoryBreakdown extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          SizedBox(
-            height: 200,
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: PieChart(
-                    PieChartData(
-                      sections: _createPieChartSections(total),
-                      sectionsSpace: 2,
-                      centerSpaceRadius: 30,
-                      startDegreeOffset: -90,
+
+          if (categoryExpenses.isEmpty)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(40.0),
+                child: Text(
+                  'No category spending data yet',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+            )
+          else
+            SizedBox(
+              height: 250, // Increased height
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 5, // Increased flex for the pie chart
+                    child: PieChart(
+                      PieChartData(
+                        sections: _createPieChartSections(total),
+                        sectionsSpace: 3, // Reduced space between sections
+                        centerSpaceRadius: 40, // Increased center space
+                        startDegreeOffset: -90,
+                        pieTouchData: PieTouchData(
+                          touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                            // Optional interactive feedback when touching sections
+                          },
+                        ),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  flex: 5,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: categoryExpenses.map((category) {
-                      return _buildCategoryLegend(
-                        category.name,
-                        category.amount,
-                        category.color,
-                        currencyFormat,
-                      );
-                    }).toList(),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    flex: 4, // Reduced flex for the legend
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: categoryExpenses.map((category) {
+                        return _buildCategoryLegend(
+                          category.name,
+                          category.amount,
+                          category.color,
+                          currencyFormat,
+                        );
+                      }).toList(),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
         ],
       ),
     );
   }
 
   List<PieChartSectionData> _createPieChartSections(double total) {
+    if (categoryExpenses.isEmpty || total <= 0) {
+      // Return a single empty section if there's no data
+      return [
+        PieChartSectionData(
+          color: Colors.grey.shade300,
+          value: 100,
+          title: '0%',
+          radius: 80,
+          titleStyle: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        )
+      ];
+    }
+
     return categoryExpenses.map((category) {
       final percentage = (category.amount / total * 100);
       return PieChartSectionData(

@@ -16,6 +16,9 @@ class TransactionItem extends StatelessWidget {
     final dateFormat = DateFormat('MMM d, h:mm a');
     final isIncome = transaction.amount > 0;
 
+    // Calculate alpha value (10% opacity = 26 in alpha value, 255 * 0.1)
+    final int alpha = (255 * 0.1).round();
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       child: Row(
@@ -23,7 +26,7 @@ class TransactionItem extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: transaction.iconColor.withOpacity(0.1),
+              color: transaction.iconColor.withAlpha(alpha),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
