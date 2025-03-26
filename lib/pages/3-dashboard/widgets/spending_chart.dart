@@ -25,7 +25,7 @@ class SpendingChart extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -113,7 +113,7 @@ class SpendingChart extends StatelessWidget {
                   horizontalInterval: _calculateInterval(),
                   getDrawingHorizontalLine: (value) {
                     return FlLine(
-                      color: Colors.grey.withOpacity(0.2),
+                      color: Colors.grey.withValues(alpha: 0.2),
                       strokeWidth: 1,
                       dashArray: [5, 5],
                     );
@@ -157,7 +157,7 @@ class SpendingChart extends StatelessWidget {
           toY: value,
           gradient: LinearGradient(
             colors: [
-              AppColors.primary.withOpacity(0.7),
+              AppColors.primary.withValues(alpha: 0.7),
               AppColors.primary,
             ],
             begin: Alignment.bottomCenter,
