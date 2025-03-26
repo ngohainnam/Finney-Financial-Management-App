@@ -15,6 +15,9 @@ class RecentTransactions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Calculate alpha value (5% opacity = 13 in alpha value, 255 * 0.05)
+    final int alpha = (255 * 0.05).round();
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -22,7 +25,7 @@ class RecentTransactions extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha(alpha),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -54,9 +57,22 @@ class RecentTransactions extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          ...transactions.map((transaction) =>
-              TransactionItem(transaction: transaction)
-          ).toList(),
+
+          transactions.isEmpty
+              ? const Padding(
+            padding: EdgeInsets.symmetric(vertical: 20.0),
+            child: Center(
+              child: Text(
+                'No transactions yet',
+                style: TextStyle(color: Colors.grey),
+              ),
+            ),
+          )
+              : Column(
+            children: transactions.map((transaction) =>
+                TransactionItem(transaction: transaction)
+            ).toList(),
+          ),
         ],
       ),
     );
