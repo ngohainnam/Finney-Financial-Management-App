@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:finney/assets/theme/app_color.dart';
+import 'package:finney/pages/2-chatbot/chatbot_help.dart';
+import 'package:finney/pages/2-chatbot/welcome_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
@@ -15,6 +17,9 @@ class Chatbot extends StatefulWidget {
 
 class _ChatbotState extends State<Chatbot> {
   final gemini = Gemini.instance;
+  bool showWelcomeScreen = true;
+  List<ChatMessage> messages = [];
+
   final String _systemPrompt = """You are Finney AI, a financial assistant made by P26 Team, trained by Google.\n
   Your mission is to provide financial advice and management to users with low financial literacy and digital literacy.\n
   Your responses should be not too long but provide enough information, concise, and easy to understand.\n
@@ -23,227 +28,194 @@ class _ChatbotState extends State<Chatbot> {
   Always ask the user if they want more support in the topic you are discussing.\n
   """;
 
-  final TextEditingController inputController = TextEditingController();
-  List<ChatMessage> messages = [];
+  final List<String> suggestedQuestions = [
+    "How do I create a basic monthly budget?",
+    "What are good ways to start saving money?",
+    "Tips for reducing daily expenses",
+  ];
 
   ChatUser currentUser = ChatUser(id: '0', firstName: 'User');
   ChatUser geminiUser = ChatUser(id: '1', firstName: 'Finney AI');
 
-  final List<String> sampleQuestions = [
-    "How does this work?",
-    "What is the best approach?",
-    "How can I use this feature?",
-  ];
-
-  bool isProcessing = false; // Flag to check if response is being processed
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue,
-        title: const Text("Visualize"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.help_outline),
-            onPressed: _showHelpDialog,
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      backgroundColor: AppColors.lightBackground,
+      body: SafeArea(
         child: Column(
           children: [
-            // Logo
-            Center(child: Image.asset('lib/images/app_logo.png', height: 180)),
-            const SizedBox(height: 20),
-
-            // Suggested Questions
-            Align(
-              alignment: Alignment.centerLeft, // Align to the left
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,  // Ensure the items inside the column are left-aligned
-                children: [
-                  const Text(
-                    "Suggested Questions:",  // Title aligned to the left
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
-                  // Map through the questions and display them
-                  ...sampleQuestions.map((question) {
-                    return GestureDetector(
-                      onTap: () => _sendMessage(question),  // On tap, send the question
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Text(
-                          question,
-                          style: const TextStyle(fontSize: 16, color: Colors.blueAccent),
-                        ),
-                      ),
-                    );
-                  }),
-                ],
+            AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              title: Text(
+                'Finney AI',
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
+
+              actions: [
+                IconButton (
+                  icon: Icon(Icons.help_outline),
+                  onPressed: () {
+                    ChatbotHelp.show(context);
+                  }
+                )
+              ]
+
             ),
 
-            const SizedBox(height: 20),
-            Expanded(child: _buildChat()),
 
-            // Custom input section instead of DashChat's input toolbar
-            _buildInputSection(),
+            Expanded(
+              child: showWelcomeScreen && messages.isEmpty
+                  ? WelcomeScreen(
+                      suggestedQuestions: suggestedQuestions,
+                      onSendMessage: _sendMessage,
+                      currentUser: currentUser,
+                      onQuestionSelected: () {
+                        setState(() {
+                          showWelcomeScreen = false;
+                        });
+                      },
+                    )
+                  : _buildChatInterface(),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildChat() {
+  Widget _buildChatInterface() {
     return DashChat(
       currentUser: currentUser,
+      onSend: _sendMessage,
       messages: messages,
-      onSend: (ChatMessage chatMessage) => isProcessing ? null : _sendMessage(chatMessage.text), // Prevent sending while processing
-      inputOptions: const InputOptions(inputDisabled: true), // Disables DashChat's input field
-      readOnly: true, // Disable DashChat's default input field completely
-    );
-  }
-
-  Widget _buildInputSection() {
-    return Row(
-      children: [
-        IconButton(
-          icon: const Icon(Icons.image),
-          onPressed: isProcessing ? null : _sendMediaMessage, // Disable if processing
-        ),
-        IconButton(
-          icon: const Icon(Icons.mic),
-          onPressed: isProcessing ? null : () {}, // Disable if processing
-        ),
-        Expanded(
-          child: TextField(
-            controller: inputController,
-            decoration: InputDecoration(
-              hintText: "Ask a question...",
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-            ),
-            onSubmitted: isProcessing ? null : (text) => _sendMessage(text), // Disable on submit if processing
-          ),
-        ),
-        IconButton(
-          icon: const Icon(Icons.send),
-          onPressed: isProcessing ? null : () => _sendMessage(inputController.text), // Disable send button if processing
-        ),
-      ],
-    );
-  }
-
-  void _sendMessage(String text) {
-  if (isProcessing) return; // Prevent sending if already processing
-
-  final chatMessage = ChatMessage(
-    user: currentUser,
-    createdAt: DateTime.now(),
-    text: text,
-  );
-
-  setState(() {
-    messages = [chatMessage] + messages;
-    isProcessing = true; // Mark processing as true while waiting for the response
-    inputController.clear(); // Clear the input field after sending the message
-  });
-
-  try {
-    String augmentedQuestion = "$_systemPrompt\n\nUser Question: $text";
-
-    // Prepare the content parts based on whether there's media or not
-    List<Part> parts = [];
-
-    // Add image part if media is present
-    if (chatMessage.medias?.isNotEmpty ?? false) {
-      Uint8List images = File(chatMessage.medias!.first.url).readAsBytesSync();
-      parts.add(Part.uint8List(images));
-    } else {
-      parts.add(Part.text(augmentedQuestion));
-    }
-
-    // Prepare the content for the chat
-    List<Content> conversation = [
-      Content(
-        parts: parts,
-        role: 'user',
+      messageOptions: MessageOptions(
+        containerColor: AppColors.softGray,
+        currentUserContainerColor: AppColors.primary,
+        textColor: Colors.black,
+        currentUserTextColor: Colors.white,
+        showTime: true,
       ),
-    ];
 
-    // Call the Gemini chat method to handle multi-turn conversation
-    gemini.chat(conversation).then((value) {
-      String response;
-      if (value != null && value.output != null) {
-        response = value.output!;
+
+      inputOptions: InputOptions(
+        trailing: [
+          IconButton(
+            onPressed: _sendMediaMessage,
+            icon: Icon(Icons.image, color: AppColors.primary),
+          ),
+        ],
+
+
+        inputDecoration: InputDecoration(
+          hintText: "Ask me financial question. . .",
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25),
+            borderSide: const BorderSide(color: AppColors.primary),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25),
+            borderSide: const BorderSide(color: AppColors.blurGray),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25),
+            borderSide: const BorderSide(color: AppColors.primary, width: 1),
+          ),
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        ),
+        sendButtonBuilder: (onSend) => IconButton(
+          icon: const Icon(Icons.send_rounded, color: AppColors.primary),
+          onPressed: onSend,
+        ),
+      ),
+    );
+  }
+
+
+  void _sendMessage(ChatMessage chatMessage) {
+    setState(() {
+      messages = [chatMessage] + messages;
+    });
+
+    try {
+      String augmentedQuestion = "$_systemPrompt\n\nUser Question: ${chatMessage.text}";
+      List<Part> parts = [];
+      
+      if (chatMessage.medias?.isNotEmpty ?? false) {
+        Uint8List images = File(chatMessage.medias!.first.url).readAsBytesSync();
+        parts.add(Part.uint8List(images));
       } else {
-        response = 'Something went wrong with the model. Please try again later...';
+        parts.add(Part.text(augmentedQuestion));
       }
 
-      // Create a new ChatMessage with the response
-      ChatMessage message = ChatMessage(
-        user: geminiUser,
-        createdAt: DateTime.now(),
-        text: response,
-      );
+      List<Content> conversation = [
+        Content(
+          parts: parts,
+          role: 'user',
+        ),
+      ];
 
-      // Add the new message to the conversation
-      setState(() {
-        messages = [message] + messages;
-        isProcessing = false; // Mark processing as false once response is received
+      gemini.chat(conversation).then((value) {    
+        String response = value?.output ?? 'Something went wrong. Please try again later...';
+
+        ChatMessage message = ChatMessage(
+          user: geminiUser, 
+          createdAt: DateTime.now(),
+          text: response,
+        );
+
+        setState(() {
+          messages = [message] + messages;
+        });
+      }).catchError((e) {
+        setState(() {
+          messages = [
+            ChatMessage(
+              user: geminiUser,
+              createdAt: DateTime.now(),
+              text: 'An error occurred. Please try again.',
+            )
+          ] + messages;
+        });
       });
-    }).catchError((e) {
-      // Handle errors related to the Gemini chat method
+    } catch (e) {
       setState(() {
         messages = [
           ChatMessage(
             user: geminiUser,
             createdAt: DateTime.now(),
-            text: 'An error occurred while contacting Gemini: $e',
+            text: 'An error occurred. Please try again.',
           )
         ] + messages;
-        isProcessing = false; // Mark processing as false on error
       });
-    });
-  } catch (e) {
-    // Catch any unexpected errors
-    setState(() {
-      messages = [
-        ChatMessage(
-          user: geminiUser,
-          createdAt: DateTime.now(),
-          text: 'An unexpected error occurred: $e',
-        )
-      ] + messages;
-      isProcessing = false; // Mark processing as false on unexpected error
-    });
+    }
   }
-}
 
 
-  void _showHelpDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Help"),
-          content: const Text("This is your chatbot, ask questions related to finance and get advice."),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text("Close"),
-            ),
-          ],
-        );
-      },
+  void _sendMediaMessage() async {
+    ImagePicker picker = ImagePicker();
+    XFile? file = await picker.pickImage(
+      source: ImageSource.gallery,
     );
-  }
 
-  void _sendMediaMessage() {
-    // Media message functionality
+    if (file != null) {
+      ChatMessage message = ChatMessage(
+        user: currentUser,
+        createdAt: DateTime.now(),
+        medias: [
+          ChatMedia(
+            url: file.path, 
+            fileName: '',
+            type: MediaType.image,
+          ),
+        ],
+      );
+      _sendMessage(message);
+    }
   }
 }
