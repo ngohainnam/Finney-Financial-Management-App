@@ -7,7 +7,7 @@ import 'package:finney/assets/widgets/common/square_tile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-
+import 'package:google_sign_in/google_sign_in.dart';
 import '../../models/user_model.dart';
 
 class LoginPage extends StatefulWidget {
@@ -19,14 +19,10 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  //text editing controllers
   final emailController = TextEditingController();
-
   final passwordController = TextEditingController();
 
-  //sign user in method
 void signUserIn() async {
-  // Show loading circle
   showDialog(
     context: context,
     builder: (context) {
@@ -92,6 +88,30 @@ void signUserIn() async {
     }
   }
 }
+
+  Future<void> signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) return; 
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      User? user = userCredential.user;
+      
+      if (user != null) {
+        var box = await Hive.openBox<UserModel>('userBox');
+        var userModel = UserModel(uid: user.uid, email: user.email ?? '', name: user.displayName ?? 'Unknown');
+        await box.put('user', userModel);
+      }
+    } catch (error) {
+      showErrorMessage(context, 'Google Sign-In failed.');
+    }
+  }
 
   //Display error message for authentication
   void showErrorMessage(BuildContext context, String message) {
@@ -217,8 +237,11 @@ void signUserIn() async {
                 //google sign in button
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    SquareTile(imagePath: AppImages.googleIcon),
+                  children: [
+                    GestureDetector(
+                      onTap: signInWithGoogle, // Calls the Google Sign-In function
+                      child: SquareTile(imagePath: AppImages.googleIcon),
+                    ),
                   ],
                 ),
             
