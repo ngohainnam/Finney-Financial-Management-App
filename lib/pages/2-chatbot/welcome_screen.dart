@@ -39,16 +39,6 @@ Widget build(BuildContext context) {
         ),
       ),
     ),
-    floatingActionButton: FloatingActionButton(
-      onPressed: () {
-
-      },
-      backgroundColor: AppColors.primary,
-      child: const Icon(
-        Icons.mic,
-        color: Colors.white,
-      ),
-    ),
   );
 }
 
