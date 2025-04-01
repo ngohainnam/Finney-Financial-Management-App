@@ -46,6 +46,8 @@ dependencies:
   build_runner: ^2.1.11
   hive_ui: ^1.0.14
   fl_chart: ^0.65.0
+  intl: ^0.19.0
+  speech_to_text: ^7.0.0
   
 dev_dependencies:
   flutter_test:
@@ -72,7 +74,6 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
   - lib/images/
-  - lib/images/app_logo.png
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:finney/assets/theme/app_color.dart';
-import 'package:finney/pages/3-dashboard/models/transaction_data.dart';
-import 'package:finney/pages/3-dashboard/widgets/transaction_item.dart';
+import 'package:finney/models/transaction_data.dart';
+import 'package:finney/assets/widgets/dashboard/transaction_item.dart';
 
 class RecentTransactions extends StatelessWidget {
   final List<Transaction> transactions;
@@ -15,9 +15,6 @@ class RecentTransactions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Calculate alpha value (5% opacity = 13 in alpha value, 255 * 0.05)
-    final int alpha = (255 * 0.05).round();
-
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -25,7 +22,7 @@ class RecentTransactions extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(alpha),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),

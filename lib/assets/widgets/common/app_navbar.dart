@@ -17,7 +17,7 @@ class AppNavbar extends StatelessWidget {
     return Container(
       color: Colors.white,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 20.0),
         child: GNav(
           backgroundColor: Colors.white,
           color: AppColors.softGray, // Unselected item color

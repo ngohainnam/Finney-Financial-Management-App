@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:finney/pages/3-dashboard/models/transaction_data.dart';
+import 'package:finney/models/transaction_data.dart';
 import 'package:intl/intl.dart';
 
-class CategoryBreakdown extends StatelessWidget {
+class CategoryPieChart extends StatelessWidget {
   final List<CategoryExpense> categoryExpenses;
 
-  const CategoryBreakdown({
+  const CategoryPieChart({
     super.key,
     required this.categoryExpenses,
   });
@@ -27,7 +27,7 @@ class CategoryBreakdown extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: const Color.fromRGBO(0, 0, 0, 0.08),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),

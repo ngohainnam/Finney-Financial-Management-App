@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:finney/assets/widgets/app_navbar.dart';
+import 'package:finney/assets/widgets/common/app_navbar.dart';
 import 'package:finney/pages/2-chatbot/chatbot.dart';
 import 'package:finney/pages/3-dashboard/dashboard.dart';
 import 'package:finney/pages/4-report/report.dart';

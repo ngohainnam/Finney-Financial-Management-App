@@ -4,10 +4,10 @@ import 'package:finney/assets/theme/app_color.dart';
 import 'package:finney/services/transaction_services.dart';
 import 'package:intl/intl.dart';
 
-class SpendingChart extends StatelessWidget {
+class SpendingBarChart extends StatelessWidget {
   final List<WeeklyExpenseData> weeklyExpenses;
 
-  const SpendingChart({
+  const SpendingBarChart({
     super.key,
     required this.weeklyExpenses,
   });
@@ -27,7 +27,7 @@ class SpendingChart extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(13),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -206,7 +206,7 @@ class SpendingChart extends StatelessWidget {
 
   BarChartGroupData _createBarGroup(int x, double value) {
     final Color primaryColor = AppColors.primary;
-    final Color primaryColorLight = primaryColor.withOpacity(0.7);
+    primaryColor.withValues(alpha: 0.7);
 
     return BarChartGroupData(
       x: x,
@@ -215,8 +215,8 @@ class SpendingChart extends StatelessWidget {
           toY: value,
           gradient: LinearGradient(
             colors: [
-              primaryColorLight,
-              primaryColor,
+              AppColors.primary.withValues(alpha: 0.7),
+              AppColors.primary,
             ],
             begin: Alignment.bottomCenter,
             end: Alignment.topCenter,

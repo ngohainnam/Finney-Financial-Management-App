@@ -25,7 +25,7 @@ class BalanceCard extends StatelessWidget {
         gradient: LinearGradient(
           colors: [
             AppColors.primary,
-            AppColors.primary.withOpacity(0.8),
+            AppColors.primary.withValues(alpha: 0.8),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -42,7 +42,11 @@ class BalanceCard extends StatelessWidget {
               fontSize: 16,
             ),
           ),
+
+
           const SizedBox(height: 8),
+
+
           Text(
             currencyFormat.format(balance),
             style: const TextStyle(
@@ -51,7 +55,11 @@ class BalanceCard extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
+
+
           const SizedBox(height: 20),
+
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -85,7 +93,7 @@ class BalanceCard extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.2),
+            color: Colors.white.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(
@@ -94,7 +102,9 @@ class BalanceCard extends StatelessWidget {
             size: 18,
           ),
         ),
+
         const SizedBox(width: 8),
+
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -105,6 +115,7 @@ class BalanceCard extends StatelessWidget {
                 fontSize: 12,
               ),
             ),
+            
             Text(
               amount,
               style: const TextStyle(

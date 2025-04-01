@@ -1,9 +1,9 @@
 import 'package:finney/assets/path/app_images.dart';
 import 'package:finney/assets/theme/app_color.dart';
-import 'package:finney/assets/widgets/error_message.dart';
-import 'package:finney/assets/widgets/my_button.dart';
-import 'package:finney/assets/widgets/my_textfield.dart';
-import 'package:finney/assets/widgets/square_tile.dart';
+import 'package:finney/assets/widgets/common/error_message.dart';
+import 'package:finney/assets/widgets/common/my_button.dart';
+import 'package:finney/assets/widgets/common/my_textfield.dart';
+import 'package:finney/assets/widgets/common/square_tile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';

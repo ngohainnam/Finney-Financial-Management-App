@@ -71,9 +71,9 @@ class TransactionService {
         .where('amount', isGreaterThan: 0)
         .get();
 
-    return snapshot.docs.fold<double>(0.0, (sum, doc) {
+    return snapshot.docs.fold<double>(0.0, (incomeSum, doc) {
       final data = doc.data() as Map<String, dynamic>;
-      return sum + (data['amount'] as num).toDouble();
+      return incomeSum + (data['amount'] as num).toDouble();
     });
   }
 
@@ -97,9 +97,9 @@ class TransactionService {
         .where('amount', isLessThan: 0)
         .get();
 
-    return snapshot.docs.fold<double>(0.0, (sum, doc) {
+    return snapshot.docs.fold<double>(0.0, (expenseSum, doc) {
       final data = doc.data() as Map<String, dynamic>;
-      return sum + (data['amount'] as num).abs().toDouble();
+      return expenseSum + (data['amount'] as num).abs().toDouble();
     });
   }
 
@@ -124,11 +124,7 @@ class TransactionService {
         .get();
 
     List<String> dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    Map<String, double> dayTotals = Map.fromIterable(
-      dayNames,
-      key: (day) => day,
-      value: (day) => 0.0,
-    );
+    Map<String, double> dayTotals = { for (var day in dayNames) day : 0.0 };
 
     for (var doc in snapshot.docs) {
       final data = doc.data() as Map<String, dynamic>;
