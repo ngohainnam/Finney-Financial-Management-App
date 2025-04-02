@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:finney/assets/theme/app_color.dart';
-import 'package:finney/services/transaction_services.dart';
+import 'package:finney/pages/3-dashboard/services/transaction_services.dart';
 import 'package:intl/intl.dart';
 
 class SpendingBarChart extends StatelessWidget {

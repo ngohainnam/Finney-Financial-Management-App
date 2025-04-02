@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:finney/models/transaction_data.dart';
+import 'package:finney/pages/3-dashboard/models/transaction_data.dart';
 import 'package:intl/intl.dart';
 
 class TransactionItem extends StatelessWidget {

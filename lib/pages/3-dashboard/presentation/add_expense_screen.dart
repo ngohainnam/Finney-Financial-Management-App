@@ -1,41 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:finney/models/transaction_model.dart';
-import 'package:finney/services/transaction_services.dart';
+import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
+import 'package:finney/pages/3-dashboard/services/transaction_services.dart';
 
-class AddIncomeScreen extends StatefulWidget {
-  final Function? onIncomeAdded;
+class AddExpenseScreen extends StatefulWidget {
+  final Function? onExpenseAdded;
 
-  const AddIncomeScreen({
+  const AddExpenseScreen({
     super.key,
-    this.onIncomeAdded,
+    this.onExpenseAdded,
   });
 
   @override
-  State<AddIncomeScreen> createState() => _AddIncomeScreenState();
+  State<AddExpenseScreen> createState() => _AddExpenseScreenState();
 }
 
-class _AddIncomeScreenState extends State<AddIncomeScreen> {
+class _AddExpenseScreenState extends State<AddExpenseScreen> {
   final _amountController = TextEditingController();
   final _descriptionController = TextEditingController();
+  String _selectedCategory = '';
   DateTime _selectedDate = DateTime.now();
   bool _isSaving = false;
   final TransactionService _transactionService = TransactionService();
 
-  // Pre-defined income sources with icons and colors
-  final List<IncomeCategoryData> _incomeSources = [
-    IncomeCategoryData('Salary', Icons.account_balance_wallet, const Color(0xFF4CAF50)),
-    IncomeCategoryData('Freelance', Icons.laptop, const Color(0xFF2196F3)),
-    IncomeCategoryData('Bonus', Icons.card_giftcard, const Color(0xFFFF9800)),
-    IncomeCategoryData('Investment', Icons.trending_up, const Color(0xFF9C27B0)),
-    IncomeCategoryData('Other', Icons.add_circle_outline, const Color(0xFF9E9E9E)),
+  // Pre-defined category data
+  final List<CategoryData> _categories = [
+    CategoryData('Shopping', Icons.shopping_bag, const Color(0xFFFF9800)),
+    CategoryData('Food', Icons.restaurant, const Color(0xFF2196F3)),
+    CategoryData('Entertainment', Icons.movie, const Color(0xFFE91E63)),
+    CategoryData('Transport', Icons.directions_car, const Color(0xFF4CAF50)),
+    CategoryData('Health', Icons.medical_services, const Color(0xFFF44336)),
+    CategoryData('Utilities', Icons.phone, const Color(0xFF9C27B0)),
+    CategoryData('Others', Icons.category_outlined, const Color(0xFF9E9E9E)),
   ];
-
-  String _selectedSource = 'Salary';
 
   @override
   void initState() {
     super.initState();
+    // Set default category
+    if (_categories.isNotEmpty) {
+      _selectedCategory = _categories[0].name;
+    }
+
     // Initialize amount controller with 0.00
     _amountController.text = '0.00';
   }
@@ -48,10 +54,15 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
   }
 
   Future<void> _saveTransaction() async {
-    // Validate amount
+    // Validate and save transaction
     if (_amountController.text.isEmpty ||
         double.tryParse(_amountController.text.replaceAll(',', '.')) == null) {
       _showErrorSnackBar('Please enter a valid amount');
+      return;
+    }
+
+    if (_selectedCategory.isEmpty) {
+      _showErrorSnackBar('Please select a category');
       return;
     }
 
@@ -60,28 +71,28 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
     });
 
     try {
-      // Parse amount (positive for income)
-      double amountValue = double.parse(_amountController.text.replaceAll(',', '.'));
+      // Parse amount (negative for expenses)
+      double amountValue = -double.parse(_amountController.text.replaceAll(',', '.'));
 
       // Create transaction model
       final transaction = TransactionModel(
-        name: _selectedSource,
-        category: 'Income',
+        name: _selectedCategory,
+        category: _selectedCategory,
         amount: amountValue,
         date: _selectedDate,
         description: _descriptionController.text.trim(),
       );
 
       // Optimistic UI update
-      if (widget.onIncomeAdded != null) {
-        widget.onIncomeAdded!(transaction);
+      if (widget.onExpenseAdded != null) {
+        widget.onExpenseAdded!(transaction);
       }
 
       // Show success message
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Income saved successfully'),
+            content: Text('Expense saved successfully'),
             backgroundColor: Colors.green,
           ),
         );
@@ -99,7 +110,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
     } catch (e) {
       debugPrint('Error saving transaction: $e');
       if (mounted) {
-        _showErrorSnackBar('Failed to save income. Please try again.');
+        _showErrorSnackBar('Failed to save expense. Please try again.');
         setState(() {
           _isSaving = false;
         });
@@ -129,13 +140,25 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text(
-          'Add Income',
+          'Add Expense',
           style: TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: true,
+        actions: [
+          TextButton(
+            onPressed: () {},
+            child: const Text(
+              'More categories',
+              style: TextStyle(
+                color: Color(0xFF2196F3),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -149,7 +172,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
               style: const TextStyle(
                 fontSize: 40,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF4CAF50),
+                color: Color(0xFFF44336),
               ),
               decoration: InputDecoration(
                 border: InputBorder.none,
@@ -157,7 +180,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                 hintText: '0.00',
                 prefixText: '\$',
                 prefixStyle: const TextStyle(
-                  color: Color(0xFF4CAF50),
+                  color: Color(0xFFF44336),
                   fontWeight: FontWeight.bold,
                   fontSize: 40,
                 ),
@@ -176,9 +199,9 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Income Source section
+                  // Category section
                   const Text(
-                    'Income Source',
+                    'Category',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -186,7 +209,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                   ),
                   const SizedBox(height: 10),
 
-                  // Income Sources grid
+                  // Categories grid
                   GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -196,15 +219,15 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 15,
                     ),
-                    itemCount: _incomeSources.length,
+                    itemCount: _categories.length,
                     itemBuilder: (context, index) {
-                      final source = _incomeSources[index];
-                      final isSelected = _selectedSource == source.name;
+                      final category = _categories[index];
+                      final isSelected = _selectedCategory == category.name;
 
-                      return _buildIncomeSourceItem(
-                        source.name,
-                        source.icon,
-                        source.color,
+                      return _buildCategoryItem(
+                        category.name,
+                        category.icon,
+                        category.color,
                         isSelected,
                       );
                     },
@@ -296,7 +319,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
         padding: const EdgeInsets.all(16.0),
         child: FloatingActionButton(
           onPressed: _saveTransaction,
-          backgroundColor: const Color(0xFF4CAF50),
+          backgroundColor: const Color(0xFFF44336),
           elevation: 4,
           child: const Icon(Icons.check, color: Colors.white),
         ),
@@ -320,12 +343,12 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
     }
   }
 
-  Widget _buildIncomeSourceItem(String name, IconData icon, Color color, bool isSelected) {
+  Widget _buildCategoryItem(String name, IconData icon, Color color, bool isSelected) {
     final backgroundColor = const Color(0xFFF5F5F5);
     return GestureDetector(
       onTap: () {
         setState(() {
-          _selectedSource = name;
+          _selectedCategory = name;
         });
       },
       child: Column(
@@ -358,11 +381,11 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
   }
 }
 
-// Separate class for income source data
-class IncomeCategoryData {
+// Reuse the CategoryData class from previous implementation
+class CategoryData {
   final String name;
   final IconData icon;
   final Color color;
 
-  IncomeCategoryData(this.name, this.icon, this.color);
+  CategoryData(this.name, this.icon, this.color);
 }

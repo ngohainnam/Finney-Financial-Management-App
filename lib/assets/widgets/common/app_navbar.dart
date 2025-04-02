@@ -30,16 +30,16 @@ class AppNavbar extends StatelessWidget {
           selectedIndex: selectedIndex,
           tabs: const [
             GButton(
-              icon: Icons.dashboard,
-              text: 'Dashboard',
+              icon: Icons.home,
+              text: 'Home',
             ),
             GButton(
               icon: Icons.chat,
-              text: 'Chatbot',
+              text: 'AI Chat',
             ),
             GButton(
               icon: Icons.bar_chart,
-              text: 'Report',
+              text: 'Reports',
             ),
             GButton(
               icon: Icons.settings,

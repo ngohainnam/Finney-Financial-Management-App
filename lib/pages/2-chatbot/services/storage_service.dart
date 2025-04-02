@@ -1,7 +1,7 @@
 import 'package:hive/hive.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
-import 'package:finney/models/chat_message_model.dart';
+import 'package:finney/pages/2-chatbot/models/chat_message_model.dart';
 
 class ChatStorageService {
   late Box<ChatMessageModel> chatBox;

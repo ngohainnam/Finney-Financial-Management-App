@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:finney/assets/theme/app_color.dart';
-import 'package:finney/models/transaction_data.dart';
-import 'package:finney/assets/widgets/dashboard/transaction_item.dart';
+import 'package:finney/pages/3-dashboard/models/transaction_data.dart';
+import 'package:finney/pages/3-dashboard/widgets/transaction_item.dart';
 
 class RecentTransactions extends StatelessWidget {
   final List<Transaction> transactions;

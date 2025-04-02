@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:finney/assets/theme/app_color.dart';
-import 'package:finney/assets/widgets/dashboard/balance_card.dart';
-import 'package:finney/assets/widgets/dashboard/spending_bar_chart.dart';
-import 'package:finney/assets/widgets/dashboard/category_pie_chart.dart';
-import 'package:finney/pages/3-dashboard/transactions/add_income_screen.dart';
-import 'package:finney/pages/3-dashboard/transactions/add_expense_screen.dart';
-import 'package:finney/services/transaction_services.dart' as services;
-import 'package:finney/models/transaction_data.dart';
-import 'package:finney/models/transaction_model.dart';
+import 'package:finney/pages/3-dashboard/widgets/balance_card.dart';
+import 'package:finney/pages/3-dashboard/widgets/spending_bar_chart.dart';
+import 'package:finney/pages/3-dashboard/widgets/category_pie_chart.dart';
+import 'package:finney/pages/3-dashboard/presentation/add_income_screen.dart';
+import 'package:finney/pages/3-dashboard/presentation/add_expense_screen.dart';
+import 'package:finney/pages/3-dashboard/services/transaction_services.dart' as services;
+import 'package:finney/pages/3-dashboard/models/transaction_data.dart';
+import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
