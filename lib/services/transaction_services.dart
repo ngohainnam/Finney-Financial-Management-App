@@ -71,9 +71,9 @@ class TransactionService {
         .where('amount', isGreaterThan: 0)
         .get();
 
-    return snapshot.docs.fold<double>(0.0, (incomeSum, doc) {
+    return snapshot.docs.fold<double>(0.0, (sum, doc) {
       final data = doc.data() as Map<String, dynamic>;
-      return incomeSum + (data['amount'] as num).toDouble();
+      return sum + (data['amount'] as num).toDouble();
     });
   }
 
@@ -97,32 +97,34 @@ class TransactionService {
         .where('amount', isLessThan: 0)
         .get();
 
-    return snapshot.docs.fold<double>(0.0, (expenseSum, doc) {
+    return snapshot.docs.fold<double>(0.0, (sum, doc) {
       final data = doc.data() as Map<String, dynamic>;
-      return expenseSum + (data['amount'] as num).abs().toDouble();
+      return sum + (data['amount'] as num).abs().toDouble();
     });
   }
 
-  // Get weekly expenses
+  // Get weekly expenses - modified to match the same monthly period as category expenses
   Future<List<WeeklyExpenseData>> getWeeklyExpenses() async {
     User? user = _auth.currentUser;
     if (user == null) {
       throw Exception('No authenticated user found');
     }
 
+    // Use current month instead of just current week
     DateTime now = DateTime.now();
-    DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
-    DateTime endOfWeek = startOfWeek.add(const Duration(days: 6));
+    DateTime firstDayOfMonth = DateTime(now.year, now.month, 1);
+    DateTime lastDayOfMonth = DateTime(now.year, now.month + 1, 0, 23, 59, 59);
 
     QuerySnapshot snapshot = await _firestore
         .collection('users')
         .doc(user.uid)
         .collection('transactions')
-        .where('date', isGreaterThanOrEqualTo: startOfWeek)
-        .where('date', isLessThanOrEqualTo: endOfWeek)
+        .where('date', isGreaterThanOrEqualTo: firstDayOfMonth)
+        .where('date', isLessThanOrEqualTo: lastDayOfMonth)
         .where('amount', isLessThan: 0)
         .get();
 
+    // Initialize a map to hold daily totals for the whole month
     List<String> dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     Map<String, double> dayTotals = { for (var day in dayNames) day : 0.0 };
 
@@ -135,7 +137,6 @@ class TransactionService {
 
     return dayNames.map((day) => WeeklyExpenseData(day, dayTotals[day] ?? 0.0)).toList();
   }
-
   // Get category expenses
   Future<List<CategoryExpenseData>> getCategoryExpenses() async {
     User? user = _auth.currentUser;

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:finney/assets/theme/app_color.dart';
-import 'package:finney/assets/widgets/dashboard/balance_card.dart';
-import 'package:finney/assets/widgets/dashboard/spending_bar_chart.dart';
-import 'package:finney/assets/widgets/dashboard/category_pie_chart.dart';
+import 'package:finney/pages/3-dashboard/widgets/balance_card.dart';
+import 'package:finney/pages/3-dashboard/widgets/spending_chart.dart';
+import 'package:finney/pages/3-dashboard/widgets/category_breakdown.dart';
 import 'package:finney/pages/3-dashboard/transactions/add_income_screen.dart';
 import 'package:finney/pages/3-dashboard/transactions/add_expense_screen.dart';
 import 'package:finney/services/transaction_services.dart' as services;
-import 'package:finney/models/transaction_data.dart';
+import 'package:finney/pages/3-dashboard/models/transaction_data.dart';
 import 'package:finney/models/transaction_model.dart';
 
 class Dashboard extends StatefulWidget {
@@ -278,13 +278,13 @@ class DashboardState extends State<Dashboard> {
                 expenses: _monthlyExpenses,
               ),
               const SizedBox(height: 20),
-              SpendingBarChart(
+              SpendingChart(
                   weeklyExpenses: _weeklyExpenses.map((e) =>
                       services.WeeklyExpenseData(e.day, e.amount)
                   ).toList()
               ),
               const SizedBox(height: 20),
-              CategoryPieChart(categoryExpenses: _categoryExpenses),
+              CategoryBreakdown(categoryExpenses: _categoryExpenses),
               const SizedBox(height: 20),
               _buildRecentTransactions(),
               const SizedBox(height: 80),
@@ -294,13 +294,8 @@ class DashboardState extends State<Dashboard> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primary,
-        onPressed: () {
-          _showAddTransactionModal(context);
-        },
-        child: const Icon(
-          Icons.add, 
-          color: Colors.white,
-        ),
+        onPressed: () => _showAddTransactionModal(context),
+        child: const Icon(Icons.add),
       ),
     );
   }

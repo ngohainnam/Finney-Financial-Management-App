@@ -1,4 +1,3 @@
-import 'package:finney/models/chat_message_model.dart';
 import 'package:finney/pages/1-auth/auth_page.dart';
 import 'package:finney/assets/path/api.dart';
 import 'package:flutter/material.dart';
@@ -17,9 +16,7 @@ void main() async {
 
   await Hive.initFlutter();
   Hive.registerAdapter(UserModelAdapter());
-  Hive.registerAdapter(ChatMessageModelAdapter());
   await Hive.openBox<UserModel>('userBox');
-  await Hive.openBox<ChatMessageModel>('chatMessage');
 
   Gemini.init(
     apiKey: geminiApiKey,
