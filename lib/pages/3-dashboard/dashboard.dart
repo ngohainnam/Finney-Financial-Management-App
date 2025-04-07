@@ -5,10 +5,12 @@ import 'package:finney/assets/widgets/dashboard/balance_card.dart';
 import 'package:finney/assets/widgets/dashboard/spending_bar_chart.dart';
 import 'package:finney/assets/widgets/dashboard/category_pie_chart.dart';
 import 'package:finney/pages/3-dashboard/transactions/add_income_screen.dart';
-import 'package:finney/pages/3-dashboard/transactions/add_expense_screen.dart';
+import 'package:finney/pages/3-dashboard/transactions/addexpense.dart';
 import 'package:finney/services/transaction_services.dart' as services;
 import 'package:finney/models/transaction_data.dart';
 import 'package:finney/models/transaction_model.dart';
+
+import 'package:finney/pages/3-dashboard/transactions/add_saving_goal_screen.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -18,7 +20,8 @@ class Dashboard extends StatefulWidget {
 }
 
 class DashboardState extends State<Dashboard> {
-  final services.TransactionService _transactionService = services.TransactionService();
+  final services.TransactionService _transactionService =
+      services.TransactionService();
 
   double _currentBalance = 0.0;
   double _monthlyIncome = 0.0;
@@ -63,28 +66,38 @@ class DashboardState extends State<Dashboard> {
       final categoryExpensesData = results[3] as List<dynamic>;
 
       // Convert data
-      final weeklyExpenses = weeklyExpensesData.map((data) =>
-          WeeklyExpense(data.day, data.amount)
-      ).toList();
+      final weeklyExpenses =
+          weeklyExpensesData
+              .map((data) => WeeklyExpense(data.day, data.amount))
+              .toList();
 
-      final categoryExpenses = categoryExpensesData.map((data) =>
-          CategoryExpense(data.name, data.amount, data.color, data.icon)
-      ).toList();
+      final categoryExpenses =
+          categoryExpensesData
+              .map(
+                (data) => CategoryExpense(
+                  data.name,
+                  data.amount,
+                  data.color,
+                  data.icon,
+                ),
+              )
+              .toList();
 
       if (_recentTransactions.isEmpty) {
         _transactionService.getTransactions().listen((transactionModels) {
           if (mounted) {
-            final transactions = transactionModels.take(5).map((model) {
-              return Transaction(
-                id: model.id ?? '',
-                name: model.name,
-                category: model.category,
-                amount: model.amount,
-                date: model.date,
-                icon: _getIconForCategory(model.category),
-                iconColor: _getColorForCategory(model.category),
-              );
-            }).toList();
+            final transactions =
+                transactionModels.take(5).map((model) {
+                  return Transaction(
+                    id: model.id ?? '',
+                    name: model.name,
+                    category: model.category,
+                    amount: model.amount,
+                    date: model.date,
+                    icon: _getIconForCategory(model.category),
+                    iconColor: _getColorForCategory(model.category),
+                  );
+                }).toList();
 
             setState(() {
               _recentTransactions = transactions;
@@ -207,8 +220,8 @@ class DashboardState extends State<Dashboard> {
         final currentDayExpense = updatedWeeklyExpenses[dayIndex];
 
         updatedWeeklyExpenses[dayIndex] = WeeklyExpense(
-            dayNames[dayIndex],
-            currentDayExpense.amount + model.amount.abs()
+          dayNames[dayIndex],
+          currentDayExpense.amount + model.amount.abs(),
         );
 
         _weeklyExpenses = updatedWeeklyExpenses;
@@ -217,30 +230,35 @@ class DashboardState extends State<Dashboard> {
       // Update category expenses if it's an expense
       if (model.amount < 0) {
         final existingCategoryIndex = _categoryExpenses.indexWhere(
-                (expense) => expense.name == model.category
+          (expense) => expense.name == model.category,
         );
 
         if (existingCategoryIndex != -1) {
           // Update existing category
-          final updatedCategoryExpenses = List<CategoryExpense>.from(_categoryExpenses);
-          final existingCategory = updatedCategoryExpenses[existingCategoryIndex];
+          final updatedCategoryExpenses = List<CategoryExpense>.from(
+            _categoryExpenses,
+          );
+          final existingCategory =
+              updatedCategoryExpenses[existingCategoryIndex];
 
           updatedCategoryExpenses[existingCategoryIndex] = CategoryExpense(
-              existingCategory.name,
-              existingCategory.amount + model.amount.abs(),
-              existingCategory.color,
-              existingCategory.icon
+            existingCategory.name,
+            existingCategory.amount + model.amount.abs(),
+            existingCategory.color,
+            existingCategory.icon,
           );
 
           _categoryExpenses = updatedCategoryExpenses;
         } else {
           // Add new category
-          _categoryExpenses.add(CategoryExpense(
+          _categoryExpenses.add(
+            CategoryExpense(
               model.category,
               model.amount.abs(),
               _getColorForCategory(model.category),
-              _getIconForCategory(model.category)
-          ));
+              _getIconForCategory(model.category),
+            ),
+          );
         }
       }
     });
@@ -262,45 +280,49 @@ class DashboardState extends State<Dashboard> {
           ),
         ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-        onRefresh: _loadDashboardData,
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              BalanceCard(
-                balance: _currentBalance,
-                income: _monthlyIncome,
-                expenses: _monthlyExpenses,
+      body:
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : RefreshIndicator(
+                onRefresh: _loadDashboardData,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      BalanceCard(
+                        balance: _currentBalance,
+                        income: _monthlyIncome,
+                        expenses: _monthlyExpenses,
+                      ),
+                      const SizedBox(height: 20),
+                      SpendingBarChart(
+                        weeklyExpenses:
+                            _weeklyExpenses
+                                .map(
+                                  (e) => services.WeeklyExpenseData(
+                                    e.day,
+                                    e.amount,
+                                  ),
+                                )
+                                .toList(),
+                      ),
+                      const SizedBox(height: 20),
+                      CategoryPieChart(categoryExpenses: _categoryExpenses),
+                      const SizedBox(height: 20),
+                      _buildRecentTransactions(),
+                      const SizedBox(height: 80),
+                    ],
+                  ),
+                ),
               ),
-              const SizedBox(height: 20),
-              SpendingBarChart(
-                  weeklyExpenses: _weeklyExpenses.map((e) =>
-                      services.WeeklyExpenseData(e.day, e.amount)
-                  ).toList()
-              ),
-              const SizedBox(height: 20),
-              CategoryPieChart(categoryExpenses: _categoryExpenses),
-              const SizedBox(height: 20),
-              _buildRecentTransactions(),
-              const SizedBox(height: 80),
-            ],
-          ),
-        ),
-      ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primary,
         onPressed: () {
           _showAddTransactionModal(context);
         },
-        child: const Icon(
-          Icons.add, 
-          color: Colors.white,
-        ),
+        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }
@@ -327,14 +349,10 @@ class DashboardState extends State<Dashboard> {
             children: [
               const Text(
                 'Recent Transactions',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               TextButton(
-                onPressed: () {
-                },
+                onPressed: () {},
                 child: Text(
                   'See All',
                   style: TextStyle(
@@ -348,19 +366,20 @@ class DashboardState extends State<Dashboard> {
           const SizedBox(height: 8),
           _recentTransactions.isEmpty
               ? const Center(
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 20.0),
-              child: Text(
-                'No transactions yet',
-                style: TextStyle(color: Colors.grey),
-              ),
-            ),
-          )
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 20.0),
+                  child: Text(
+                    'No transactions yet',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
+              )
               : Column(
-            children: _recentTransactions.map((transaction) {
-              return _buildTransactionItem(transaction);
-            }).toList(),
-          ),
+                children:
+                    _recentTransactions.map((transaction) {
+                      return _buildTransactionItem(transaction);
+                    }).toList(),
+              ),
         ],
       ),
     );
@@ -402,10 +421,7 @@ class DashboardState extends State<Dashboard> {
                 const SizedBox(height: 4),
                 Text(
                   transaction.category,
-                  style: TextStyle(
-                    color: Colors.grey.shade600,
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
                 ),
               ],
             ),
@@ -426,10 +442,7 @@ class DashboardState extends State<Dashboard> {
               const SizedBox(height: 4),
               Text(
                 dateFormat.format(transaction.date),
-                style: TextStyle(
-                  color: Colors.grey.shade600,
-                  fontSize: 12,
-                ),
+                style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
               ),
             ],
           ),
@@ -444,62 +457,62 @@ class DashboardState extends State<Dashboard> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'Add Transaction',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      builder:
+          (context) => Container(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                _buildOptionButton(
-                  context: context,
-                  label: 'Expense',
-                  icon: Icons.remove_circle_outline,
-                  color: Colors.red,
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => AddExpenseScreen(
-                              onExpenseAdded: _handleTransactionAdded,
-                            )
-                        )
-                    );
-                  },
+                const Text(
+                  'Add Transaction',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-                _buildOptionButton(
-                  context: context,
-                  label: 'Income',
-                  icon: Icons.add_circle_outline,
-                  color: Colors.green,
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => AddIncomeScreen(
-                              onIncomeAdded: _handleTransactionAdded,
-                            )
-                        )
-                    );
-                  },
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildOptionButton(
+                      context: context,
+                      label: 'Expense',
+                      icon: Icons.remove_circle_outline,
+                      color: Colors.red,
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => AddExpenseScreen(
+                                  onExpenseAdded: _handleTransactionAdded,
+                                ),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildOptionButton(
+                      context: context,
+                      label: 'Income',
+                      icon: Icons.add_circle_outline,
+                      color: Colors.green,
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => AddIncomeScreen(
+                                  onIncomeAdded: _handleTransactionAdded,
+                                ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
+                const SizedBox(height: 20),
               ],
             ),
-            const SizedBox(height: 20),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -525,24 +538,97 @@ class DashboardState extends State<Dashboard> {
               shape: BoxShape.circle,
               border: Border.all(color: color, width: 1),
             ),
-            child: Center(
-              child: Icon(
-                icon,
-                color: color,
-                size: 40,
-              ),
-            ),
+            child: Center(child: Icon(icon, color: color, size: 40)),
           ),
           const SizedBox(height: 8),
           Text(
             label,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           ),
         ],
       ),
     );
   }
+}
+
+void _showAddOptionsModal(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    builder: (context) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        child: Wrap(
+          children: [
+            _buildOptionButton(
+              context: context,
+              label: 'Saving Goal',
+              icon: Icons.savings,
+              color: Colors.green,
+              onTap: () {
+                Navigator.pop(context);
+                // Navigate to the Add Saving Goal screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AddSavingGoalScreen(),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+            _buildOptionButton(
+              context: context,
+              label: 'Budget',
+              icon: Icons.savings,
+              color: Colors.green,
+              onTap: () {
+                Navigator.pop(context);
+                // Navigate to the Add Budget screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AddSavingGoalScreen(),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+Widget _buildOptionButton({
+  required BuildContext context,
+  required String label,
+  required IconData icon,
+  required Color color,
+  required VoidCallback onTap,
+}) {
+  final backgroundColor = const Color(0xFFF5F5F5);
+
+  return GestureDetector(
+    onTap: onTap,
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 80,
+          height: 80,
+          decoration: BoxDecoration(
+            color: backgroundColor,
+            shape: BoxShape.circle,
+            border: Border.all(color: color, width: 1),
+          ),
+          child: Center(child: Icon(icon, color: color, size: 40)),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        ),
+      ],
+    ),
+  );
 }
