@@ -5,12 +5,16 @@ import 'package:finney/assets/widgets/dashboard/balance_card.dart';
 import 'package:finney/assets/widgets/dashboard/spending_bar_chart.dart';
 import 'package:finney/assets/widgets/dashboard/category_pie_chart.dart';
 import 'package:finney/pages/3-dashboard/transactions/add_income_screen.dart';
-import 'package:finney/pages/3-dashboard/transactions/addexpense.dart';
+import 'package:finney/pages/3-dashboard/transactions/add_expense_screen.dart';
+import 'package:finney/pages/3-dashboard/transactions/add_saving_goal_screen.dart';
+//import 'package:finney/pages/3-dashboard/transactions/add_expense.dart';
 import 'package:finney/services/transaction_services.dart' as services;
+import 'package:finney/services/saving_goal_service.dart';
 import 'package:finney/models/transaction_data.dart';
 import 'package:finney/models/transaction_model.dart';
+import 'package:finney/models/saving_goal_model.dart';
 
-import 'package:finney/pages/3-dashboard/transactions/add_saving_goal_screen.dart';
+//import 'package:finney/pages/3-dashboard/transactions/add_saving_goal_screen.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -464,7 +468,7 @@ class DashboardState extends State<Dashboard> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Text(
-                  'Add Transaction',
+                  'Add New',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 20),
@@ -503,6 +507,21 @@ class DashboardState extends State<Dashboard> {
                                 (context) => AddIncomeScreen(
                                   onIncomeAdded: _handleTransactionAdded,
                                 ),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildOptionButton(
+                      context: context,
+                      label: 'Saving',
+                      icon: Icons.savings,
+                      color: Colors.blue,
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AddSavingGoalScreen(),
                           ),
                         );
                       },
@@ -549,86 +568,4 @@ class DashboardState extends State<Dashboard> {
       ),
     );
   }
-}
-
-void _showAddOptionsModal(BuildContext context) {
-  showModalBottomSheet(
-    context: context,
-    builder: (context) {
-      return Container(
-        padding: const EdgeInsets.all(16),
-        child: Wrap(
-          children: [
-            _buildOptionButton(
-              context: context,
-              label: 'Saving Goal',
-              icon: Icons.savings,
-              color: Colors.green,
-              onTap: () {
-                Navigator.pop(context);
-                // Navigate to the Add Saving Goal screen
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const AddSavingGoalScreen(),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 16),
-            _buildOptionButton(
-              context: context,
-              label: 'Budget',
-              icon: Icons.savings,
-              color: Colors.green,
-              onTap: () {
-                Navigator.pop(context);
-                // Navigate to the Add Budget screen
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const AddSavingGoalScreen(),
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
-      );
-    },
-  );
-}
-
-Widget _buildOptionButton({
-  required BuildContext context,
-  required String label,
-  required IconData icon,
-  required Color color,
-  required VoidCallback onTap,
-}) {
-  final backgroundColor = const Color(0xFFF5F5F5);
-
-  return GestureDetector(
-    onTap: onTap,
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 80,
-          height: 80,
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            shape: BoxShape.circle,
-            border: Border.all(color: color, width: 1),
-          ),
-          child: Center(child: Icon(icon, color: color, size: 40)),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-        ),
-      ],
-    ),
-  );
 }
