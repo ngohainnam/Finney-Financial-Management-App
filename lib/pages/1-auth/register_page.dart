@@ -7,6 +7,7 @@ import 'package:finney/assets/widgets/square_tile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import './google_sign_in.dart';
 
 class RegisterPage extends StatefulWidget {
   final Function()? onTap;
@@ -17,14 +18,11 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  //text editing controllers
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmedController = TextEditingController();
 
-  //sign user up method
 void signUserUp() async {
-  //Show loading circle
   showDialog(
     context: context,
     builder: (context) {
@@ -36,27 +34,21 @@ void signUserUp() async {
     },
   );
 
-  //Sign up process with Firebase
-  // Sign up process with Firebase
   if (passwordController.text == confirmedController.text) {
     try {
-      // Create user with Firebase
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailController.text,
         password: passwordController.text,
       );
 
-      // If user is successfully created, save to Hive
       User? user = FirebaseAuth.instance.currentUser;
 
       if (user != null) {
-        // Open Hive box
-        var box = await Hive.openBox('userBox'); // Open or create a Hive box
-        // Save user's UID and email to Hive
+        var box = await Hive.openBox('userBox');
+
         await box.put('uid', user.uid);
         await box.put('email', user.email);
 
-        // Fetch the stored user data from Hive
         var storedUid = box.get('uid');
         var storedEmail = box.get('email');
         
@@ -68,24 +60,23 @@ void signUserUp() async {
       }
 
       if (mounted) {
-        Navigator.pop(context); // Pop the loading circle
+        Navigator.pop(context); 
       }
 
     } catch (e) {
-      // Handle error
+
       if (mounted) {
-        Navigator.pop(context); // Pop the loading circle
+        Navigator.pop(context);
       }
       showErrorMessage(context, 'Error: $e');
     }
   } else {
-    Navigator.pop(context); // Pop the loading circle
-    // Show if the password and confirm password are not the same
+    Navigator.pop(context); 
+
     showErrorMessage(context, 'Passwords do not match.');
   }
 }
 
-  // Display error message for authentication
   void showErrorMessage(BuildContext context, String message) {
     showDialog(
       context: context,
@@ -105,13 +96,11 @@ void signUserUp() async {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const SizedBox(height: 25),
-            
-                //logo
+
                 Image.asset(AppImages.appLogo),
             
                 const SizedBox(height: 25),
-            
-                //login text
+
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
                   child: Align(
@@ -128,8 +117,7 @@ void signUserUp() async {
                 ),
             
                 const SizedBox(height: 25),
-            
-                //email textfield
+
                 MyTextField(
                   controller: emailController,
                   hintText: 'Email',
@@ -137,8 +125,7 @@ void signUserUp() async {
                 ),
             
                 const SizedBox(height: 10),
-            
-                //password textfield
+
                 MyTextField(
                   controller: passwordController,
                   hintText: 'Password',
@@ -147,7 +134,6 @@ void signUserUp() async {
             
                 const SizedBox(height: 10),
 
-                //confirm password textfield
                 MyTextField(
                   controller: confirmedController,
                   hintText: 'Confirm Password',
@@ -155,16 +141,14 @@ void signUserUp() async {
                 ),
             
                 const SizedBox(height: 25),
-            
-                //sign in button
+
                 MyButton(
                   text: 'Sign Up',
                   onTap: signUserUp,
                 ),
             
                 const SizedBox(height: 50),
-            
-                //or continue with
+
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
                   child: Row(
@@ -195,18 +179,21 @@ void signUserUp() async {
                 ),
             
                 const SizedBox(height: 50),
-            
-                //google sign in button
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    SquareTile(imagePath: AppImages.googleIcon),
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        GoogleSignInService.signInWithGoogle(context); // Call the service
+                      },
+                      child: SquareTile(imagePath: AppImages.googleIcon),
+                    ),
                   ],
                 ),
             
                 const SizedBox(height: 50),
-            
-                //not a member? register now
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

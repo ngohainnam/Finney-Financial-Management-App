@@ -11,6 +11,7 @@ P26 PROJECT - FINNEY - AI-driven expense tracker.
 | **16th March 2025 (11:33 PM)**  | Do Thanh Phuc Dang | `master` | - Add Hive local storage. |
 | **25th March 2025 (01:33 PM)**  | Do Thanh Phuc Dang | `master` | - Implement chatbot UI. - Need to add history question  - Adjust UI scrolling|
 | **1st April 2025 (02:20 AM)**  | Do Thanh Phuc Dang | `master` | - Add google sign in function|
+| **8th April 2025 (12:09 PM)**  | Do Thanh Phuc Dang | `master` | - Add reset password function|
   | None |
 
 ---
