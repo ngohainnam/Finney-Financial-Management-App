@@ -1,3 +1,4 @@
+import 'package:finney/assets/theme/app_color.dart';
 import 'package:finney/pages/2-chatbot/models/chat_message_model.dart';
 import 'package:finney/pages/1-auth/auth_page.dart';
 import 'package:finney/assets/path/api.dart';
@@ -33,6 +34,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        primaryColor: AppColors.primary,
+        fontFamily: 'Poppins',
+      ),
       debugShowCheckedModeBanner: false,
       home: AuthPage(),
     );

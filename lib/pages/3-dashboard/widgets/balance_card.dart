@@ -44,8 +44,6 @@ class BalanceCard extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 5),
-
           Text(
             currencyFormat.format(balance),
             style: const TextStyle(
@@ -55,9 +53,7 @@ class BalanceCard extends StatelessWidget {
               letterSpacing: 1,
             ),
           ),
-
-          const SizedBox(height: 5),
-          
+  
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -68,7 +64,7 @@ class BalanceCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildIncomeExpenseIndicator(
-                  Icons.arrow_upward_rounded,
+                  Icons.add_circle_outline,
                   'Income',
                   currencyFormat.format(income),
                   Colors.greenAccent,
@@ -79,7 +75,7 @@ class BalanceCard extends StatelessWidget {
                   color: Colors.white.withValues(alpha:0.2),
                 ),
                 _buildIncomeExpenseIndicator(
-                  Icons.arrow_downward_rounded,
+                  Icons.remove_circle_outline,
                   'Expenses',
                   currencyFormat.format(expenses),
                   Colors.redAccent,

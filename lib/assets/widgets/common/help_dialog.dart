@@ -129,7 +129,7 @@ class AppDialog extends StatelessWidget {
             child: Text(
               instruction.text,
               style: const TextStyle(
-                fontSize: 16,
+                fontSize: 15,
                 color: Colors.black87,
               ),
             ),

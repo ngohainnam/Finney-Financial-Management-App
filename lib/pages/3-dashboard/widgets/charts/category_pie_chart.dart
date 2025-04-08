@@ -1,6 +1,6 @@
+import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:finney/pages/3-dashboard/models/transaction_data.dart';
 import 'package:intl/intl.dart';
 
 class CategoryPieChart extends StatelessWidget {
@@ -42,7 +42,7 @@ class CategoryPieChart extends StatelessWidget {
               const Text(
                 'Spending by Category',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -73,12 +73,12 @@ class CategoryPieChart extends StatelessWidget {
               child: Row(
                 children: [
                   Expanded(
-                    flex: 5, // Increased flex for the pie chart
+                    flex: 6, // Increased flex for the pie chart
                     child: PieChart(
                       PieChartData(
                         sections: _createPieChartSections(total),
                         sectionsSpace: 3, // Reduced space between sections
-                        centerSpaceRadius: 40, // Increased center space
+                        centerSpaceRadius: 30, // Increased center space
                         startDegreeOffset: -90,
                         pieTouchData: PieTouchData(
                           touchCallback: (FlTouchEvent event, pieTouchResponse) {
@@ -88,7 +88,8 @@ class CategoryPieChart extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  
+                  const SizedBox(width: 20),
                   Expanded(
                     flex: 4, // Reduced flex for the legend
                     child: Column(
