@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:finney/assets/theme/app_color.dart';
+//import 'package:finney/pages/3-dashboard/widgets/goals_page.dart';
+import 'package:finney/pages/3-dashboard/transaction/add_saving/saving_goal_page.dart';
 
 class NavigationTiles extends StatelessWidget {
   const NavigationTiles({super.key});
@@ -15,7 +17,10 @@ class NavigationTiles extends StatelessWidget {
             context,
             'Reports',
             Icons.bar_chart,
-            () => Navigator.pushNamed(context, '/reports'), //the link is just a placeholder (same with the other links)
+            () => Navigator.pushNamed(
+              context,
+              '/reports',
+            ), //the link is just a placeholder (same with the other links)
           ),
           _buildNavigationTile(
             context,
@@ -41,8 +46,8 @@ class NavigationTiles extends StatelessWidget {
   }
 
   Widget _buildNavigationTile(
-    BuildContext context, 
-    String title, 
+    BuildContext context,
+    String title,
     IconData icon,
     VoidCallback onTap,
   ) {
@@ -59,11 +64,7 @@ class NavigationTiles extends StatelessWidget {
               color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Icon(
-              icon,
-              color: AppColors.primary,
-              size: 28,
-            ),
+            child: Icon(icon, color: AppColors.primary, size: 28),
           ),
           const SizedBox(height: 8),
           Text(
