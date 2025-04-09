@@ -1,8 +1,9 @@
 import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
+import 'package:finney/pages/3-dashboard/services/transaction_services.dart';
 import 'package:finney/pages/3-dashboard/transaction/widgets/transaction_list.dart';
 import 'package:flutter/material.dart';
 
-class AllTransactionsScreen extends StatelessWidget {
+class AllTransactionsScreen extends StatefulWidget {
   final List<TransactionModel> transactions;
   final Function(TransactionModel)? onDeleteTransaction;
 
@@ -12,6 +13,13 @@ class AllTransactionsScreen extends StatelessWidget {
     this.onDeleteTransaction,
   });
 
+  @override
+  State<AllTransactionsScreen> createState() => _AllTransactionsScreenState();
+}
+
+class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
+  final TransactionService _transactionService = TransactionService();
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,15 +40,30 @@ class AllTransactionsScreen extends StatelessWidget {
       ),
       backgroundColor: Colors.white,
       
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: TransactionList(
-            transactions: transactions,
-            onDeleteTransaction: onDeleteTransaction,
-            showAll: true,
-          ),
-        ),
+      body: StreamBuilder<List<TransactionModel>>(
+        stream: _transactionService.getTransactions(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final transactions = snapshot.data!;
+          
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: TransactionList(
+                transactions: transactions,
+                onDeleteTransaction: widget.onDeleteTransaction,
+                showAll: true,
+              ),
+            ),
+          );
+        },
       ),
     );
   }
