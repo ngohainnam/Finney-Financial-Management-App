@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:finney/pages/3-dashboard/models/saving_goal_model.dart';
-import 'package:finney/pages/3-dashboard/transaction/add_saving/saving_goal_page.dart';
+//import 'package:finney/pages/3-dashboard/transaction/add_saving/saving_goal_page.dart';
 
 class GoalCard extends StatelessWidget {
   final SavingGoal goal;

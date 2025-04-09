@@ -27,7 +27,8 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
     if (widget.existingGoal != null) {
       _nameController.text = widget.existingGoal!.name;
       _descriptionController.text = widget.existingGoal!.description ?? '';
-      _amountController.text = widget.existingGoal!.targetAmount.toString();
+      _amountController.text = widget.existingGoal!.targetAmount
+          .toStringAsFixed(2);
       _targetDate = widget.existingGoal!.targetDate;
     } else {
       _amountController.text = '0.00';
@@ -58,11 +59,22 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Budget Selector
+              const Text(
+                'Budget',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 8),
               DropdownButtonFormField<String>(
                 value: 'Budget 1',
-                decoration: const InputDecoration(
-                  labelText: 'Budget',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                 ),
                 items: const [
                   DropdownMenuItem(value: 'Budget 1', child: Text('Budget 1')),
@@ -71,33 +83,78 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
               ),
               const SizedBox(height: 24),
 
-              // Amount Field
-              TextFormField(
-                controller: _amountController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'AUS',
-                  prefixText: '\$',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter an amount';
-                  }
-                  if (double.tryParse(value) == null) {
-                    return 'Please enter a valid number';
-                  }
-                  return null;
-                },
+              // New Large Amount Input
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'AUS',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    controller: _amountController,
+                    keyboardType: TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    textAlign: TextAlign.left,
+                    style: const TextStyle(
+                      fontSize: 40,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                    decoration: const InputDecoration(
+                      prefixText: '\$ ',
+                      prefixStyle: TextStyle(
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                      border: InputBorder.none,
+                      hintText: '0.00',
+                      hintStyle: TextStyle(fontSize: 40, color: Colors.grey),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter an amount';
+                      }
+                      if (double.tryParse(value) == null) {
+                        return 'Please enter a valid number';
+                      }
+                      return null;
+                    },
+                  ),
+                  const Divider(thickness: 1),
+                ],
               ),
               const SizedBox(height: 24),
 
               // Goal Name
+              const Text(
+                'Saving Goal Name',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 8),
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Saving Goal Name',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  hintText: 'Enter name',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                 ),
                 validator:
                     (value) =>
@@ -110,7 +167,11 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
               // Target Date
               const Text(
                 'Finished in date',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey,
+                ),
               ),
               const SizedBox(height: 8),
               InkWell(
@@ -119,7 +180,7 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
                     children: [
@@ -139,14 +200,22 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
               // Description
               const Text(
                 'Description',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey,
+                ),
               ),
+              const SizedBox(height: 8),
               TextFormField(
                 controller: _descriptionController,
                 maxLines: 3,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: 'Enter description',
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  contentPadding: const EdgeInsets.all(16),
                 ),
               ),
             ],
@@ -155,7 +224,8 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _saveGoal,
-        child: const Icon(Icons.check),
+        backgroundColor: Colors.blue,
+        child: const Icon(Icons.check, color: Colors.white),
       ),
     );
   }
