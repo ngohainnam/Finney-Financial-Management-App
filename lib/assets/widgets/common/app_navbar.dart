@@ -17,12 +17,7 @@ class AppNavbar extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.white,
-            blurRadius: 10,
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.white, blurRadius: 10)],
       ),
       child: SafeArea(
         child: Padding(
@@ -38,22 +33,11 @@ class AppNavbar extends StatelessWidget {
             onTabChange: onTabChange,
             selectedIndex: selectedIndex,
             tabs: const [
-              GButton(
-                icon: Icons.dashboard,
-                text: 'Dashboard',
-              ),
-              GButton(
-                icon: Icons.chat,
-                text: 'AI Chat',
-              ),
-              GButton(
-                icon: Icons.bar_chart,
-                text: 'Reports',
-              ),
-              GButton(
-                icon: Icons.settings,
-                text: 'Settings',
-              ),
+              GButton(icon: Icons.dashboard, text: 'Dashboard'),
+              GButton(icon: Icons.chat, text: 'AI Chat'),
+              GButton(icon: Icons.bar_chart, text: 'Reports'),
+              GButton(icon: Icons.school, text: 'Learn'),
+              GButton(icon: Icons.settings, text: 'Settings'),
             ],
           ),
         ),
