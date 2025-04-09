@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:finney/assets/theme/app_color.dart';
-//import 'package:finney/pages/3-dashboard/widgets/goals_page.dart';
 import 'package:finney/pages/3-dashboard/transaction/add_saving/saving_goal_page.dart';
 
 class NavigationTiles extends StatelessWidget {
@@ -34,11 +33,19 @@ class NavigationTiles extends StatelessWidget {
             Icons.support_agent_rounded,
             () => Navigator.pushNamed(context, '/ai'),
           ),
+          //_buildNavigationTile(
+          //context,
+          //'Goals',
+          //Icons.flag,
+          //() => Navigator.pushNamed(context, '/goals'),
           _buildNavigationTile(
             context,
             'Goals',
             Icons.flag,
-            () => Navigator.pushNamed(context, '/goals'),
+            () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => SavingGoalPage()),
+            ),
           ),
         ],
       ),
