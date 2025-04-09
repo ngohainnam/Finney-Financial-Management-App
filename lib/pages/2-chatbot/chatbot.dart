@@ -1,14 +1,14 @@
-import 'dart:io';
-import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:finney/assets/theme/app_color.dart';
-import 'package:finney/models/chat_message_model.dart';
-import 'package:finney/pages/2-chatbot/chatbot_help.dart';
-import 'package:finney/pages/2-chatbot/welcome_screen.dart';
-import 'package:flutter/foundation.dart';
+import 'package:finney/pages/2-chatbot/presentation/chat_interface.dart';
+import 'package:finney/pages/2-chatbot/services/storage_service.dart';
+import 'package:finney/pages/2-chatbot/utils/chat_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
-import 'package:hive/hive.dart';
+import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:image_picker/image_picker.dart';
+import 'services/chat_service.dart';
+import 'presentation/welcome_screen.dart';
+import 'utils/chatbot_help.dart';
 
 class Chatbot extends StatefulWidget {
   const Chatbot({super.key});
@@ -18,43 +18,36 @@ class Chatbot extends StatefulWidget {
 }
 
 class _ChatbotState extends State<Chatbot> {
-  late Box<ChatMessageModel> chatBox;
+  final ChatStorageService _storageService = ChatStorageService();
+  late ChatService _chatService;
   final gemini = Gemini.instance;
   bool showWelcomeScreen = true;
   List<ChatMessage> messages = [];
-
-  //NEW UPDATE: this is for the conversation history using Hive storage (chatbot needs to remember the conversation)
   List<Content> conversationHistory = [];
 
   @override
   void initState() {
     super.initState();
-    _initChatBox();
+    _initServices();
   }
 
-  Future<void> _initChatBox() async {
-    chatBox = await Hive.openBox<ChatMessageModel>('chat_message');
+  Future<void> _initServices() async {
+    await _storageService.init();
+    _chatService = ChatService(
+      gemini: gemini,
+      conversationHistory: conversationHistory,
+    );
     _loadMessages();
   }
 
   void _loadMessages() {
-    final savedMessages = chatBox.values.toList().reversed;
     setState(() {
-      messages = savedMessages.map((model) => model.toChatMessage()).toList();
-      // Rebuild conversation history
-      conversationHistory = savedMessages.map((model) => Content(
-        parts: [Part.text(model.text)],
-        role: model.role,
-      )).toList();
+      messages = _storageService.loadMessages();
+      conversationHistory = _storageService.loadConversationHistory();
       if (messages.isNotEmpty) {
         showWelcomeScreen = false;
       }
     });
-  }
-
-  Future<void> _saveMessage(ChatMessage message, {required String role}) async {
-    final messageModel = ChatMessageModel.fromChatMessage(message, role: role);
-    await chatBox.add(messageModel);
   }
 
   void _sendMessage(ChatMessage chatMessage) async {
@@ -62,80 +55,32 @@ class _ChatbotState extends State<Chatbot> {
       messages = [chatMessage] + messages;
       showWelcomeScreen = false;
     });
-    await _saveMessage(chatMessage, role: 'user');
+    await _storageService.saveMessage(chatMessage, role: 'user');
 
-    try {
-      String augmentedQuestion = "$_systemPrompt\n\nUser Question: ${chatMessage.text}";
-      List<Part> parts = [];
-      
-      if (chatMessage.medias?.isNotEmpty ?? false) {
-        Uint8List images = File(chatMessage.medias!.first.url).readAsBytesSync();
-        parts.add(Part.uint8List(images));
-      } else {
-        parts.add(Part.text(augmentedQuestion));
-      }
+    final response = await _chatService.sendMessage(chatMessage);
+    final message = ChatMessage(
+      user: ChatConstants.geminiUser,
+      createdAt: DateTime.now(),
+      text: response,
+    );
 
-      conversationHistory.add(Content(
-        parts: parts,
-        role: 'user',
-      ));
-
-      gemini.chat(conversationHistory).then((value) async {    
-        String response = value?.output ?? 'Something went wrong. Please try again later...';
-
-        conversationHistory.add(Content(
-          parts: [Part.text(response)],
-          role: 'model',
-        ));
-
-        ChatMessage message = ChatMessage(
-          user: geminiUser, 
-          createdAt: DateTime.now(),
-          text: response,
-        );
-
-        setState(() {
-          messages = [message] + messages;
-        });
-        await _saveMessage(message, role: 'model');
-      }).catchError((e) {
-        setState(() {
-          messages = [
-            ChatMessage(
-              user: geminiUser,
-              createdAt: DateTime.now(),
-              text: 'An error occurred. Please try again after 1 minute.',
-            )
-          ] + messages;
-        });
-      });
-    } catch (e) {
-      setState(() {
-        messages = [
-          ChatMessage(
-            user: geminiUser,
-            createdAt: DateTime.now(),
-            text: 'An error occurred. Please try again after 1 minute.',
-          )
-        ] + messages;
-      });
-      
-    }
+    setState(() {
+      messages = [message] + messages;
+    });
+    await _storageService.saveMessage(message, role: 'model');
   }
 
   void _sendMediaMessage() async {
-    ImagePicker picker = ImagePicker();
-    XFile? file = await picker.pickImage(
-      source: ImageSource.gallery,
-    );
+    final picker = ImagePicker();
+    final file = await picker.pickImage(source: ImageSource.gallery);
 
     if (file != null) {
-      ChatMessage message = ChatMessage(
-        user: currentUser,
+      final message = ChatMessage(
+        user: ChatConstants.currentUser,
         createdAt: DateTime.now(),
         medias: [
           ChatMedia(
-            url: file.path, 
+            url: file.path,
             fileName: '',
             type: MediaType.image,
           ),
@@ -146,7 +91,7 @@ class _ChatbotState extends State<Chatbot> {
   }
 
   Future<void> clearChat() async {
-    await chatBox.clear();
+    await _storageService.clearChat();
     setState(() {
       messages = [];
       conversationHistory = [];
@@ -156,26 +101,9 @@ class _ChatbotState extends State<Chatbot> {
 
   @override
   void dispose() {
-    chatBox.close();
+    _storageService.dispose();
     super.dispose();
   }
-
-  final String _systemPrompt = """You are Finney AI, a financial assistant made by P26 Team, trained by Google.\n
-  Your mission is to provide financial advice and management to users with low financial literacy and digital literacy.\n
-  Your responses should not be long but provide enough information, concise, and easy to understand.\n
-  If the user asks a question that is not related to finance, you can respond with "I'm sorry, I can only help with financial questions.\n
-  IF the user send an image is not related to finance, you can respond with "I'm sorry, this image is not related to finance.\n
-  Always ask the user if they want more support in the topic you are discussing.\n
-  """;
-
-  final List<String> suggestedQuestions = [
-    "How do I create a basic monthly budget?",
-    "What are good ways to start saving money?",
-    "Tips for reducing daily expenses",
-  ];
-
-  ChatUser currentUser = ChatUser(id: '0', firstName: 'User');
-  ChatUser geminiUser = ChatUser(id: '1', firstName: 'Finney AI');
 
   @override
   Widget build(BuildContext context) {
@@ -194,89 +122,37 @@ class _ChatbotState extends State<Chatbot> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-
               actions: [
-                IconButton (
+                IconButton(
                   icon: Icon(Icons.help_outline),
-                  onPressed: () {
-                    ChatbotHelp.show(context);
-                  }
+                  onPressed: () => ChatbotHelp.show(context),
                 ),
-                IconButton (
+                IconButton(
                   icon: Icon(Icons.delete_outline),
                   onPressed: clearChat,
                 )
-              ]
-
+              ],
             ),
-
-
             Expanded(
               child: showWelcomeScreen && messages.isEmpty
                   ? WelcomeScreen(
-                      suggestedQuestions: suggestedQuestions,
+                      suggestedQuestions: ChatConstants.suggestedQuestions,
                       onSendMessage: _sendMessage,
-                      currentUser: currentUser,
+                      currentUser: ChatConstants.currentUser,
                       onQuestionSelected: () {
                         setState(() {
                           showWelcomeScreen = false;
                         });
                       },
                     )
-                  : _buildChatInterface(),
+                  : ChatInterface(
+                      currentUser: ChatConstants.currentUser,
+                      onSend: _sendMessage,
+                      messages: messages,
+                      onMediaSend: _sendMediaMessage,
+                    ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildChatInterface() {
-    return DashChat(
-      currentUser: currentUser,
-      onSend: _sendMessage,
-      messages: messages,
-      messageOptions: MessageOptions(
-        containerColor: AppColors.softGray,
-        currentUserContainerColor: AppColors.primary,
-        textColor: Colors.black,
-        currentUserTextColor: Colors.white,
-        showTime: true,
-      ),
-
-      inputOptions: InputOptions(
-        trailing: [
-          IconButton(
-            onPressed: _sendMediaMessage,
-            icon: Icon(Icons.image, color: AppColors.primary),
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.mic, color: AppColors.primary),
-          ),
-        ],
-
-        inputDecoration: InputDecoration(
-          hintText: "Ask me financial question. . .",
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(25),
-            borderSide: const BorderSide(color: AppColors.primary),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(25),
-            borderSide: const BorderSide(color: AppColors.blurGray),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(25),
-            borderSide: const BorderSide(color: AppColors.primary, width: 1),
-          ),
-          filled: true,
-          fillColor: Colors.white,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        ),
-        sendButtonBuilder: (onSend) => IconButton(
-          icon: const Icon(Icons.send_rounded, color: AppColors.primary),
-          onPressed: onSend,
         ),
       ),
     );

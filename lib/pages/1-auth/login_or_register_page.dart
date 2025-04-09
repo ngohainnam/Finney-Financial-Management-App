@@ -1,5 +1,5 @@
-import 'package:finney/pages/1-auth/login_page.dart';
-import 'package:finney/pages/1-auth/register_page.dart';
+import 'package:finney/pages/1-auth/presentation/login_page.dart';
+import 'package:finney/pages/1-auth/presentation/register_page.dart';
 import 'package:flutter/material.dart';
 
 class LoginOrRegisterPage extends StatefulWidget {

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:finney/assets/theme/app_color.dart';
-import 'package:finney/services/transaction_services.dart';
+import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
 import 'package:intl/intl.dart';
 
 class SpendingBarChart extends StatelessWidget {
-  final List<WeeklyExpenseData> weeklyExpenses;
+  final List<WeeklyExpense> weeklyExpenses;
 
   const SpendingBarChart({
     super.key,
@@ -15,7 +15,6 @@ class SpendingBarChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currencyFormat = NumberFormat.currency(symbol: '\$');
-    // Calculate total, handling empty data case
     final totalSpending = weeklyExpenses.isEmpty
         ? 0.0
         : weeklyExpenses.fold(0.0, (sum, expense) => sum + expense.amount);
@@ -42,7 +41,7 @@ class SpendingBarChart extends StatelessWidget {
               const Text(
                 'Weekly Spending',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -74,7 +73,6 @@ class SpendingBarChart extends StatelessWidget {
   }
 
   Widget _buildBarChart() {
-    // Ensure we have valid data
     if (weeklyExpenses.isEmpty) {
       return const SizedBox(
         height: 200,
@@ -84,7 +82,6 @@ class SpendingBarChart extends StatelessWidget {
       );
     }
 
-    // Get maximum value for chart scaling
     final maxValue = _calculateMaxY();
 
     return SizedBox(
@@ -146,7 +143,7 @@ class SpendingBarChart extends StatelessWidget {
             horizontalInterval: _calculateInterval(),
             getDrawingHorizontalLine: (value) {
               return FlLine(
-                color: Colors.grey.withAlpha(51),
+                color: Colors.grey.withValues(alpha: 0.2),
                 strokeWidth: 1,
                 dashArray: [5, 5],
               );
@@ -174,11 +171,10 @@ class SpendingBarChart extends StatelessWidget {
     );
   }
 
-  // Create all bar groups for the chart
   List<BarChartGroupData> _createBarGroups() {
     return List.generate(
       weeklyExpenses.length,
-          (index) => _createBarGroup(index, weeklyExpenses[index].amount),
+      (index) => _createBarGroup(index, weeklyExpenses[index].amount),
     );
   }
 
@@ -189,10 +185,7 @@ class SpendingBarChart extends StatelessWidget {
         .map((expense) => expense.amount)
         .reduce((a, b) => a > b ? a : b);
 
-    // If max amount is 0, return a default value
     if (maxAmount == 0) return 100;
-
-    // Round up to the nearest 25
     return ((maxAmount / 25).ceil() * 25).toDouble();
   }
 
@@ -205,9 +198,6 @@ class SpendingBarChart extends StatelessWidget {
   }
 
   BarChartGroupData _createBarGroup(int x, double value) {
-    final Color primaryColor = AppColors.primary;
-    primaryColor.withValues(alpha: 0.7);
-
     return BarChartGroupData(
       x: x,
       barRods: [

@@ -1,43 +1,52 @@
+import 'package:finney/pages/3-dashboard/utils/category.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:finney/models/transaction_model.dart';
-import 'package:finney/services/transaction_services.dart';
+import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
+import 'package:finney/pages/3-dashboard/services/transaction_services.dart';
 
-class AddIncomeScreen extends StatefulWidget {
-  final Function? onIncomeAdded;
+abstract class BaseTransactionScreen extends StatefulWidget {
+  final Function? onTransactionAdded;
+  final TransactionModel? existingTransaction;
 
-  const AddIncomeScreen({
+  const BaseTransactionScreen({
     super.key,
-    this.onIncomeAdded,
+    this.onTransactionAdded,
+    this.existingTransaction,
   });
-
-  @override
-  State<AddIncomeScreen> createState() => _AddIncomeScreenState();
 }
 
-class _AddIncomeScreenState extends State<AddIncomeScreen> {
+abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
+    extends State<T> {
   final _amountController = TextEditingController();
   final _descriptionController = TextEditingController();
+  String _selectedCategory = '';
   DateTime _selectedDate = DateTime.now();
   bool _isSaving = false;
   final TransactionService _transactionService = TransactionService();
 
-  // Pre-defined income sources with icons and colors
-  final List<IncomeCategoryData> _incomeSources = [
-    IncomeCategoryData('Salary', Icons.account_balance_wallet, const Color(0xFF4CAF50)),
-    IncomeCategoryData('Freelance', Icons.laptop, const Color(0xFF2196F3)),
-    IncomeCategoryData('Bonus', Icons.card_giftcard, const Color(0xFFFF9800)),
-    IncomeCategoryData('Investment', Icons.trending_up, const Color(0xFF9C27B0)),
-    IncomeCategoryData('Other', Icons.add_circle_outline, const Color(0xFF9E9E9E)),
-  ];
+  TextEditingController get amountController => _amountController;
 
-  String _selectedSource = 'Salary';
+  String get screenTitle;
+  Color get amountColor;
+  List<CategoryData> get categories;
+  double getTransactionAmount();
 
   @override
   void initState() {
     super.initState();
-    // Initialize amount controller with 0.00
-    _amountController.text = '0.00';
+    if (widget.existingTransaction != null) {
+      // if the transaction exists
+      _selectedCategory = widget.existingTransaction!.category;
+      _selectedDate = widget.existingTransaction!.date;
+      _amountController.text = widget.existingTransaction!.amount.abs().toStringAsFixed(2);
+      _descriptionController.text = widget.existingTransaction!.description ?? '';
+    } else {
+      // if it is a new transaction
+      if (categories.isNotEmpty) {
+        _selectedCategory = categories[0].name;
+      }
+      _amountController.text = '0.00';
+    }
   }
 
   @override
@@ -47,71 +56,90 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
     super.dispose();
   }
 
-  Future<void> _saveTransaction() async {
-    // Validate amount
-    if (_amountController.text.isEmpty ||
-        double.tryParse(_amountController.text.replaceAll(',', '.')) == null) {
-      _showErrorSnackBar('Please enter a valid amount');
+Future<void> _saveTransaction() async {
+  // Validate amount
+  if (_amountController.text == '0.00' || _amountController.text.isEmpty) {
+    _showErrorSnackBar('Please enter a valid amount');
+    return;
+  }
+
+  try {
+    double amount = double.parse(_amountController.text);
+    if (amount <= 0) {
+      _showErrorSnackBar('Please enter a positive amount');
       return;
     }
+  } catch (e) {
+    _showErrorSnackBar('Please enter a valid number');
+    return;
+  }
 
-    setState(() {
-      _isSaving = true;
-    });
+  if (_selectedCategory.isEmpty) {
+    _showErrorSnackBar('Please select a category');
+    return;
+  }
 
-    try {
-      // Parse amount (positive for income)
-      double amountValue = double.parse(_amountController.text.replaceAll(',', '.'));
+  setState(() {
+    _isSaving = true;
+  });
 
-      // Create transaction model
-      final transaction = TransactionModel(
-        name: _selectedSource,
-        category: 'Income',
-        amount: amountValue,
-        date: _selectedDate,
-        description: _descriptionController.text.trim(),
+  try {
+    double amountValue = getTransactionAmount();
+
+    final transaction = TransactionModel(
+      id: widget.existingTransaction?.id,
+      name: _selectedCategory,
+      category: _selectedCategory,
+      amount: amountValue,
+      date: _selectedDate,
+      description: _descriptionController.text.trim(),
+    );
+
+    // Optimistic UI update - call callback first
+    if (widget.onTransactionAdded != null) {
+      widget.onTransactionAdded!(transaction);
+    }
+
+    // Show success message and pop screen
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(widget.existingTransaction != null 
+            ? 'Transaction updated successfully' 
+            : 'Transaction saved successfully'),
+          backgroundColor: Colors.green,
+        ),
       );
+      Navigator.pop(context);
+    }
 
-      // Optimistic UI update
-      if (widget.onIncomeAdded != null) {
-        widget.onIncomeAdded!(transaction);
-      }
-
-      // Show success message
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Income saved successfully'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
-
-      // Go back to previous screen
-      if (mounted) {
-        Navigator.pop(context);
-      }
-
-      // Save to Firestore in the background
+    // Save to Firestore in the background
+    if (widget.existingTransaction != null) {
+      _transactionService.updateTransaction(transaction).catchError((e) {
+        debugPrint('Error updating transaction: $e');
+      });
+    } else {
       _transactionService.addTransaction(transaction).catchError((e) {
         debugPrint('Error saving transaction: $e');
       });
-    } catch (e) {
-      debugPrint('Error saving transaction: $e');
-      if (mounted) {
-        _showErrorSnackBar('Failed to save income. Please try again.');
-        setState(() {
-          _isSaving = false;
-        });
-      }
+    }
+
+  } catch (e) {
+    debugPrint('Error processing transaction: $e');
+    if (mounted) {
+      setState(() {
+        _isSaving = false;
+      });
+      _showErrorSnackBar('Failed to save transaction. Please try again.');
     }
   }
+}
 
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: const Color(0xFFF44336),
+        backgroundColor: Colors.redAccent,
         duration: const Duration(seconds: 2),
       ),
     );
@@ -125,12 +153,12 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text(
-          'Add Income',
-          style: TextStyle(
+        title: Text(
+          screenTitle,
+          style: const TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.bold,
           ),
@@ -146,18 +174,18 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
             child: TextField(
               controller: _amountController,
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 40,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF4CAF50),
+                color: amountColor,
               ),
               decoration: InputDecoration(
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.zero,
                 hintText: '0.00',
                 prefixText: '\$',
-                prefixStyle: const TextStyle(
-                  color: Color(0xFF4CAF50),
+                prefixStyle: TextStyle(
+                  color: amountColor,
                   fontWeight: FontWeight.bold,
                   fontSize: 40,
                 ),
@@ -176,9 +204,9 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Income Source section
+                  // Category section
                   const Text(
-                    'Income Source',
+                    'Category',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -186,7 +214,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                   ),
                   const SizedBox(height: 10),
 
-                  // Income Sources grid
+                  // Categories grid
                   GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -196,15 +224,15 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 15,
                     ),
-                    itemCount: _incomeSources.length,
+                    itemCount: categories.length,
                     itemBuilder: (context, index) {
-                      final source = _incomeSources[index];
-                      final isSelected = _selectedSource == source.name;
+                      final category = categories[index];
+                      final isSelected = _selectedCategory == category.name;
 
-                      return _buildIncomeSourceItem(
-                        source.name,
-                        source.icon,
-                        source.color,
+                      return _buildCategoryItem(
+                        category.name,
+                        category.icon,
+                        category.color,
                         isSelected,
                       );
                     },
@@ -233,9 +261,9 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            'Today',
-                            style: TextStyle(
+                          Text(
+                            DateFormat('EEEE').format(_selectedDate),
+                            style: const TextStyle(
                               color: Color(0xFF424242),
                               fontWeight: FontWeight.w500,
                             ),
@@ -289,18 +317,18 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
       ),
       floatingActionButton: _isSaving
           ? const Padding(
-        padding: EdgeInsets.all(16.0),
-        child: CircularProgressIndicator(),
-      )
+              padding: EdgeInsets.all(16.0),
+              child: CircularProgressIndicator(),
+            )
           : Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: FloatingActionButton(
-          onPressed: _saveTransaction,
-          backgroundColor: const Color(0xFF4CAF50),
-          elevation: 4,
-          child: const Icon(Icons.check, color: Colors.white),
-        ),
-      ),
+              padding: const EdgeInsets.all(16.0),
+              child: FloatingActionButton(
+                onPressed: _saveTransaction,
+                backgroundColor: amountColor,
+                elevation: 4,
+                child: const Icon(Icons.check, color: Colors.white),
+              ),
+            ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
@@ -320,12 +348,11 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
     }
   }
 
-  Widget _buildIncomeSourceItem(String name, IconData icon, Color color, bool isSelected) {
-    final backgroundColor = const Color(0xFFF5F5F5);
+  Widget _buildCategoryItem(String name, IconData icon, Color color, bool isSelected) {
     return GestureDetector(
       onTap: () {
         setState(() {
-          _selectedSource = name;
+          _selectedCategory = name;
         });
       },
       child: Column(
@@ -333,13 +360,13 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
           Container(
             padding: const EdgeInsets.all(15),
             decoration: BoxDecoration(
-              color: backgroundColor,
+              color: const Color(0xFFF5F5F5),
               shape: BoxShape.circle,
               border: isSelected ? Border.all(color: color, width: 2) : null,
             ),
             child: Icon(
-              icon,
-              color: color,
+              CategoryUtils.getIconForCategory(name),
+              color: CategoryUtils.getColorForCategory(name),
               size: 30,
             ),
           ),
@@ -358,11 +385,12 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
   }
 }
 
-// Separate class for income source data
-class IncomeCategoryData {
+class CategoryData {
   final String name;
   final IconData icon;
   final Color color;
 
-  IncomeCategoryData(this.name, this.icon, this.color);
+  CategoryData(this.name) : 
+    icon = CategoryUtils.getIconForCategory(name),
+    color = CategoryUtils.getColorForCategory(name);
 }

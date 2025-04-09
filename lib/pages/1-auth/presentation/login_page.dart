@@ -8,7 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import '../../models/user_model.dart';
+import '../models/user_model.dart';
 
 class LoginPage extends StatefulWidget {
   final Function()? onTap;
