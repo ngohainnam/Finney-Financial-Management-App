@@ -17,14 +17,23 @@ void main() async {
   );
 
   await Hive.initFlutter();
+
+  // Registering adapters
   Hive.registerAdapter(UserModelAdapter());
   Hive.registerAdapter(ChatMessageModelAdapter());
+
+  // Opening boxes
   await Hive.openBox<UserModel>('userBox');
   await Hive.openBox<ChatMessageModel>('chatMessage');
 
+  // Open learning progress box
+  await Hive.openBox('learning_progress');
+
+  // Gemini AI Init
   Gemini.init(
     apiKey: geminiApiKey,
   );
+
   runApp(const MyApp());
 }
 

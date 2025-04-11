@@ -50,6 +50,10 @@ class AppNavbar extends StatelessWidget {
                 icon: Icons.bar_chart,
                 text: 'Reports',
               ),
+			  GButton(
+				icon: Icons.menu_book, 
+				text: 'Learn',
+			  ),
               GButton(
                 icon: Icons.settings,
                 text: 'Settings',
