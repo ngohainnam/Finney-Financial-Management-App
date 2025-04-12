@@ -80,6 +80,6 @@ class CategoryExpense {
   final IconData icon;
 
   CategoryExpense(this.name, this.amount)
-      : color = CategoryUtils.getColorForCategory(name),
-        icon = CategoryUtils.getIconForCategory(name);
+    : color = CategoryUtils.getColorForCategory(name),
+      icon = CategoryUtils.getIconForCategory(name);
 }

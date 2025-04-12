@@ -1,282 +1,70 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finney/pages/3-dashboard/models/saving_goal_model.dart';
-import 'package:finney/pages/3-dashboard/services/saving_goal_service.dart';
-//import 'package:finney/pages/3-dashboard/transaction/add_saving/saving_goal_page.dart';
+import 'package:finney/pages/3-dashboard/transaction/add_saving/saving_goal_page.dart';
+import 'package:intl/intl.dart';
 
 class AddEditGoalPage extends StatefulWidget {
   final SavingGoal? existingGoal;
+  final VoidCallback? onGoalSaved;
+  final VoidCallback? onGoalDeleted;
 
-  const AddEditGoalPage({super.key, this.existingGoal});
+  const AddEditGoalPage({
+    Key? key,
+    this.existingGoal,
+    this.onGoalSaved,
+    this.onGoalDeleted, // Add this
+  }) : super(key: key);
 
   @override
-  State<AddEditGoalPage> createState() => _AddEditGoalPageState();
+  _AddEditGoalPageState createState() => _AddEditGoalPageState();
 }
 
 class _AddEditGoalPageState extends State<AddEditGoalPage> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
+  final _titleController = TextEditingController();
+  final _targetAmountController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _amountController = TextEditingController();
-  DateTime _targetDate = DateTime.now();
-  final SavingGoalService _goalService = SavingGoalService();
+  DateTime _selectedDate = DateTime.now().add(const Duration(days: 30));
 
   @override
   void initState() {
     super.initState();
     if (widget.existingGoal != null) {
-      _nameController.text = widget.existingGoal!.name;
+      _titleController.text = widget.existingGoal!.title;
+      _targetAmountController.text =
+          widget.existingGoal!.targetAmount.toString();
       _descriptionController.text = widget.existingGoal!.description ?? '';
-      _amountController.text = widget.existingGoal!.targetAmount
-          .toStringAsFixed(2);
-      _targetDate = widget.existingGoal!.targetDate;
-    } else {
-      _amountController.text = '0.00';
+      _selectedDate = widget.existingGoal!.targetDate;
     }
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: const CloseButton(),
-        title: Text(widget.existingGoal == null ? 'Create Goal' : 'Edit Goal'),
-        actions:
-            widget.existingGoal != null
-                ? [
-                  IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: _deleteGoal,
-                  ),
-                ]
-                : null,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Budget Selector
-              const Text(
-                'Budget',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey,
-                ),
-              ),
-              const SizedBox(height: 8),
-              DropdownButtonFormField<String>(
-                value: 'Budget 1',
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                ),
-                items: const [
-                  DropdownMenuItem(value: 'Budget 1', child: Text('Budget 1')),
-                ],
-                onChanged: (value) {},
-              ),
-              const SizedBox(height: 24),
-
-              // New Large Amount Input
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'AUS',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  TextFormField(
-                    controller: _amountController,
-                    keyboardType: TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
-                    textAlign: TextAlign.left,
-                    style: const TextStyle(
-                      fontSize: 40,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                    decoration: const InputDecoration(
-                      prefixText: '\$ ',
-                      prefixStyle: TextStyle(
-                        fontSize: 40,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                      border: InputBorder.none,
-                      hintText: '0.00',
-                      hintStyle: TextStyle(fontSize: 40, color: Colors.grey),
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter an amount';
-                      }
-                      if (double.tryParse(value) == null) {
-                        return 'Please enter a valid number';
-                      }
-                      return null;
-                    },
-                  ),
-                  const Divider(thickness: 1),
-                ],
-              ),
-              const SizedBox(height: 24),
-
-              // Goal Name
-              const Text(
-                'Saving Goal Name',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey,
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextFormField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  hintText: 'Enter name',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                ),
-                validator:
-                    (value) =>
-                        value == null || value.isEmpty
-                            ? 'Enter goal name'
-                            : null,
-              ),
-              const SizedBox(height: 16),
-
-              // Target Date
-              const Text(
-                'Finished in date',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey,
-                ),
-              ),
-              const SizedBox(height: 8),
-              InkWell(
-                onTap: _selectDate,
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.calendar_today),
-                      const SizedBox(width: 12),
-                      Text(DateFormat('dd/MM/yyyy').format(_targetDate)),
-                      if (_isToday(_targetDate)) ...[
-                        const SizedBox(width: 8),
-                        const Text('Today'),
-                      ],
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Description
-              const Text(
-                'Description',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey,
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextFormField(
-                controller: _descriptionController,
-                maxLines: 3,
-                decoration: InputDecoration(
-                  hintText: 'Enter description',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  contentPadding: const EdgeInsets.all(16),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _saveGoal,
-        backgroundColor: Colors.blue,
-        child: const Icon(Icons.check, color: Colors.white),
-      ),
-    );
+  void dispose() {
+    _titleController.dispose();
+    _targetAmountController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
   }
 
-  bool _isToday(DateTime date) {
-    final now = DateTime.now();
-    return date.year == now.year &&
-        date.month == now.month &&
-        date.day == now.day;
-  }
-
-  Future<void> _selectDate() async {
-    final picked = await showDatePicker(
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: _targetDate,
+      initialDate: _selectedDate,
       firstDate: DateTime.now(),
       lastDate: DateTime(2100),
     );
-    if (picked != null) {
-      setState(() => _targetDate = picked);
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+      });
     }
   }
 
-  Future<void> _saveGoal() async {
-    if (_formKey.currentState!.validate()) {
-      final goal = SavingGoal(
-        id:
-            widget.existingGoal?.id ??
-            DateTime.now().millisecondsSinceEpoch.toString(),
-        name: _nameController.text,
-        targetAmount: double.parse(_amountController.text),
-        currentAmount: widget.existingGoal?.currentAmount ?? 0,
-        targetDate: _targetDate,
-        description:
-            _descriptionController.text.isEmpty
-                ? null
-                : _descriptionController.text,
-        createdAt: widget.existingGoal?.createdAt ?? DateTime.now(),
-      );
-
-      if (widget.existingGoal == null) {
-        await _goalService.addGoal(goal);
-      } else {
-        await _goalService.updateGoal(goal);
-      }
-
-      Navigator.pop(context);
-    }
-  }
-
+  // First, add this method to your _AddEditGoalPageState class
   Future<void> _deleteGoal() async {
+    if (widget.existingGoal == null) return;
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder:
@@ -299,9 +87,153 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
           ),
     );
 
-    if (confirmed == true && widget.existingGoal != null) {
-      await _goalService.deleteGoal(widget.existingGoal!.id);
-      Navigator.pop(context);
+    if (confirmed == true) {
+      try {
+        await FirebaseFirestore.instance
+            .collection('goals')
+            .doc(widget.existingGoal!.id)
+            .delete();
+
+        if (widget.onGoalDeleted != null) {
+          widget.onGoalDeleted!();
+        }
+
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Goal deleted successfully')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to delete goal: $e')));
+      }
     }
+  }
+
+  Future<void> _saveGoal() async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        final goal = SavingGoal(
+          id:
+              widget.existingGoal?.id ??
+              FirebaseFirestore.instance.collection('goals').doc().id,
+          title: _titleController.text,
+          targetAmount: double.parse(_targetAmountController.text),
+          savedAmount:
+              widget.existingGoal?.savedAmount ??
+              0.0, // Keep existing saved amount or default to 0
+          targetDate: _selectedDate,
+          description:
+              _descriptionController.text.isNotEmpty
+                  ? _descriptionController.text
+                  : null,
+          createdAt: widget.existingGoal?.createdAt ?? DateTime.now(),
+        );
+
+        await FirebaseFirestore.instance
+            .collection('goals')
+            .doc(goal.id)
+            .set(goal.toMap());
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Goal "${goal.title}" created successfully!'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+
+        Navigator.pop(context);
+      } catch (e) {
+        // Navigate back and notify parent
+        if (widget.onGoalSaved != null) {
+          widget.onGoalSaved!();
+        }
+        Navigator.pop(context);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.existingGoal == null ? 'Create Goal' : 'Edit Goal'),
+        actions: [
+          if (widget.existingGoal != null) // Only show delete when editing
+            IconButton(icon: const Icon(Icons.delete), onPressed: _deleteGoal),
+          IconButton(icon: const Icon(Icons.save), onPressed: _saveGoal),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: [
+              TextFormField(
+                controller: _titleController,
+                decoration: const InputDecoration(
+                  labelText: 'Goal Title',
+                  hintText: 'e.g. New Laptop',
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a title';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _targetAmountController,
+                decoration: const InputDecoration(
+                  labelText: 'Target Amount',
+                  prefixText: '\$',
+                ),
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter an amount';
+                  }
+                  if (double.tryParse(value) == null) {
+                    return 'Please enter a valid number';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              InkWell(
+                onTap: () => _selectDate(context),
+                child: InputDecorator(
+                  decoration: const InputDecoration(labelText: 'Target Date'),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(DateFormat('dd/MM/yyyy').format(_selectedDate)),
+                      const Icon(Icons.calendar_today),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _descriptionController,
+                decoration: const InputDecoration(
+                  labelText: 'Description (Optional)',
+                  hintText: 'Notes about your goal',
+                ),
+                maxLines: 3,
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: _saveGoal,
+                child: const Text('Save Goal'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
