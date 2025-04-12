@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:finney/assets/theme/app_color.dart';
+import 'package:finney/pages/2-chatbot/chatbot.dart'; // Ensure this import is correct and the file exists
+// Ensure ChatbotPage is defined in the imported file
+import 'package:finney/assets/widgets/common/app_navbar.dart';
 
 class Learn extends StatelessWidget {
   const Learn({super.key});
@@ -55,7 +58,35 @@ class Learn extends StatelessWidget {
             color: Colors.blue,
             onTap: () => _navigateToSafety(context),
           ),
+          _buildAIAssistantButton(context),
         ],
+      ),
+    );
+  }
+
+  Widget _buildAIAssistantButton(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: ElevatedButton.icon(
+        icon: const Icon(Icons.chat, color: Colors.white),
+        label: const Text(
+          'Ask Finney AI for any help',
+          style: TextStyle(color: Colors.white, fontSize: 16),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 3,
+        ),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const Chatbot()),
+          );
+        },
       ),
     );
   }
@@ -364,6 +395,17 @@ class SectionDetailPage extends StatelessWidget {
             ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const Chatbot()),
+          );
+        },
+        icon: const Icon(Icons.chat),
+        label: const Text('AI Assistant'),
+        backgroundColor: AppColors.primary,
       ),
     );
   }
