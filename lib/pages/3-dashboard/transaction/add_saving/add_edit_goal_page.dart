@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finney/pages/3-dashboard/models/saving_goal_model.dart';
 import 'package:finney/pages/3-dashboard/transaction/add_saving/saving_goal_page.dart';
-import 'package:intl/intl.dart';
 
 class AddEditGoalPage extends StatefulWidget {
   final SavingGoal? existingGoal;
-  final VoidCallback? onGoalSaved;
+  final Function(SavingGoal)? onGoalSaved;
   final VoidCallback? onGoalDeleted;
 
   const AddEditGoalPage({
     Key? key,
     this.existingGoal,
     this.onGoalSaved,
-    this.onGoalDeleted, // Add this
+    this.onGoalDeleted,
   }) : super(key: key);
 
   @override
@@ -61,55 +61,6 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
     }
   }
 
-  // First, add this method to your _AddEditGoalPageState class
-  Future<void> _deleteGoal() async {
-    if (widget.existingGoal == null) return;
-
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Delete Goal'),
-            content: const Text('Are you sure you want to delete this goal?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text(
-                  'Delete',
-                  style: TextStyle(color: Colors.red),
-                ),
-              ),
-            ],
-          ),
-    );
-
-    if (confirmed == true) {
-      try {
-        await FirebaseFirestore.instance
-            .collection('goals')
-            .doc(widget.existingGoal!.id)
-            .delete();
-
-        if (widget.onGoalDeleted != null) {
-          widget.onGoalDeleted!();
-        }
-
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Goal deleted successfully')),
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Failed to delete goal: $e')));
-      }
-    }
-  }
-
   Future<void> _saveGoal() async {
     if (_formKey.currentState!.validate()) {
       try {
@@ -119,9 +70,7 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
               FirebaseFirestore.instance.collection('goals').doc().id,
           title: _titleController.text,
           targetAmount: double.parse(_targetAmountController.text),
-          savedAmount:
-              widget.existingGoal?.savedAmount ??
-              0.0, // Keep existing saved amount or default to 0
+          savedAmount: widget.existingGoal?.savedAmount ?? 0.0,
           targetDate: _selectedDate,
           description:
               _descriptionController.text.isNotEmpty
@@ -135,21 +84,45 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
             .doc(goal.id)
             .set(goal.toMap());
 
-        // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Goal "${goal.title}" created successfully!'),
-            duration: const Duration(seconds: 2),
+            content: Row(
+              children: [
+                Icon(Icons.check_circle, color: Colors.white),
+                SizedBox(width: 8),
+                Text(
+                  widget.existingGoal == null
+                      ? 'Goal "${goal.title}" created!'
+                      : 'Goal "${goal.title}" updated!',
+                ),
+              ],
+            ),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
         );
 
-        Navigator.pop(context);
-      } catch (e) {
-        // Navigate back and notify parent
         if (widget.onGoalSaved != null) {
-          widget.onGoalSaved!();
+          widget.onGoalSaved!(goal);
         }
-        Navigator.pop(context);
+
+        Navigator.of(context).pop();
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.error, color: Colors.white),
+                SizedBox(width: 8),
+                Text('Error saving goal'),
+              ],
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }
@@ -158,77 +131,276 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.existingGoal == null ? 'Create Goal' : 'Edit Goal'),
-        actions: [
-          if (widget.existingGoal != null) // Only show delete when editing
-            IconButton(icon: const Icon(Icons.delete), onPressed: _deleteGoal),
-          IconButton(icon: const Icon(Icons.save), onPressed: _saveGoal),
-        ],
+        title: Text(
+          widget.existingGoal == null ? 'Create New Goal' : 'Edit Your Goal',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).primaryColor,
+          ),
+        ),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.grey[50],
+        iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      backgroundColor: Colors.grey[50],
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
         child: Form(
           key: _formKey,
-          child: ListView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TextFormField(
-                controller: _titleController,
-                decoration: const InputDecoration(
-                  labelText: 'Goal Title',
-                  hintText: 'e.g. New Laptop',
+              // Amount Section
+              Card(
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: Colors.grey[200]!),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a title';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _targetAmountController,
-                decoration: const InputDecoration(
-                  labelText: 'Target Amount',
-                  prefixText: '\$',
-                ),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter an amount';
-                  }
-                  if (double.tryParse(value) == null) {
-                    return 'Please enter a valid number';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              InkWell(
-                onTap: () => _selectDate(context),
-                child: InputDecorator(
-                  decoration: const InputDecoration(labelText: 'Target Date'),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(DateFormat('dd/MM/yyyy').format(_selectedDate)),
-                      const Icon(Icons.calendar_today),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.monetization_on,
+                            color: Colors.deepPurple,
+                            size: 20,
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            'TARGET AMOUNT (AUD)',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.deepPurple,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8),
+                      TextFormField(
+                        controller: _targetAmountController,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          prefixIcon: Padding(
+                            padding: EdgeInsets.only(top: 15),
+                            child: Text(
+                              '\$ ',
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          border: InputBorder.none,
+                          hintText: '0.00',
+                          hintStyle: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[400],
+                          ),
+                        ),
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty)
+                            return 'Please enter an amount';
+                          if (double.tryParse(value) == null)
+                            return 'Please enter a valid number';
+                          return null;
+                        },
+                      ),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _descriptionController,
-                decoration: const InputDecoration(
-                  labelText: 'Description (Optional)',
-                  hintText: 'Notes about your goal',
+              SizedBox(height: 24),
+
+              // Goal Name Section
+              Card(
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: Colors.grey[200]!),
                 ),
-                maxLines: 3,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.flag, color: Colors.deepPurple, size: 20),
+                          SizedBox(width: 8),
+                          Text(
+                            'GOAL NAME',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.deepPurple,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8),
+                      TextFormField(
+                        controller: _titleController,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'e.g. Vacation, New Car, Emergency Fund',
+                          hintStyle: TextStyle(color: Colors.grey[400]),
+                        ),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        validator:
+                            (value) =>
+                                value == null || value.isEmpty
+                                    ? 'Please enter a goal name'
+                                    : null,
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: _saveGoal,
-                child: const Text('Save Goal'),
+              SizedBox(height: 24),
+
+              // Target Date Section
+              Card(
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: Colors.grey[200]!),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.calendar_today,
+                            color: Colors.deepPurple,
+                            size: 20,
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            'TARGET DATE',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.deepPurple,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8),
+                      InkWell(
+                        onTap: () => _selectDate(context),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              DateFormat('dd/MM/yyyy').format(_selectedDate),
+                              style: TextStyle(fontSize: 18),
+                            ),
+                            Icon(
+                              Icons.arrow_drop_down,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(height: 24),
+
+              // Description Section
+              Card(
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: Colors.grey[200]!),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.description,
+                            color: Colors.deepPurple,
+                            size: 20,
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            'DESCRIPTION (OPTIONAL)',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.deepPurple,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8),
+                      TextFormField(
+                        controller: _descriptionController,
+                        maxLines: 3,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'Add notes about your goal...',
+                          hintStyle: TextStyle(color: Colors.grey[400]),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(height: 32),
+
+              // Save Button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _saveGoal,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).primaryColor,
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 2,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.save, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text(
+                        'SAVE GOAL',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),

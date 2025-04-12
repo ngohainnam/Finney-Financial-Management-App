@@ -1,76 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finney/pages/3-dashboard/models/saving_goal_model.dart';
 import 'package:finney/pages/3-dashboard/services/saving_goal_service.dart';
 import 'package:finney/pages/3-dashboard/transaction/add_saving/add_edit_goal_page.dart';
 import 'package:finney/pages/3-dashboard/widgets/goal_card.dart';
 
-// Enhanced color scheme
-const _successColor = Color(0xFF4CAF50); // Green 500
-const _successDark = Color(0xFF388E3C); // Green 700
-const _errorColor = Color(0xFFF44336); // Red 500
-const _errorDark = Color(0xFFD32F2F); // Red 700
-const _infoColor = Color(0xFF2196F3); // Blue 500
-const _warningColor = Color(0xFFFFC107); // Amber 500
+// Color constants
+const _successColor = Color(0xFF4CAF50);
+const _successDark = Color(0xFF388E3C);
+const _errorColor = Color(0xFFF44336);
+const _errorDark = Color(0xFFD32F2F);
+const _infoColor = Color(0xFF2196F3);
 
-class SavingGoalPage extends StatelessWidget {
+class SavingGoalPage extends StatefulWidget {
+  const SavingGoalPage({Key? key}) : super(key: key);
+
+  @override
+  _SavingGoalPageState createState() => _SavingGoalPageState();
+}
+
+class _SavingGoalPageState extends State<SavingGoalPage> {
   final SavingGoalService _goalService = SavingGoalService();
 
-  // Helper method for success messages
-  void _showSuccessMessage(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(Icons.check_circle, color: Colors.white),
-            SizedBox(width: 8),
-            Expanded(child: Text(message)),
-          ],
-        ),
-        backgroundColor: _successColor,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        duration: const Duration(seconds: 2),
-        elevation: 6,
-      ),
-    );
+  void _showSuccessMessage(String message) {
+    _showSnackbar(message, _successColor, Icons.check_circle);
   }
 
-  // Helper method for error messages
-  void _showErrorMessage(BuildContext context, String message) {
+  void _showErrorMessage(String message) {
+    _showSnackbar(message, _errorColor, Icons.error);
+  }
+
+  void _showInfoMessage(String message) {
+    _showSnackbar(message, _infoColor, Icons.info);
+  }
+
+  void _showSnackbar(String message, Color color, IconData icon) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
-            Icon(Icons.error, color: Colors.white),
-            SizedBox(width: 8),
-            Expanded(child: Text(message)),
+            Icon(icon, color: Colors.white),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(message, style: const TextStyle(fontSize: 16)),
+            ),
           ],
         ),
-        backgroundColor: _errorColor,
+        backgroundColor: color,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         duration: const Duration(seconds: 3),
-        elevation: 6,
-      ),
-    );
-  }
-
-  // Helper method for info messages
-  void _showInfoMessage(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(Icons.info, color: Colors.white),
-            SizedBox(width: 8),
-            Expanded(child: Text(message)),
-          ],
-        ),
-        backgroundColor: _infoColor,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        duration: const Duration(seconds: 2),
         elevation: 6,
       ),
     );
@@ -79,13 +59,21 @@ class SavingGoalPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text('Saving Goals'),
+        title: const Text(
+          'My Saving Goals',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded, size: 28),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.info_outline),
-            onPressed: () => _showSavingsInfo(context),
+            icon: const Icon(Icons.help_outline_rounded, size: 28),
+            onPressed: _showSavingsInfo,
           ),
         ],
       ),
@@ -93,7 +81,19 @@ class SavingGoalPage extends StatelessWidget {
         stream: _goalService.getGoals(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Loading your goals...',
+                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                  ),
+                ],
+              ),
+            );
           }
 
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -101,11 +101,30 @@ class SavingGoalPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text('No saving goals yet'),
+                  Icon(
+                    Icons.savings_outlined,
+                    size: 80,
+                    color: Colors.grey[400],
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'No saving goals yet',
+                    style: TextStyle(fontSize: 18, color: Colors.grey[700]),
+                  ),
                   const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => _navigateToAddGoal(context),
-                    child: const Text('Create Goal'),
+                  ElevatedButton.icon(
+                    onPressed: _navigateToAddGoal,
+                    icon: const Icon(Icons.add_circle_outline),
+                    label: const Text('Create Your First Goal'),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 16,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -116,25 +135,39 @@ class SavingGoalPage extends StatelessWidget {
 
           return Column(
             children: [
+              // Progress Card
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: _buildTotalSavingsProgress(goals),
+                child: Card(
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: _buildTotalSavingsProgress(goals),
+                  ),
+                ),
               ),
+
+              // Goals List
               Expanded(
                 child: RefreshIndicator(
-                  onRefresh: () => _refreshGoals(context),
+                  onRefresh: _refreshGoals,
+                  color: _infoColor,
                   child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
                     itemCount: goals.length,
                     itemBuilder:
-                        (context, index) => GoalCard(
-                          goal: goals[index],
-                          onTap:
-                              () => _navigateToEditGoal(context, goals[index]),
-                          onAddSavings:
-                              (amount) =>
-                                  _addToSavings(context, goals[index], amount),
-                          onDelete: () => _deleteGoal(context, goals[index]),
+                        (context, index) => Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: GoalCard(
+                            goal: goals[index],
+                            onTap: () => _navigateToEditGoal(goals[index]),
+                            onAddSavings:
+                                (amount) => _addToSavings(goals[index], amount),
+                            onDelete: () => _deleteGoal(goals[index]),
+                          ),
                         ),
                   ),
                 ),
@@ -144,90 +177,149 @@ class SavingGoalPage extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _navigateToAddGoal(context),
-        icon: const Icon(Icons.add),
-        label: const Text('Create Goal'),
-        backgroundColor: _successColor,
+        onPressed: _navigateToAddGoal,
+        icon: const Icon(Icons.add_circle_outline, size: 24),
+        label: const Text('New Goal', style: TextStyle(fontSize: 16)),
+        backgroundColor: Theme.of(context).primaryColor,
+        foregroundColor: Colors.white,
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
     );
   }
 
-  // Builds the total savings progress bar
   Widget _buildTotalSavingsProgress(List<SavingGoal> goals) {
-    final totalTarget = goals.fold<double>(
-      0,
-      (sum, goal) => sum + goal.targetAmount,
-    );
-    final totalSaved = goals.fold<double>(
-      0,
-      (sum, goal) => sum + goal.savedAmount,
-    );
-
+    final totalTarget = goals.fold(0.0, (sum, goal) => sum + goal.targetAmount);
+    final totalSaved = goals.fold(0.0, (sum, goal) => sum + goal.savedAmount);
     final progress = totalTarget > 0 ? totalSaved / totalTarget : 0;
+    final percentage = (progress * 100).toStringAsFixed(1);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Total Savings Progress',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        Row(
+          children: [
+            Icon(Icons.bar_chart_rounded, color: _infoColor, size: 24),
+            const SizedBox(width: 8),
+            const Text(
+              'TOTAL SAVINGS PROGRESS',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 16),
         LinearProgressIndicator(
           value: progress.toDouble(),
-          backgroundColor: Colors.grey[300],
-          valueColor: const AlwaysStoppedAnimation<Color>(_successColor),
+          minHeight: 12,
+          backgroundColor: Colors.grey[200],
+          valueColor: AlwaysStoppedAnimation<Color>(_successColor),
+          borderRadius: BorderRadius.circular(6),
         ),
-        const SizedBox(height: 8),
-        Text(
-          '\$${totalSaved.toStringAsFixed(2)} saved of \$${totalTarget.toStringAsFixed(2)}',
-          style: const TextStyle(fontSize: 14),
+        const SizedBox(height: 12),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              '$percentage% Complete',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: _successDark,
+              ),
+            ),
+            Text(
+              '\$${totalSaved.toStringAsFixed(2)} of \$${totalTarget.toStringAsFixed(2)}',
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
       ],
     );
   }
 
-  Future<void> _addToSavings(
-    BuildContext context,
-    SavingGoal goal,
-    double amount,
-  ) async {
+  Future<void> _refreshGoals() async {
+    _showInfoMessage("Your goals have been refreshed");
+    setState(() {});
+  }
+
+  void _navigateToAddGoal() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder:
+            (_) => AddEditGoalPage(
+              onGoalSaved: (SavingGoal goal) {
+                _showSuccessMessage('"${goal.title}" goal created!');
+              },
+            ),
+      ),
+    );
+  }
+
+  void _navigateToEditGoal(SavingGoal goal) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder:
+            (_) => AddEditGoalPage(
+              existingGoal: goal,
+              onGoalSaved: (SavingGoal updatedGoal) {
+                _showSuccessMessage('"${updatedGoal.title}" goal updated!');
+              },
+              onGoalDeleted: () {
+                _showErrorMessage('Goal was deleted');
+              },
+            ),
+      ),
+    );
+  }
+
+  Future<void> _addToSavings(SavingGoal goal, double amount) async {
     if (amount <= 0) {
-      _showErrorMessage(context, 'Please enter a valid amount');
+      _showErrorMessage('Please enter an amount greater than zero');
       return;
     }
-
     try {
       await _goalService.addToSavings(goal.id, amount);
       _showSuccessMessage(
-        context,
-        '\$${amount.toStringAsFixed(2)} added to ${goal.title}',
+        'Added \$${amount.toStringAsFixed(2)} to "${goal.title}"',
       );
     } catch (e) {
-      _showErrorMessage(context, 'Failed to add savings: ${e.toString()}');
+      _showErrorMessage('Could not add to savings. Please try again.');
     }
   }
 
-  Future<void> _deleteGoal(BuildContext context, SavingGoal goal) async {
+  Future<void> _deleteGoal(SavingGoal goal) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text(
-              'Delete Goal',
-              style: TextStyle(color: _errorDark),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
             ),
-            content: Text('Are you sure you want to delete "${goal.title}"?'),
+            title: Row(
+              children: [
+                Icon(Icons.warning_amber_rounded, color: _errorColor),
+                const SizedBox(width: 12),
+                const Text('Delete Goal?'),
+              ],
+            ),
+            content: Text('This will permanently delete "${goal.title}"'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
                 child: const Text('Cancel'),
               ),
-              TextButton(
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: _errorColor),
                 onPressed: () => Navigator.pop(context, true),
                 child: const Text(
                   'Delete',
-                  style: TextStyle(color: _errorColor),
+                  style: TextStyle(color: Colors.white),
                 ),
               ),
             ],
@@ -237,77 +329,117 @@ class SavingGoalPage extends StatelessWidget {
     if (confirmed == true) {
       try {
         await _goalService.deleteGoal(goal.id);
-        _showErrorMessage(context, '"${goal.title}" deleted successfully');
+        _showSuccessMessage('"${goal.title}" was deleted');
       } catch (e) {
-        _showErrorMessage(context, 'Failed to delete goal: ${e.toString()}');
+        _showErrorMessage('Could not delete goal. Please try again.');
       }
     }
   }
 
-  Future<void> _refreshGoals(BuildContext context) async {
-    try {
-      _showInfoMessage(context, 'Goals refreshed');
-    } catch (e) {
-      _showErrorMessage(context, 'Error refreshing goals: ${e.toString()}');
-    }
-  }
-
-  void _navigateToAddGoal(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder:
-            (_) => AddEditGoalPage(
-              onGoalSaved: () {
-                _showSuccessMessage(context, 'Goal created successfully! 🎉');
-                _refreshGoals(context);
-              },
-            ),
-      ),
-    );
-  }
-
-  void _navigateToEditGoal(BuildContext context, SavingGoal goal) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder:
-            (_) => AddEditGoalPage(
-              existingGoal: goal,
-              onGoalSaved: () {
-                _showSuccessMessage(context, 'Goal updated successfully!');
-                _refreshGoals(context);
-              },
-              onGoalDeleted: () {
-                _showErrorMessage(context, 'Goal deleted successfully');
-                _refreshGoals(context);
-              },
-            ),
-      ),
-    );
-  }
-
-  void _showSavingsInfo(BuildContext context) {
+  void _showSavingsInfo() {
     showDialog(
       context: context,
       builder:
-          (context) => AlertDialog(
-            title: const Text(
-              'About Saving Goals',
-              style: TextStyle(color: _infoColor),
+          (context) => Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
             ),
-            content: const Text(
-              'Track your savings progress by creating goals.\n'
-              'Add money to your goals whenever you save.\n'
-              'Reach your targets by the specified dates!',
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.savings_rounded, size: 32, color: _infoColor),
+                      const SizedBox(width: 12),
+                      Text(
+                        'About Saving Goals',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: _infoColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  _buildInfoTip(
+                    Icons.track_changes_rounded,
+                    'Track your progress',
+                    'See how close you are to reaching each goal',
+                  ),
+                  const SizedBox(height: 16),
+                  _buildInfoTip(
+                    Icons.attach_money_rounded,
+                    'Add money anytime',
+                    'Contribute to your goals whenever you save money',
+                  ),
+                  const SizedBox(height: 16),
+                  _buildInfoTip(
+                    Icons.calendar_today_rounded,
+                    'Set target dates',
+                    'Stay motivated with clear deadlines',
+                  ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _infoColor,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text(
+                        'GOT IT',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('OK', style: TextStyle(color: _infoColor)),
+          ),
+    );
+  }
+
+  Widget _buildInfoTip(IconData icon, String title, String description) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 24, color: _infoColor),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                description,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[700],
+                  height: 1.4,
+                ),
               ),
             ],
           ),
+        ),
+      ],
     );
   }
 }
