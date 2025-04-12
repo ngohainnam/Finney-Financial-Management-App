@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:finney/assets/widgets/common/app_navbar.dart';
-import 'package:finney/pages/5-learn/widgets/section_card.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:finney/assets/theme/app_color.dart';
-import 'package:finney/pages/2-chatbot/chatbot.dart';
-
-//import 'package:flutter/material.dart';
 
 class Learn extends StatelessWidget {
   const Learn({super.key});
@@ -14,187 +10,360 @@ class Learn extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF7F6FA),
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+        backgroundColor: Colors.white,
+        elevation: 1,
         title: const Text(
-          'Learn',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          'Financial Basics',
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
         ),
         centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
-          const Text(
-            'Expand your financial knowledge',
-            style: TextStyle(fontSize: 16, color: Colors.grey),
-          ),
           const SizedBox(height: 16),
-          _buildSectionCard(
+          _buildSimpleCard(
             context,
-            title: 'Fundamentals of Finance',
-            color: Colors.blue,
-            icon: Icons.menu_book,
-            topics: [
-              _Topic(
-                'You and Money',
-                "Understanding income, expenses, and needs vs wants.",
-              ),
-              _Topic(
-                'Investing Basics',
-                "How investing differs from saving and what compounding means.",
-              ),
-              _Topic(
-                'Society and Money',
-                "How the economy, government, and banks impact your finances.",
-              ),
-            ],
+            title: 'Money Management',
+            subtitle: 'Track, plan, and control your money',
+            icon: Icons.account_balance_wallet,
+            color: AppColors.primary,
+            onTap: () => _navigateToMoneyBasics(context),
           ),
-          _buildSectionCard(
+          _buildSimpleCard(
             context,
-            title: 'Trading Basics',
+            title: 'Saving & Budgeting',
+            subtitle: 'Learn how to save and budget smartly',
+            icon: Icons.savings,
             color: Colors.green,
-            icon: Icons.show_chart,
-            topics: [
-              _Topic(
-                'What is Trading?',
-                "Intro to buying and selling assets like stocks or crypto.",
-              ),
-              _Topic(
-                'Common Trading Terms',
-                "Learn bid/ask, stop loss, bull & bear markets.",
-              ),
-              _Topic(
-                'Types of Traders',
-                "Differences between day, swing, and long-term traders.",
-              ),
-            ],
+            onTap: () => _navigateToSaving(context),
           ),
-          _buildSectionCard(
+          _buildSimpleCard(
             context,
-            title: 'Investing Basics',
+            title: 'Investing Fundamentals',
+            subtitle: 'Understand how to grow your money',
+            icon: Icons.trending_up,
             color: Colors.orange,
-            icon: Icons.bar_chart,
-            topics: [
-              _Topic(
-                'Why Invest Early',
-                "Benefits of long-term investing and compound interest.",
-              ),
-              _Topic(
-                'Asset Types',
-                "Stocks, bonds, ETFs, mutual funds, and crypto.",
-              ),
-              _Topic(
-                'Diversification',
-                "How spreading investments lowers your risk.",
-              ),
-            ],
+            onTap: () => _navigateToInvesting(context),
           ),
-          _buildSectionCard(
+          _buildSimpleCard(
             context,
-            title: 'Investing Advanced',
-            color: Colors.purple,
-            icon: Icons.rocket_launch,
-            topics: [
-              _Topic(
-                'Risk Management',
-                "How to evaluate and manage investment risk.",
-              ),
-              _Topic(
-                'Stock Analysis',
-                "Intro to fundamental and technical analysis.",
-              ),
-              _Topic(
-                'Building a Portfolio',
-                "Create a mix of growth, value, and dividend stocks.",
-              ),
-            ],
+            title: 'Financial Safety',
+            subtitle: 'Stay secure and avoid scams',
+            icon: Icons.shield,
+            color: Colors.blue,
+            onTap: () => _navigateToSafety(context),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSectionCard(
+  Widget _buildSimpleCard(
     BuildContext context, {
     required String title,
-    required Color color,
+    required String subtitle,
     required IconData icon,
-    required List<_Topic> topics,
+    required Color color,
+    required VoidCallback onTap,
   }) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          ListTile(
-            leading: CircleAvatar(
-              backgroundColor: color.withOpacity(0.1),
-              child: Icon(icon, color: color),
-            ),
-            title: Text(
-              title,
-              style: TextStyle(fontWeight: FontWeight.bold, color: color),
-            ),
-          ),
-          const Divider(),
-          ...topics.map(
-            (t) => ListTile(
-              title: Text(t.title),
-              subtitle: Text(t.description),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-              onTap:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder:
-                          (_) => LearnDetailPage(
-                            title: t.title,
-                            content: t.description,
-                          ),
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: color, size: 28),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-            ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+            ],
           ),
-        ],
+        ),
+      ),
+    );
+  }
+
+  void _navigateToMoneyBasics(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder:
+            (_) => SectionDetailPage(
+              title: 'Money Management',
+              points: [
+                "Track income and expenses regularly",
+                "Differentiate between needs and wants",
+                "Understand basic banking services",
+                "Maintain a simple financial record",
+              ],
+              resources: [
+                Resource(
+                  type: ResourceType.video,
+                  title: "Basic Money Management",
+                  url:
+                      "https://www.youtube.com/results?search_query=emergency+funds+save+for+emergency",
+                ),
+                Resource(
+                  type: ResourceType.article,
+                  title: "Journal: Personal Finance Basics",
+                  url: "https://www.investopedia.com/personal-finance-4427760",
+                ),
+              ],
+            ),
+      ),
+    );
+  }
+
+  void _navigateToSaving(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder:
+            (_) => SectionDetailPage(
+              title: 'Saving & Budgeting',
+              points: [
+                "Follow the 50-30-20 rule (Needs-Wants-Savings)",
+                "Build an emergency fund (3-6 months expenses)",
+                "Automate your savings",
+                "Review and adjust budget monthly",
+              ],
+              resources: [
+                Resource(
+                  type: ResourceType.video,
+                  title: "Budgeting for Beginners",
+                  url: "https://www.youtube.com/watch?v=7lHNMGoACdQ",
+                ),
+              ],
+            ),
+      ),
+    );
+  }
+
+  void _navigateToInvesting(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder:
+            (_) => SectionDetailPage(
+              title: 'Investing Fundamentals',
+              points: [
+                "Understand risk and return",
+                "Diversify your investments",
+                "Learn about stocks, bonds, and mutual funds",
+                "Start with small investments and grow gradually",
+              ],
+              resources: [
+                Resource(
+                  type: ResourceType.video,
+                  title: "Investing 101",
+                  url: "https://www.youtube.com/watch?v=gFQNPmLKj1k",
+                ),
+                Resource(
+                  type: ResourceType.article,
+                  title: "Guide to Investing Basics",
+                  url:
+                      "https://www.nerdwallet.com/article/investing/investing-basics",
+                ),
+              ],
+            ),
+      ),
+    );
+  }
+
+  void _navigateToSafety(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder:
+            (_) => SectionDetailPage(
+              title: 'Financial Safety',
+              points: [
+                "Recognize and avoid financial scams",
+                "Understand the importance of insurance",
+                "Secure your online financial accounts",
+                "Learn about identity theft protection",
+              ],
+              resources: [
+                Resource(
+                  type: ResourceType.video,
+                  title: "Financial Safety Tips",
+                  url: "https://www.youtube.com/watch?v=G6O7lU7sxq8",
+                ),
+                Resource(
+                  type: ResourceType.article,
+                  title: "Guide to Financial Security",
+                  url: "https://www.consumerfinance.gov/consumer-tools/fraud/",
+                ),
+              ],
+            ),
       ),
     );
   }
 }
 
-class _Topic {
+enum ResourceType { video, article }
+
+class Resource {
+  final ResourceType type;
   final String title;
-  final String description;
-  _Topic(this.title, this.description);
+  final String url;
+
+  Resource({required this.type, required this.title, required this.url});
 }
 
-class LearnDetailPage extends StatelessWidget {
+class SectionDetailPage extends StatelessWidget {
   final String title;
-  final String content;
+  final List<String> points;
+  final List<Resource> resources;
 
-  const LearnDetailPage({
+  const SectionDetailPage({
     super.key,
     required this.title,
-    required this.content,
+    required this.points,
+    this.resources = const [],
   });
+
+  Future<void> _launchURL(String url) async {
+    try {
+      final uri = Uri.parse(url);
+      if (!await canLaunchUrl(uri)) {
+        throw Exception('Could not launch $url');
+      }
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      debugPrint('Error launching URL: $e');
+      // You might want to show a snackbar or dialog here
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Text(content, style: const TextStyle(fontSize: 16, height: 1.5)),
+      appBar: AppBar(
+        title: Text(title),
+        backgroundColor: Colors.white,
+        elevation: 1,
+        iconTheme: const IconThemeData(color: Colors.black),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 16),
+            Text(
+              'Key Points:',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ...points.map(
+              (point) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(top: 4),
+                      child: Icon(
+                        Icons.check_circle,
+                        size: 18,
+                        color: Colors.green,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        point,
+                        style: const TextStyle(fontSize: 16, height: 1.4),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            if (resources.isNotEmpty) ...[
+              const SizedBox(height: 32),
+              Text(
+                'Learn More:',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).primaryColor,
+                ),
+              ),
+              const SizedBox(height: 16),
+              ...resources.map(
+                (resource) => Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: ListTile(
+                    leading: Icon(
+                      resource.type == ResourceType.video
+                          ? Icons.play_circle_fill
+                          : Icons.article_outlined,
+                      color: Colors.blue,
+                      size: 28,
+                    ),
+                    title: Text(resource.title),
+                    trailing: const Icon(Icons.open_in_new, size: 18),
+                    onTap: () => _launchURL(resource.url),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+              ),
+            ],
+
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text('Back to Topics'),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
