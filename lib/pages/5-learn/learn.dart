@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:finney/assets/theme/app_color.dart';
 import 'package:finney/pages/2-chatbot/chatbot.dart'; // Ensure this import is correct and the file exists
-// Ensure ChatbotPage is defined in the imported file
 import 'package:finney/assets/widgets/common/app_navbar.dart';
 
 class Learn extends StatelessWidget {
@@ -162,8 +161,7 @@ class Learn extends StatelessWidget {
                 Resource(
                   type: ResourceType.video,
                   title: "Basic Money Management",
-                  url:
-                      "https://www.youtube.com/results?search_query=emergency+funds+save+for+emergency",
+                  url: "https://youtu.be/3m3-lMdIlJw?si=LJMRj1273-hjIwMZ",
                 ),
                 Resource(
                   type: ResourceType.article,
@@ -192,8 +190,15 @@ class Learn extends StatelessWidget {
               resources: [
                 Resource(
                   type: ResourceType.video,
-                  title: "Budgeting for Beginners",
-                  url: "https://www.youtube.com/watch?v=7lHNMGoACdQ",
+                  title: "Budgeting for Beginners; Learn 50-30-20 Rule",
+                  url: "https://youtu.be/HQzoZfc3GwQ?si=SOQDM3sDXQBNdkOh",
+                ),
+
+                Resource(
+                  type: ResourceType.article,
+                  title: "Journal: NerdWallet: Budgeting 101",
+                  url:
+                      "https://www.nerdwallet.com/au/personal-finance/how-to-budget",
                 ),
               ],
             ),
@@ -217,14 +222,8 @@ class Learn extends StatelessWidget {
               resources: [
                 Resource(
                   type: ResourceType.video,
-                  title: "Investing 101",
-                  url: "https://www.youtube.com/watch?v=gFQNPmLKj1k",
-                ),
-                Resource(
-                  type: ResourceType.article,
-                  title: "Guide to Investing Basics",
-                  url:
-                      "https://www.nerdwallet.com/article/investing/investing-basics",
+                  title: "Investing basics by Prof Dave",
+                  url: "https://youtu.be/qIw-yFC-HNU?si=xoqGmxGuv1jZzyHH",
                 ),
               ],
             ),
@@ -248,13 +247,13 @@ class Learn extends StatelessWidget {
               resources: [
                 Resource(
                   type: ResourceType.video,
-                  title: "Financial Safety Tips",
-                  url: "https://www.youtube.com/watch?v=G6O7lU7sxq8",
+                  title: "Financial Safety Tips for Mobile Banking",
+                  url: "https://youtu.be/F5l2BucBfKY?si=Ksbi-NEHQXze3a0E",
                 ),
                 Resource(
-                  type: ResourceType.article,
+                  type: ResourceType.video,
                   title: "Guide to Financial Security",
-                  url: "https://www.consumerfinance.gov/consumer-tools/fraud/",
+                  url: "https://www.youtube.com/watch?v=3m3-lMdIlJw",
                 ),
               ],
             ),
@@ -285,16 +284,33 @@ class SectionDetailPage extends StatelessWidget {
     this.resources = const [],
   });
 
-  Future<void> _launchURL(String url) async {
+  Future<void> launchURL(BuildContext context, String url) async {
     try {
-      final uri = Uri.parse(url);
+      // Convert YouTube URLs to proper format if needed
+      String processedUrl = url;
+      if (url.contains('youtube.com/watch') || url.contains('youtu.be')) {
+        final videoId = RegExp(
+          r'(?:youtube.com/watch?v=|youtu.be/)([a-zA-Z0-9-]+)',
+        ).firstMatch(url)?.group(1);
+        if (videoId != null) {
+          processedUrl = 'https://youtube.com/watch?v=$videoId';
+        }
+      }
+
+      final uri = Uri.parse(processedUrl);
       if (!await canLaunchUrl(uri)) {
         throw Exception('Could not launch $url');
       }
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+      await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+        webOnlyWindowName: '_blank',
+      );
     } catch (e) {
       debugPrint('Error launching URL: $e');
-      // You might want to show a snackbar or dialog here
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not open link: ${e.toString()}')),
+      );
     }
   }
 
@@ -372,7 +388,7 @@ class SectionDetailPage extends StatelessWidget {
                     ),
                     title: Text(resource.title),
                     trailing: const Icon(Icons.open_in_new, size: 18),
-                    onTap: () => _launchURL(resource.url),
+                    onTap: () => launchURL(context, resource.url),
                     contentPadding: EdgeInsets.zero,
                   ),
                 ),
