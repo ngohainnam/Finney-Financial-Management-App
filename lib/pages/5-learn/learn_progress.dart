@@ -28,4 +28,11 @@ class LearnProgress {
   static bool isLessonCompleted(String lessonKey, int totalVideos) {
     return getCompletedCount(lessonKey, totalVideos) == totalVideos;
   }
+
+  // 🆕 Reset progress for all given lesson keys
+  static void resetAll(List<String> lessonKeys) {
+    for (final key in lessonKeys) {
+      _box.delete(key);
+    }
+  }
 }

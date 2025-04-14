@@ -8,31 +8,32 @@ import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'firebase_options.dart';
 import 'pages/1-auth/models/user_model.dart';
+import 'package:finney/pages/5-learn/quiz/quiz_result_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Initialize Firebase with platform options
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  // Initialize Hive
   await Hive.initFlutter();
 
-  // Registering adapters
+  // Register your Hive adapters
   Hive.registerAdapter(UserModelAdapter());
   Hive.registerAdapter(ChatMessageModelAdapter());
+  Hive.registerAdapter(QuizResultAdapter());
 
-  // Opening boxes
+  // Open the required Hive boxes
   await Hive.openBox<UserModel>('userBox');
   await Hive.openBox<ChatMessageModel>('chatMessage');
-
-  // Open learning progress box
   await Hive.openBox('learning_progress');
+  await Hive.openBox<QuizResult>('quiz_results');
 
-  // Gemini AI Init
-  Gemini.init(
-    apiKey: geminiApiKey,
-  );
+  // Initialize Gemini AI
+  Gemini.init(apiKey: geminiApiKey);
 
   runApp(const MyApp());
 }
@@ -48,7 +49,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Poppins',
       ),
       debugShowCheckedModeBanner: false,
-      home: AuthPage(),
+      home: const AuthPage(),
     );
   }
 }

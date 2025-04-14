@@ -21,7 +21,7 @@ class Dashboard extends StatefulWidget {
 class DashboardState extends State<Dashboard> {
   final TransactionService _transactionService = TransactionService();
   final ChartService _chartService = ChartService();
-  
+
   double _currentBalance = 0.0;
   double _monthlyIncome = 0.0;
   double _monthlyExpenses = 0.0;
@@ -97,7 +97,7 @@ class DashboardState extends State<Dashboard> {
   void _handleTransactionAdded(TransactionModel transaction) {
     setState(() {
       _recentTransactions.add(transaction);
-      
+
       if (transaction.isIncome) {
         _monthlyIncome += transaction.amount;
       } else {
@@ -126,7 +126,7 @@ class DashboardState extends State<Dashboard> {
   void _handleDeleteTransaction(TransactionModel transaction) {
     setState(() {
       _recentTransactions.remove(transaction);
-      
+
       if (transaction.isIncome) {
         _monthlyIncome -= transaction.amount;
       } else {
