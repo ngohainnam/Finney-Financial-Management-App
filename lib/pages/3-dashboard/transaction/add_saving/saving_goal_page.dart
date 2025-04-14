@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finney/pages/3-dashboard/models/saving_goal_model.dart';
 import 'package:finney/pages/3-dashboard/services/saving_goal_service.dart';
 import 'package:finney/pages/3-dashboard/transaction/add_saving/add_edit_goal_page.dart';
@@ -10,11 +8,10 @@ import 'package:finney/pages/3-dashboard/widgets/goal_card.dart';
 const _successColor = Color(0xFF4CAF50);
 const _successDark = Color(0xFF388E3C);
 const _errorColor = Color(0xFFF44336);
-const _errorDark = Color(0xFFD32F2F);
 const _infoColor = Color(0xFF2196F3);
 
 class SavingGoalPage extends StatefulWidget {
-  const SavingGoalPage({Key? key}) : super(key: key);
+  const SavingGoalPage({super.key});
 
   @override
   _SavingGoalPageState createState() => _SavingGoalPageState();

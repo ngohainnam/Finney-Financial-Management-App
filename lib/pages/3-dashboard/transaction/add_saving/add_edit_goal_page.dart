@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finney/pages/3-dashboard/models/saving_goal_model.dart';
-import 'package:finney/pages/3-dashboard/transaction/add_saving/saving_goal_page.dart';
 
 class AddEditGoalPage extends StatefulWidget {
   final SavingGoal? existingGoal;
@@ -88,8 +87,8 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
           SnackBar(
             content: Row(
               children: [
-                Icon(Icons.check_circle, color: Colors.white),
-                SizedBox(width: 8),
+                const Icon(Icons.check_circle, color: Colors.white),
+                const SizedBox(width: 8),
                 Text(
                   widget.existingGoal == null
                       ? 'Goal "${goal.title}" created!'
@@ -115,9 +114,9 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
           SnackBar(
             content: Row(
               children: [
-                Icon(Icons.error, color: Colors.white),
-                SizedBox(width: 8),
-                Text('Error saving goal'),
+                const Icon(Icons.error, color: Colors.white),
+                const SizedBox(width: 8),
+                const Text('Error saving goal'),
               ],
             ),
             backgroundColor: Colors.red,
@@ -171,7 +170,7 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                             color: Colors.deepPurple,
                             size: 20,
                           ),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           Text(
                             'TARGET AMOUNT (AUD)',
                             style: TextStyle(
@@ -182,14 +181,14 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       TextFormField(
                         controller: _targetAmountController,
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
                           prefixIcon: Padding(
-                            padding: EdgeInsets.only(top: 15),
-                            child: Text(
+                            padding: const EdgeInsets.only(top: 15),
+                            child: const Text(
                               '\$ ',
                               style: TextStyle(
                                 fontSize: 24,
@@ -205,15 +204,17 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                             color: Colors.grey[400],
                           ),
                         ),
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                         ),
                         validator: (value) {
-                          if (value == null || value.isEmpty)
+                          if (value == null || value.isEmpty) {
                             return 'Please enter an amount';
-                          if (double.tryParse(value) == null)
+                          }
+                          if (double.tryParse(value) == null) {
                             return 'Please enter a valid number';
+                          }
                           return null;
                         },
                       ),
@@ -221,7 +222,7 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                   ),
                 ),
               ),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
 
               // Goal Name Section
               Card(
@@ -238,7 +239,7 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                       Row(
                         children: [
                           Icon(Icons.flag, color: Colors.deepPurple, size: 20),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           Text(
                             'GOAL NAME',
                             style: TextStyle(
@@ -249,7 +250,7 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       TextFormField(
                         controller: _titleController,
                         decoration: InputDecoration(
@@ -257,7 +258,7 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                           hintText: 'e.g. Vacation, New Car, Emergency Fund',
                           hintStyle: TextStyle(color: Colors.grey[400]),
                         ),
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
                         ),
@@ -271,7 +272,7 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                   ),
                 ),
               ),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
 
               // Target Date Section
               Card(
@@ -292,7 +293,7 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                             color: Colors.deepPurple,
                             size: 20,
                           ),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           Text(
                             'TARGET DATE',
                             style: TextStyle(
@@ -303,7 +304,7 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       InkWell(
                         onTap: () => _selectDate(context),
                         child: Row(
@@ -311,7 +312,7 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                           children: [
                             Text(
                               DateFormat('dd/MM/yyyy').format(_selectedDate),
-                              style: TextStyle(fontSize: 18),
+                              style: const TextStyle(fontSize: 18),
                             ),
                             Icon(
                               Icons.arrow_drop_down,
@@ -324,7 +325,7 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                   ),
                 ),
               ),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
 
               // Description Section
               Card(
@@ -345,7 +346,7 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                             color: Colors.deepPurple,
                             size: 20,
                           ),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           Text(
                             'DESCRIPTION (OPTIONAL)',
                             style: TextStyle(
@@ -356,7 +357,7 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       TextFormField(
                         controller: _descriptionController,
                         maxLines: 3,
@@ -370,7 +371,7 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                   ),
                 ),
               ),
-              SizedBox(height: 32),
+              const SizedBox(height: 32),
 
               // Save Button
               SizedBox(
@@ -388,9 +389,9 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.save, color: Colors.white),
-                      SizedBox(width: 8),
-                      Text(
+                      const Icon(Icons.save, color: Colors.white),
+                      const SizedBox(width: 8),
+                      const Text(
                         'SAVE GOAL',
                         style: TextStyle(
                           fontSize: 16,

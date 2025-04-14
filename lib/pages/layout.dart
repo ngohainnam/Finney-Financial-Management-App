@@ -4,7 +4,6 @@ import 'package:finney/pages/2-chatbot/chatbot.dart';
 import 'package:finney/pages/3-dashboard/dashboard.dart';
 import 'package:finney/pages/4-report/report.dart';
 import 'package:finney/pages/5-learn/learn.dart';
-import 'package:finney/pages/5-learn/widgets/section_card.dart';
 import 'package:finney/pages/6-setting/setting.dart';
 
 class MainLayout extends StatefulWidget {

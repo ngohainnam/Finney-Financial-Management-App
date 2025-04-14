@@ -1,6 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import 'package:finney/pages/3-dashboard/widgets/goal_card.dart';
 
 class SavingGoal {
   final String id;

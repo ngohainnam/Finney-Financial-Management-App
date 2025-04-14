@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:finney/assets/theme/app_color.dart';
 import 'package:finney/pages/2-chatbot/chatbot.dart'; // Ensure this import is correct and the file exists
-import 'package:finney/assets/widgets/common/app_navbar.dart';
 
 class Learn extends StatelessWidget {
   const Learn({super.key});
