@@ -9,14 +9,14 @@ class AddEditGoalPage extends StatefulWidget {
   final VoidCallback? onGoalDeleted;
 
   const AddEditGoalPage({
-    Key? key,
+    super.key,
     this.existingGoal,
     this.onGoalSaved,
     this.onGoalDeleted,
-  }) : super(key: key);
+  });
 
   @override
-  _AddEditGoalPageState createState() => _AddEditGoalPageState();
+  State<AddEditGoalPage> createState() => _AddEditGoalPageState();
 }
 
 class _AddEditGoalPageState extends State<AddEditGoalPage> {

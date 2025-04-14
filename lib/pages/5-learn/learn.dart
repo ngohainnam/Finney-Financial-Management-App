@@ -110,7 +110,7 @@ class Learn extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withAlpha(26),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(icon, color: color, size: 28),
@@ -164,8 +164,14 @@ class Learn extends StatelessWidget {
                 ),
                 Resource(
                   type: ResourceType.article,
-                  title: "Journal: Personal Finance Basics",
+                  title: "Investopedia: Personal Finance Basics",
                   url: "https://www.investopedia.com/personal-finance-4427760",
+                ),
+                Resource(
+                  type: ResourceType.article,
+                  title: "Investopedia: Ultimate Guide to Financial Literacy",
+                  url:
+                      "https://www.investopedia.com/guide-to-financial-literacy-4800530",
                 ),
               ],
             ),
@@ -195,7 +201,7 @@ class Learn extends StatelessWidget {
 
                 Resource(
                   type: ResourceType.article,
-                  title: "Journal: NerdWallet: Budgeting 101",
+                  title: "NerdWallet: How to Budget Money",
                   url:
                       "https://www.nerdwallet.com/au/personal-finance/how-to-budget",
                 ),
@@ -221,8 +227,14 @@ class Learn extends StatelessWidget {
               resources: [
                 Resource(
                   type: ResourceType.video,
-                  title: "Investing basics by Prof Dave",
+                  title: "Investing basics by Professor Dave",
                   url: "https://youtu.be/qIw-yFC-HNU?si=xoqGmxGuv1jZzyHH",
+                ),
+                Resource(
+                  type: ResourceType.article,
+                  title: "Investopedia: Investing Basics",
+                  url:
+                      "https://www.investopedia.com/articles/basics/11/3-s-simple-investing.asp",
                 ),
               ],
             ),
@@ -253,6 +265,19 @@ class Learn extends StatelessWidget {
                   type: ResourceType.video,
                   title: "Guide to Financial Security",
                   url: "https://www.youtube.com/watch?v=3m3-lMdIlJw",
+                ),
+                Resource(
+                  type: ResourceType.article,
+                  title: "Investopedia: Financial Security Tips",
+                  url:
+                      "https://www.investopedia.com/articles/retirement/06/10secureretirementtips.asp",
+                ),
+
+                Resource(
+                  type: ResourceType.article,
+                  title: "MoneySmart: Protect Yourself from Scams",
+                  url:
+                      "https://moneysmart.gov.au/online-safety/protect-yourself-from-scams",
                 ),
               ],
             ),
@@ -420,7 +445,7 @@ class SectionDetailPage extends StatelessWidget {
         },
         icon: const Icon(Icons.chat),
         label: const Text('AI Assistant'),
-        backgroundColor: AppColors.primary,
+        backgroundColor: const Color.fromARGB(255, 42, 146, 231),
       ),
     );
   }

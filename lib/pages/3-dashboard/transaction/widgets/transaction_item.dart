@@ -99,10 +99,7 @@ class TransactionItem extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     dateFormat.format(transaction.date),
-                    style: TextStyle(
-                      color: Colors.grey.shade600,
-                      fontSize: 12,
-                    ),
+                    style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
                   ),
                 ],
               ),
@@ -126,31 +123,37 @@ class TransactionItem extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => transaction.amount > 0
-            ? AddIncomeScreen(
-                existingTransaction: transactionModel,
-                onTransactionAdded: (updatedTransaction) {
-                  onUpdate?.call(transaction.copyWith(
-                    name: updatedTransaction.name,
-                    category: updatedTransaction.category,
-                    amount: updatedTransaction.amount,
-                    date: updatedTransaction.date,
-                    description: updatedTransaction.description,
-                  ));
-                },
-              )
-            : AddExpenseScreen(
-                existingTransaction: transactionModel,
-                onTransactionAdded: (updatedTransaction) {
-                  onUpdate?.call(transaction.copyWith(
-                    name: updatedTransaction.name,
-                    category: updatedTransaction.category,
-                    amount: updatedTransaction.amount,
-                    date: updatedTransaction.date,
-                    description: updatedTransaction.description,
-                  ));
-                },
-              ),
+        builder:
+            (context) =>
+                transaction.amount > 0
+                    ? AddIncomeScreen(
+                      existingTransaction: transactionModel,
+                      onTransactionAdded: (updatedTransaction) {
+                        onUpdate?.call(
+                          transaction.copyWith(
+                            name: updatedTransaction.name,
+                            category: updatedTransaction.category,
+                            amount: updatedTransaction.amount,
+                            date: updatedTransaction.date,
+                            description: updatedTransaction.description,
+                          ),
+                        );
+                      },
+                    )
+                    : AddExpenseScreen(
+                      existingTransaction: transactionModel,
+                      onTransactionAdded: (updatedTransaction) {
+                        onUpdate?.call(
+                          transaction.copyWith(
+                            name: updatedTransaction.name,
+                            category: updatedTransaction.category,
+                            amount: updatedTransaction.amount,
+                            date: updatedTransaction.date,
+                            description: updatedTransaction.description,
+                          ),
+                        );
+                      },
+                    ),
       ),
     );
   }

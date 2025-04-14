@@ -10,20 +10,14 @@ class SavingGoal {
   final DateTime createdAt;
 
   SavingGoal({
-    required String id,
-    required String title,
-    required double targetAmount,
-    required double savedAmount,
-    required DateTime targetDate,
-    String? description,
-    required DateTime createdAt,
-  }) : this.id = id,
-       this.title = title,
-       this.targetAmount = targetAmount,
-       this.savedAmount = savedAmount,
-       this.targetDate = targetDate,
-       this.description = description,
-       this.createdAt = createdAt;
+    required this.id,
+    required this.title,
+    required this.targetAmount,
+    required this.savedAmount,
+    required this.targetDate,
+    this.description,
+    required this.createdAt,
+  });
 
   // Helper getters
   double get progressPercentage => (savedAmount / targetAmount) * 100;

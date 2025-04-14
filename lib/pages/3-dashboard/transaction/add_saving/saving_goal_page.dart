@@ -14,10 +14,10 @@ class SavingGoalPage extends StatefulWidget {
   const SavingGoalPage({super.key});
 
   @override
-  _SavingGoalPageState createState() => _SavingGoalPageState();
+  SavingGoalPageState createState() => SavingGoalPageState();
 }
 
-class _SavingGoalPageState extends State<SavingGoalPage> {
+class SavingGoalPageState extends State<SavingGoalPage> {
   final SavingGoalService _goalService = SavingGoalService();
 
   void _showSuccessMessage(String message) {
