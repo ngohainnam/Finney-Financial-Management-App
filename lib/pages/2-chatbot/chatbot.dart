@@ -1,5 +1,6 @@
 import 'package:finney/assets/theme/app_color.dart';
 import 'package:finney/pages/2-chatbot/presentation/chat_interface.dart';
+import 'package:finney/pages/2-chatbot/presentation/voicechat_interface.dart'; // Add this import
 import 'package:finney/pages/2-chatbot/services/storage_service.dart';
 import 'package:finney/pages/2-chatbot/utils/chat_constants.dart';
 import 'package:flutter/material.dart';
@@ -44,9 +45,7 @@ class _ChatbotState extends State<Chatbot> {
     setState(() {
       messages = _storageService.loadMessages();
       conversationHistory = _storageService.loadConversationHistory();
-      if (messages.isNotEmpty) {
-        showWelcomeScreen = false;
-      }
+      showWelcomeScreen = messages.isEmpty;
     });
   }
 
@@ -57,6 +56,18 @@ class _ChatbotState extends State<Chatbot> {
     });
     await _storageService.saveMessage(chatMessage, role: 'user');
 
+    //add a temporary "thinking" message
+    final loadingMessage = ChatMessage(
+      user: ChatConstants.geminiUser,
+      createdAt: DateTime.now(),
+      text: "I am thinking...",
+      customProperties: {"isLoading": true},
+    );
+
+    setState(() {
+      messages = [loadingMessage] + messages;
+    });
+
     final response = await _chatService.sendMessage(chatMessage);
     final message = ChatMessage(
       user: ChatConstants.geminiUser,
@@ -65,6 +76,7 @@ class _ChatbotState extends State<Chatbot> {
     );
 
     setState(() {
+      messages.removeAt(0);
       messages = [message] + messages;
     });
     await _storageService.saveMessage(message, role: 'model');
@@ -90,6 +102,18 @@ class _ChatbotState extends State<Chatbot> {
     }
   }
 
+  void _navigateToVoiceChat() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => VoiceChatInterface(
+          currentUser: ChatConstants.currentUser,
+          onSend: _sendMessage,
+          messages: messages,
+        ),
+      ),
+    );
+  }
+
   Future<void> clearChat() async {
     await _storageService.clearChat();
     setState(() {
@@ -109,32 +133,33 @@ class _ChatbotState extends State<Chatbot> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.lightBackground,
-      body: SafeArea(
-        child: Column(
-          children: [
-            AppBar(
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              title: Text(
-                'Finney AI',
-                style: TextStyle(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              actions: [
-                IconButton(
-                  icon: Icon(Icons.help_outline),
-                  onPressed: () => ChatbotHelp.show(context),
-                ),
-                IconButton(
-                  icon: Icon(Icons.delete_outline),
-                  onPressed: clearChat,
-                )
-              ],
-            ),
-            Expanded(
-              child: showWelcomeScreen && messages.isEmpty
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text(
+          'Finney AI',
+          style: TextStyle(
+            color: AppColors.primary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete_outline),
+            onPressed: clearChat,
+          ),
+          IconButton(
+            icon: const Icon(Icons.help_outline),
+            onPressed: () => ChatbotHelp.show(context),
+          ),
+        ],
+      ),
+      body: Stack(
+        children: [
+          Column(
+            children: [
+              Expanded(
+                child: showWelcomeScreen 
                   ? WelcomeScreen(
                       suggestedQuestions: ChatConstants.suggestedQuestions,
                       onSendMessage: _sendMessage,
@@ -151,9 +176,39 @@ class _ChatbotState extends State<Chatbot> {
                       messages: messages,
                       onMediaSend: _sendMediaMessage,
                     ),
+              ),
+            ],
+          ),
+          
+          //mimic the floating action button that navigates to the voice chat screen
+          //cannot use floatingbutton here (then the floating button in dashboard wont work?)
+          Positioned(
+            right: 16,
+            bottom: 60,
+            child: Material(
+              elevation: 4.0,
+              shape: const CircleBorder(),
+              color: AppColors.primary,
+              child: InkWell(
+                onTap: _navigateToVoiceChat,
+                customBorder: const CircleBorder(),
+                child: Container(
+                  width: 56.0,
+                  height: 56.0,
+                  alignment: Alignment.center,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.mic,
+                    color: Colors.white,
+                    size: 24.0,
+                  ),
+                ),
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

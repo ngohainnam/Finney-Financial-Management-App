@@ -30,40 +30,17 @@ Widget build(BuildContext context) {
             const SizedBox(height: 40),
             Image.asset(AppImages.appLogo),
             const SizedBox(height: 30),
-            _buildWelcomeText(),
-            const SizedBox(height: 40),
             _buildTryAskingText(),
             const SizedBox(height: 20),
             _buildSuggestedQuestions(),
+            const SizedBox(height: 20),
+            _buildSkipButton(),
           ],
         ),
       ),
     ),
   );
 }
-
-  Widget _buildWelcomeText() {
-    return Column(
-      children: [
-        Text(
-          'Welcome to Finney AI',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: AppColors.primary,
-          ),
-        ),
-        const SizedBox(height: 10),
-        const Text(
-          'Your personal financial assistant',
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.grey,
-          ),
-        ),
-      ],
-    );
-  }
 
   Widget _buildTryAskingText() {
     return Text(
@@ -134,6 +111,28 @@ Widget build(BuildContext context) {
           ),
         );
       }).toList(),
+    );
+  }
+
+  Widget _buildSkipButton() {
+    return TextButton(
+      onPressed: onQuestionSelected,
+      style: TextButton.styleFrom(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: BorderSide(
+            color: AppColors.primary.withValues(alpha: 0.5), // Use withOpacity instead of withValues
+          ),
+        ),
+      ),
+      child: Text(
+        'Write your own question',
+        style: TextStyle(
+          color: AppColors.primary,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
     );
   }
 }
