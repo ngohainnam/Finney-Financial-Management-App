@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finney/pages/3-dashboard/models/saving_goal_model.dart';
-import 'package:finney/assets/theme/app_color.dart'; // Make sure to import your AppColors
 
 class AddEditGoalPage extends StatefulWidget {
   final SavingGoal? existingGoal;
@@ -64,12 +63,18 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
   Future<void> _saveGoal() async {
     if (_formKey.currentState!.validate()) {
       try {
+        final amount = double.tryParse(_targetAmountController.text);
+        if (amount == null || amount <= 0) {
+          _showErrorMessage('Please enter a valid positive amount');
+          return;
+        }
+
         final goal = SavingGoal(
           id:
               widget.existingGoal?.id ??
               FirebaseFirestore.instance.collection('goals').doc().id,
           title: _titleController.text,
-          targetAmount: double.parse(_targetAmountController.text),
+          targetAmount: amount,
           savedAmount: widget.existingGoal?.savedAmount ?? 0.0,
           targetDate: _selectedDate,
           description:
@@ -84,25 +89,10 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
             .doc(goal.id)
             .set(goal.toMap());
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.check_circle, color: Colors.white),
-                const SizedBox(width: 8),
-                Text(
-                  widget.existingGoal == null
-                      ? 'Goal "${goal.title}" created!'
-                      : 'Goal "${goal.title}" updated!',
-                ),
-              ],
-            ),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
+        _showSuccessMessage(
+          widget.existingGoal == null
+              ? 'Goal "${goal.title}" created!'
+              : 'Goal "${goal.title}" updated!',
         );
 
         if (widget.onGoalSaved != null) {
@@ -111,20 +101,31 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
 
         Navigator.of(context).pop();
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.error, color: Colors.white),
-                const SizedBox(width: 8),
-                const Text('Error saving goal'),
-              ],
-            ),
-            backgroundColor: Colors.red,
-          ),
-        );
+        _showErrorMessage('Error saving goal. Please try again.');
       }
     }
+  }
+
+  void _showSuccessMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
+  void _showErrorMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
   }
 
   @override
@@ -132,308 +133,164 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          widget.existingGoal == null ? 'Create New Goal' : 'Edit Your Goal',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: AppColors.primary, // Changed to AppColors.primary
-          ),
+          widget.existingGoal == null ? 'Add Saving Goal' : 'Edit Saving Goal',
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
         ),
         centerTitle: true,
         elevation: 0,
-        backgroundColor:
-            AppColors.lightBackground, // Changed to AppColors.lightBackground
-        iconTheme: IconThemeData(
-          color: AppColors.primary,
-        ), // Changed to AppColors.primary
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
       ),
-      backgroundColor:
-          AppColors.lightBackground, // Changed to AppColors.lightBackground
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(20),
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Amount Section
-              Card(
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(
-                    color: AppColors.gray,
-                  ), // Changed to AppColors.gray
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.monetization_on,
-                            color:
-                                AppColors
-                                    .primary, // Changed to AppColors.primary
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'TARGET AMOUNT (AUD)',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color:
-                                  AppColors
-                                      .primary, // Changed to AppColors.primary
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
+              // Amount Field
+              // Replace the Amount Field section with this:
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Text(
+                    '\$',
+                    style: TextStyle(
+                      fontSize: 40,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF4CAF50),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: TextFormField(
+                      controller: _targetAmountController,
+                      keyboardType: TextInputType.numberWithOptions(
+                        decimal: true,
                       ),
-                      const SizedBox(height: 8),
-                      TextFormField(
-                        controller: _targetAmountController,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          prefixIcon: Padding(
-                            padding: const EdgeInsets.only(top: 15),
-                            child: Text(
-                              '\$ ',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color:
-                                    AppColors
-                                        .primary, // Changed to AppColors.primary
-                              ),
-                            ),
-                          ),
-                          border: InputBorder.none,
-                          hintText: '0.00',
-                          hintStyle: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.gray, // Changed to AppColors.gray
-                          ),
-                        ),
-                        style: TextStyle(
-                          fontSize: 24,
+                      style: const TextStyle(
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF4CAF50),
+                      ),
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.zero,
+                        hintText: '0.00',
+                        hintStyle: TextStyle(
+                          color: Color(0xFF4CAF50),
                           fontWeight: FontWeight.bold,
-                          color:
-                              AppColors
-                                  .darkBlue, // Changed to AppColors.darkBlue
+                          fontSize: 40,
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter an amount';
-                          }
-                          final amount = double.tryParse(value);
-                          if (amount == null) {
-                            return 'Please enter a valid number';
-                          }
-                          if (amount <= 0) {
-                            return 'Please enter a positive amount';
-                          }
-                          return null;
-                        },
                       ),
-                    ],
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter an amount';
+                        }
+                        final amount = double.tryParse(value);
+                        if (amount == null) {
+                          return 'Please enter a valid number';
+                        }
+                        if (amount <= 0) {
+                          return 'Please enter a positive amount';
+                        }
+                        return null;
+                      },
+                    ),
                   ),
-                ),
+                ],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
-              // Goal Name Section
-              Card(
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(
-                    color: AppColors.gray,
-                  ), // Changed to AppColors.gray
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.flag,
-                            color:
-                                AppColors
-                                    .primary, // Changed to AppColors.primary
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'GOAL NAME',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color:
-                                  AppColors
-                                      .primary, // Changed to AppColors.primary
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      TextFormField(
-                        controller: _titleController,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: 'e.g. Vacation, New Car, Emergency Fund',
-                          hintStyle: TextStyle(
-                            color: AppColors.gray,
-                          ), // Changed to AppColors.gray
-                        ),
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color:
-                              AppColors
-                                  .darkBlue, // Changed to AppColors.darkBlue
-                        ),
-                        validator:
-                            (value) =>
-                                value == null || value.isEmpty
-                                    ? 'Please enter a goal name'
-                                    : null,
-                      ),
-                    ],
-                  ),
-                ),
+              // Goal Name Field
+              const Text(
+                'Saving Goal Purpose',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: _titleController,
+                decoration: InputDecoration(
+                  hintText: 'e.g. Saving for new Car...',
+                  filled: true,
+                  fillColor: const Color(0xFFF5F5F5),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.all(15),
+                ),
+                validator:
+                    (value) =>
+                        value == null || value.isEmpty
+                            ? 'Please enter a saving goal name'
+                            : null,
+              ),
+              const SizedBox(height: 20),
 
-              // Target Date Section
-              Card(
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(
-                    color: AppColors.gray,
-                  ), // Changed to AppColors.gray
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              // Date Field
+              const Text(
+                'Target Date',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              const SizedBox(height: 10),
+              InkWell(
+                onTap: () => _selectDate(context),
+                child: Container(
+                  padding: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF5F5F5),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.calendar_today,
-                            color:
-                                AppColors
-                                    .primary, // Changed to AppColors.primary
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'TARGET DATE',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color:
-                                  AppColors
-                                      .primary, // Changed to AppColors.primary
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
+                      Text(
+                        DateFormat('EEEE').format(_selectedDate),
+                        style: const TextStyle(
+                          color: Color(0xFF424242),
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                      const SizedBox(height: 8),
-                      InkWell(
-                        onTap: () => _selectDate(context),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              DateFormat('dd/MM/yyyy').format(_selectedDate),
-                              style: TextStyle(
-                                fontSize: 18,
-                                color:
-                                    AppColors
-                                        .darkBlue, // Changed to AppColors.darkBlue
-                              ),
-                            ),
-                            Icon(
-                              Icons.arrow_drop_down,
-                              color:
-                                  AppColors
-                                      .primary, // Changed to AppColors.primary
-                            ),
-                          ],
+                      Text(
+                        DateFormat('dd/MM/yyyy').format(_selectedDate),
+                        style: const TextStyle(
+                          color: Color(0xFF424242),
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
-              // Description Section
-              Card(
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(
-                    color: AppColors.gray,
-                  ), // Changed to AppColors.gray
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.description,
-                            color:
-                                AppColors
-                                    .primary, // Changed to AppColors.primary
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'DESCRIPTION (OPTIONAL)',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color:
-                                  AppColors
-                                      .primary, // Changed to AppColors.primary
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      TextFormField(
-                        controller: _descriptionController,
-                        maxLines: 3,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: 'Add notes about your goal...',
-                          hintStyle: TextStyle(
-                            color: AppColors.gray,
-                          ), // Changed to AppColors.gray
-                        ),
-                        style: TextStyle(
-                          color:
-                              AppColors
-                                  .darkBlue, // Changed to AppColors.darkBlue
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              // Description Field
+              const Text(
+                'Description',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 10),
+              TextField(
+                controller: _descriptionController,
+                decoration: InputDecoration(
+                  hintText: 'Enter description (optional)',
+                  hintStyle: const TextStyle(
+                    color: Color(0xFFBDBDBD),
+                    fontSize: 14,
+                  ),
+                  filled: true,
+                  fillColor: const Color(0xFFF5F5F5),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.all(15),
+                ),
+                maxLines: 3,
+              ),
+              const SizedBox(height: 40),
 
               // Save Button
               SizedBox(
@@ -441,28 +298,19 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                 child: ElevatedButton(
                   onPressed: _saveGoal,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        AppColors.primary, // Changed to AppColors.primary
-                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    backgroundColor: Colors.green,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    elevation: 2,
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.save, color: Colors.white),
-                      const SizedBox(width: 8),
-                      const Text(
-                        'SAVE GOAL',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
+                  child: const Text(
+                    'SAVE GOAL',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
