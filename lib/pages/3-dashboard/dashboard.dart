@@ -10,6 +10,7 @@ import 'package:finney/pages/3-dashboard/widgets/charts/spending_bar_chart.dart'
 import 'package:finney/pages/3-dashboard/widgets/charts/category_pie_chart.dart';
 import 'package:finney/pages/3-dashboard/services/transaction_services.dart';
 import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
+import 'package:finney/pages/3-dashboard/budget_reminder_page.dart'; // ✅ New import
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -21,7 +22,7 @@ class Dashboard extends StatefulWidget {
 class DashboardState extends State<Dashboard> {
   final TransactionService _transactionService = TransactionService();
   final ChartService _chartService = ChartService();
-  
+
   double _currentBalance = 0.0;
   double _monthlyIncome = 0.0;
   double _monthlyExpenses = 0.0;
@@ -97,7 +98,7 @@ class DashboardState extends State<Dashboard> {
   void _handleTransactionAdded(TransactionModel transaction) {
     setState(() {
       _recentTransactions.add(transaction);
-      
+
       if (transaction.isIncome) {
         _monthlyIncome += transaction.amount;
       } else {
@@ -126,7 +127,7 @@ class DashboardState extends State<Dashboard> {
   void _handleDeleteTransaction(TransactionModel transaction) {
     setState(() {
       _recentTransactions.remove(transaction);
-      
+
       if (transaction.isIncome) {
         _monthlyIncome -= transaction.amount;
       } else {
@@ -176,31 +177,55 @@ class DashboardState extends State<Dashboard> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
-              onRefresh: _loadDashboardData,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    BalanceCard(
-                      balance: _currentBalance,
-                      income: _monthlyIncome,
-                      expenses: _monthlyExpenses,
-                    ),
-                    const SizedBox(height: 20),
-                    const NavigationTiles(),
-                    const SizedBox(height: 20),
-                    SpendingBarChart(weeklyExpenses: _weeklyExpenses),
-                    const SizedBox(height: 20),
-                    CategoryPieChart(categoryExpenses: _categoryExpenses),
-                    const SizedBox(height: 20),
-                    _buildRecentTransactions(),
-                    const SizedBox(height: 80),
-                  ],
-                ),
+        onRefresh: _loadDashboardData,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              BalanceCard(
+                balance: _currentBalance,
+                income: _monthlyIncome,
+                expenses: _monthlyExpenses,
               ),
-            ),
+              const SizedBox(height: 20),
+              const NavigationTiles(),
+              const SizedBox(height: 10),
+
+              // ✅ Budget Reminder Button
+              ElevatedButton.icon(
+                icon: const Icon(Icons.notifications),
+                label: const Text("Budget Reminder (বাজেট অনুস্মারক)"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size.fromHeight(50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const BudgetReminderPage(),
+                    ),
+                  );
+                },
+              ),
+
+              const SizedBox(height: 20),
+              SpendingBarChart(weeklyExpenses: _weeklyExpenses),
+              const SizedBox(height: 20),
+              CategoryPieChart(categoryExpenses: _categoryExpenses),
+              const SizedBox(height: 20),
+              _buildRecentTransactions(),
+              const SizedBox(height: 80),
+            ],
+          ),
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primary,
         onPressed: () => _showAddTransactionModal(context),
