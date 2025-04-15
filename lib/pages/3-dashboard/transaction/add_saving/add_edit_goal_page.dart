@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finney/pages/3-dashboard/models/saving_goal_model.dart';
+import 'package:finney/assets/theme/app_color.dart'; // Make sure to import your AppColors
 
 class AddEditGoalPage extends StatefulWidget {
   final SavingGoal? existingGoal;
@@ -135,15 +136,19 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Theme.of(context).primaryColor,
+            color: AppColors.primary, // Changed to AppColors.primary
           ),
         ),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.grey[50],
-        iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
+        backgroundColor:
+            AppColors.lightBackground, // Changed to AppColors.lightBackground
+        iconTheme: IconThemeData(
+          color: AppColors.primary,
+        ), // Changed to AppColors.primary
       ),
-      backgroundColor: Colors.grey[50],
+      backgroundColor:
+          AppColors.lightBackground, // Changed to AppColors.lightBackground
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Form(
@@ -156,7 +161,9 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: Colors.grey[200]!),
+                  side: BorderSide(
+                    color: AppColors.gray,
+                  ), // Changed to AppColors.gray
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
@@ -167,7 +174,9 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                         children: [
                           Icon(
                             Icons.monetization_on,
-                            color: Colors.deepPurple,
+                            color:
+                                AppColors
+                                    .primary, // Changed to AppColors.primary
                             size: 20,
                           ),
                           const SizedBox(width: 8),
@@ -175,7 +184,9 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                             'TARGET AMOUNT (AUD)',
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.deepPurple,
+                              color:
+                                  AppColors
+                                      .primary, // Changed to AppColors.primary
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -188,11 +199,14 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                         decoration: InputDecoration(
                           prefixIcon: Padding(
                             padding: const EdgeInsets.only(top: 15),
-                            child: const Text(
+                            child: Text(
                               '\$ ',
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
+                                color:
+                                    AppColors
+                                        .primary, // Changed to AppColors.primary
                               ),
                             ),
                           ),
@@ -201,19 +215,26 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                           hintStyle: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: Colors.grey[400],
+                            color: AppColors.gray, // Changed to AppColors.gray
                           ),
                         ),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
+                          color:
+                              AppColors
+                                  .darkBlue, // Changed to AppColors.darkBlue
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter an amount';
                           }
-                          if (double.tryParse(value) == null) {
+                          final amount = double.tryParse(value);
+                          if (amount == null) {
                             return 'Please enter a valid number';
+                          }
+                          if (amount <= 0) {
+                            return 'Please enter a positive amount';
                           }
                           return null;
                         },
@@ -229,7 +250,9 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: Colors.grey[200]!),
+                  side: BorderSide(
+                    color: AppColors.gray,
+                  ), // Changed to AppColors.gray
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
@@ -238,13 +261,21 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.flag, color: Colors.deepPurple, size: 20),
+                          Icon(
+                            Icons.flag,
+                            color:
+                                AppColors
+                                    .primary, // Changed to AppColors.primary
+                            size: 20,
+                          ),
                           const SizedBox(width: 8),
                           Text(
                             'GOAL NAME',
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.deepPurple,
+                              color:
+                                  AppColors
+                                      .primary, // Changed to AppColors.primary
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -256,11 +287,16 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                         decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: 'e.g. Vacation, New Car, Emergency Fund',
-                          hintStyle: TextStyle(color: Colors.grey[400]),
+                          hintStyle: TextStyle(
+                            color: AppColors.gray,
+                          ), // Changed to AppColors.gray
                         ),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
+                          color:
+                              AppColors
+                                  .darkBlue, // Changed to AppColors.darkBlue
                         ),
                         validator:
                             (value) =>
@@ -279,7 +315,9 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: Colors.grey[200]!),
+                  side: BorderSide(
+                    color: AppColors.gray,
+                  ), // Changed to AppColors.gray
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
@@ -290,7 +328,9 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                         children: [
                           Icon(
                             Icons.calendar_today,
-                            color: Colors.deepPurple,
+                            color:
+                                AppColors
+                                    .primary, // Changed to AppColors.primary
                             size: 20,
                           ),
                           const SizedBox(width: 8),
@@ -298,7 +338,9 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                             'TARGET DATE',
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.deepPurple,
+                              color:
+                                  AppColors
+                                      .primary, // Changed to AppColors.primary
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -312,11 +354,18 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                           children: [
                             Text(
                               DateFormat('dd/MM/yyyy').format(_selectedDate),
-                              style: const TextStyle(fontSize: 18),
+                              style: TextStyle(
+                                fontSize: 18,
+                                color:
+                                    AppColors
+                                        .darkBlue, // Changed to AppColors.darkBlue
+                              ),
                             ),
                             Icon(
                               Icons.arrow_drop_down,
-                              color: Theme.of(context).primaryColor,
+                              color:
+                                  AppColors
+                                      .primary, // Changed to AppColors.primary
                             ),
                           ],
                         ),
@@ -332,7 +381,9 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: Colors.grey[200]!),
+                  side: BorderSide(
+                    color: AppColors.gray,
+                  ), // Changed to AppColors.gray
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
@@ -343,7 +394,9 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                         children: [
                           Icon(
                             Icons.description,
-                            color: Colors.deepPurple,
+                            color:
+                                AppColors
+                                    .primary, // Changed to AppColors.primary
                             size: 20,
                           ),
                           const SizedBox(width: 8),
@@ -351,7 +404,9 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                             'DESCRIPTION (OPTIONAL)',
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.deepPurple,
+                              color:
+                                  AppColors
+                                      .primary, // Changed to AppColors.primary
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -364,7 +419,14 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                         decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: 'Add notes about your goal...',
-                          hintStyle: TextStyle(color: Colors.grey[400]),
+                          hintStyle: TextStyle(
+                            color: AppColors.gray,
+                          ), // Changed to AppColors.gray
+                        ),
+                        style: TextStyle(
+                          color:
+                              AppColors
+                                  .darkBlue, // Changed to AppColors.darkBlue
                         ),
                       ),
                     ],
@@ -379,7 +441,8 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                 child: ElevatedButton(
                   onPressed: _saveGoal,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).primaryColor,
+                    backgroundColor:
+                        AppColors.primary, // Changed to AppColors.primary
                     padding: const EdgeInsets.symmetric(vertical: 18),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
