@@ -10,7 +10,7 @@ import 'package:finney/pages/3-dashboard/widgets/charts/spending_bar_chart.dart'
 import 'package:finney/pages/3-dashboard/widgets/charts/category_pie_chart.dart';
 import 'package:finney/pages/3-dashboard/services/transaction_services.dart';
 import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
-import 'package:finney/pages/3-dashboard/budget_reminder_page.dart'; // ✅ New import
+import 'package:finney/pages/3-dashboard/budget_reminder_page.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -190,31 +190,27 @@ class DashboardState extends State<Dashboard> {
                 expenses: _monthlyExpenses,
               ),
               const SizedBox(height: 20),
-              const NavigationTiles(),
-              const SizedBox(height: 10),
-
-              // ✅ Budget Reminder Button
-              ElevatedButton.icon(
-                icon: const Icon(Icons.notifications),
-                label: const Text("Budget Reminder (বাজেট অনুস্মারক)"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  minimumSize: const Size.fromHeight(50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildDashboardTile(Icons.bar_chart, 'Reports'),
+                  _buildDashboardTile(Icons.account_balance_wallet, 'Budgets'),
+                  _buildDashboardTile(Icons.headset, 'AI Assistant'),
+                  _buildDashboardTile(Icons.flag, 'Goals'),
+                  _buildDashboardTile(
+                    Icons.notifications_active,
+                    'Reminder',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const BudgetReminderPage(),
+                        ),
+                      );
+                    },
                   ),
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const BudgetReminderPage(),
-                    ),
-                  );
-                },
+                ],
               ),
-
               const SizedBox(height: 20),
               SpendingBarChart(weeklyExpenses: _weeklyExpenses),
               const SizedBox(height: 20),
@@ -230,6 +226,29 @@ class DashboardState extends State<Dashboard> {
         backgroundColor: AppColors.primary,
         onPressed: () => _showAddTransactionModal(context),
         child: const Icon(Icons.add, color: Colors.white),
+      ),
+    );
+  }
+
+  Widget _buildDashboardTile(IconData icon, String label, {VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.blue.shade50,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Icon(icon, size: 28, color: AppColors.primary),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+          ),
+        ],
       ),
     );
   }

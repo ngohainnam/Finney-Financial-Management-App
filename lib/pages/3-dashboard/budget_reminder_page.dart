@@ -203,6 +203,7 @@ class _BudgetGraphSectionState extends State<BudgetGraphSection> {
   };
 
   int _tappedIndex = -1;
+  String _selectedFilter = "This Week";
 
   @override
   void initState() {
@@ -210,12 +211,17 @@ class _BudgetGraphSectionState extends State<BudgetGraphSection> {
     _flutterTts.setLanguage("bn-BD");
   }
 
-  bool isSameWeek(DateTime date) {
+  bool isInFilterRange(DateTime date) {
     final now = DateTime.now();
-    final beginningOfWeek = now.subtract(Duration(days: now.weekday - 1));
-    final endOfWeek = beginningOfWeek.add(const Duration(days: 6));
-    return date.isAfter(beginningOfWeek.subtract(const Duration(days: 1))) &&
-        date.isBefore(endOfWeek.add(const Duration(days: 1)));
+    if (_selectedFilter == "This Week") {
+      final start = now.subtract(Duration(days: now.weekday - 1));
+      final end = start.add(const Duration(days: 6));
+      return date.isAfter(start.subtract(const Duration(days: 1))) &&
+          date.isBefore(end.add(const Duration(days: 1)));
+    } else if (_selectedFilter == "This Month") {
+      return date.month == now.month && date.year == now.year;
+    }
+    return false;
   }
 
   void _speakBar(int index, double amount) {
@@ -234,12 +240,11 @@ class _BudgetGraphSectionState extends State<BudgetGraphSection> {
           return const Center(child: CircularProgressIndicator());
         }
 
-        // Reset totals
         _weeklyTotals.updateAll((key, value) => 0);
 
         for (var tx in snapshot.data!) {
-          if (!tx.isIncome && isSameWeek(tx.date)) {
-            final weekday = tx.date.weekday; // Monday = 1
+          if (!tx.isIncome && isInFilterRange(tx.date)) {
+            final weekday = tx.date.weekday;
             _weeklyTotals.update(weekday, (value) => value + tx.amount.abs());
           }
         }
@@ -274,11 +279,37 @@ class _BudgetGraphSectionState extends State<BudgetGraphSection> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "This Week’s Spending (এই সপ্তাহের খরচ)",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            // Dropdown aligned to left
+            DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: _selectedFilter,
+                icon: const Icon(Icons.arrow_drop_down, color: Colors.black87),
+                dropdownColor: Colors.white,
+                style: const TextStyle(color: Colors.black87, fontSize: 14),
+                borderRadius: BorderRadius.circular(10),
+                items: const [
+                  DropdownMenuItem(value: "This Week", child: Text("This Week")),
+                  DropdownMenuItem(value: "This Month", child: Text("This Month")),
+                ],
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() => _selectedFilter = value);
+                  }
+                },
+              ),
+            ),
+            const SizedBox(height: 6),
+
+            // Dynamic title based on selection
+            Text(
+              _selectedFilter == "This Week"
+                  ? "This Week’s Spending (এই সপ্তাহের খরচ)"
+                  : "This Month’s Spending (এই মাসের খরচ)",
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 10),
+
+            // Bar chart
             Container(
               height: 250,
               padding: const EdgeInsets.all(12),
@@ -306,8 +337,9 @@ class _BudgetGraphSectionState extends State<BudgetGraphSection> {
                         return BarTooltipItem(
                           '৳${rod.toY.toInt()}',
                           const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold),
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
                         );
                       },
                     ),
@@ -339,7 +371,6 @@ class _BudgetGraphSectionState extends State<BudgetGraphSection> {
               ),
             ),
             const SizedBox(height: 10),
-
             const Text(
               "✅ On Track (ঠিকঠাক চলছে)",
               style: TextStyle(color: Colors.green),
