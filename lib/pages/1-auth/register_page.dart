@@ -22,69 +22,95 @@ class _RegisterPageState extends State<RegisterPage> {
   final passwordController = TextEditingController();
   final confirmedController = TextEditingController();
 
-void signUserUp() async {
-  showDialog(
-    context: context,
-    builder: (context) {
-      return Center(
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
-        ),
-      );
-    },
-  );
+  String _passwordHint = '';
+  Color _hintColor = Colors.grey;
+  bool _obscurePassword = true;
 
-  if (passwordController.text == confirmedController.text) {
+  bool isValidGmail(String email) {
+  final gmailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@gmail\.com$');
+  return gmailRegex.hasMatch(email);
+}
+
+  bool isPasswordStrong(String password) {
+    final lengthValid = password.length >= 12;
+    final upperCaseValid = password.contains(RegExp(r'[A-Z]'));
+    final lowerCaseValid = password.contains(RegExp(r'[a-z]'));
+    final numberValid = password.contains(RegExp(r'[0-9]'));
+    final symbolValid = password.contains(RegExp(r'[!@#\$%^&*(),.?":{}|<>]'));
+
+    return lengthValid && upperCaseValid && lowerCaseValid && numberValid && symbolValid;
+  }
+
+  void signUserUp() async {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+    final confirmPassword = confirmedController.text.trim();
+
+    if (!isValidGmail(email)) {
+      Navigator.pop(context);
+      showErrorMessage(context, "Please enter a valid Gmail address.");
+      return;
+    }
+
+    if (password != confirmPassword) {
+      Navigator.pop(context);
+      showErrorMessage(context, 'Passwords do not match.');
+      return;
+    }
+
+    if (!isPasswordStrong(password)) {
+      Navigator.pop(context);
+      showErrorMessage(
+        context,
+        'Password must be at least 12 characters long and include uppercase, lowercase, number, and symbol.',
+      );
+      return;
+    }
+
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailController.text,
-        password: passwordController.text,
+        email: emailController.text.trim(),
+        password: password,
       );
 
       User? user = FirebaseAuth.instance.currentUser;
 
       if (user != null) {
         var box = await Hive.openBox('userBox');
-
         await box.put('uid', user.uid);
         await box.put('email', user.email);
 
         var storedUid = box.get('uid');
         var storedEmail = box.get('email');
-        
-        if (storedUid != null && storedEmail != null) {
-      
-        } else {
-          showErrorMessage(context,'Failed to store user in Hive.');
+
+        if (storedUid == null || storedEmail == null) {
+          showErrorMessage(context, 'Failed to store user in Hive.');
         }
       }
 
-      if (mounted) {
-        Navigator.pop(context); 
-      }
-
+      if (mounted) Navigator.pop(context);
     } catch (e) {
-
-      if (mounted) {
-        Navigator.pop(context);
-      }
+      if (mounted) Navigator.pop(context);
       showErrorMessage(context, 'Error: $e');
     }
-  } else {
-    Navigator.pop(context); 
-
-    showErrorMessage(context, 'Passwords do not match.');
   }
-}
 
   void showErrorMessage(BuildContext context, String message) {
     showDialog(
       context: context,
-      builder: (context) {
-        return ErrorDialog(message: message); 
-      },
+      builder: (context) => ErrorDialog(message: message),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -96,26 +122,24 @@ void signUserUp() async {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const SizedBox(height: 25),
-
                 Image.asset(AppImages.appLogo),
-            
                 const SizedBox(height: 25),
 
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
                   child: Align(
-                    alignment: Alignment.centerLeft, 
+                    alignment: Alignment.centerLeft,
                     child: Text(
                       'Create your Account',
                       style: TextStyle(
                         color: AppColors.darkBlue,
                         fontSize: 20,
-                        fontWeight: FontWeight.w500, 
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
                 ),
-            
+
                 const SizedBox(height: 25),
 
                 MyTextField(
@@ -123,15 +147,45 @@ void signUserUp() async {
                   hintText: 'Email',
                   obscureText: false,
                 ),
-            
+
                 const SizedBox(height: 10),
 
                 MyTextField(
                   controller: passwordController,
                   hintText: 'Password',
-                  obscureText: true,
+                  obscureText: _obscurePassword,
+                  onChanged: (value) {
+                    final valid = isPasswordStrong(value);
+                    setState(() {
+                      _passwordHint = valid
+                          ? '✅ Strong password'
+                          : '❌ Use 12+ chars w/ upper, lower, number & symbol';
+                      _hintColor = valid ? Colors.green : Colors.red;
+                    });
+                  },
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
+                  ),
                 ),
-            
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      _passwordHint,
+                      style: TextStyle(color: _hintColor, fontSize: 12),
+                    ),
+                  ),
+                ),
+
                 const SizedBox(height: 10),
 
                 MyTextField(
@@ -139,14 +193,14 @@ void signUserUp() async {
                   hintText: 'Confirm Password',
                   obscureText: true,
                 ),
-            
+
                 const SizedBox(height: 25),
 
                 MyButton(
                   text: 'Sign Up',
                   onTap: signUserUp,
                 ),
-            
+
                 const SizedBox(height: 50),
 
                 Padding(
@@ -154,66 +208,50 @@ void signUserUp() async {
                   child: Row(
                     children: [
                       Expanded(
-                        child: Divider(
-                          thickness: 0.5,
-                          color: AppColors.blurGray,
-                        ),
+                        child: Divider(thickness: 0.5, color: AppColors.blurGray),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10.0),
                         child: Text(
                           'Or continue with',
-                          style: TextStyle(
-                            color: AppColors.blurGray,
-                          ),
+                          style: TextStyle(color: AppColors.blurGray),
                         ),
                       ),
                       Expanded(
-                        child: Divider(
-                          thickness: 0.5,
-                          color: AppColors.blurGray,
-                        ),
+                        child: Divider(thickness: 0.5, color: AppColors.blurGray),
                       ),
                     ],
                   ),
                 ),
-            
+
                 const SizedBox(height: 50),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     GestureDetector(
-                      onTap: () {
-                        GoogleSignInService.signInWithGoogle(context); // Call the service
-                      },
+                      onTap: () => GoogleSignInService.signInWithGoogle(context),
                       child: SquareTile(imagePath: AppImages.googleIcon),
                     ),
                   ],
                 ),
-            
+
                 const SizedBox(height: 50),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      'Already a member?',
-                      style: TextStyle(color: AppColors.blurGray),
-                    ),
+                    Text('Already a member?', style: TextStyle(color: AppColors.blurGray)),
                     const SizedBox(width: 4),
                     GestureDetector(
                       onTap: widget.onTap,
                       child: const Text(
                         'Log in now',
-                        style: TextStyle(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],
-                )
+                ),
               ],
             ),
           ),

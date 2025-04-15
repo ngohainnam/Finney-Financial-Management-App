@@ -5,12 +5,16 @@ class MyTextField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
   final bool obscureText;
+  final Function(String)? onChanged; // ✅ New
+  final Widget? suffixIcon;          // ✅ New
 
   const MyTextField({
     super.key,
     required this.controller,
     required this.hintText,
     required this.obscureText,
+    this.onChanged,
+    this.suffixIcon,
   });
 
   @override
@@ -20,17 +24,20 @@ class MyTextField extends StatelessWidget {
       child: TextField(
         controller: controller,
         obscureText: obscureText,
+        onChanged: onChanged, // ✅ Hook into change event
         decoration: InputDecoration(
-            enabledBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: AppColors.softGray),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: AppColors.darkBlue),
-            ),
-            fillColor: Colors.white,
-            filled: true,
-            hintText: hintText,
-            hintStyle: TextStyle(color: AppColors.blurGray)),
+          enabledBorder: const OutlineInputBorder(
+            borderSide: BorderSide(color: AppColors.softGray),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: AppColors.darkBlue),
+          ),
+          fillColor: Colors.white,
+          filled: true,
+          hintText: hintText,
+          hintStyle: TextStyle(color: AppColors.blurGray),
+          suffixIcon: suffixIcon, // ✅ Optional icon
+        ),
       ),
     );
   }
