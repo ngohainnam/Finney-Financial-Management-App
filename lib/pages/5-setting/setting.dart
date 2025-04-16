@@ -261,8 +261,8 @@ class _SettingState extends State<Setting> {
                           ? const NetworkImage('https://placehold.co/150x150')
                           : FileImage(File(_imageFile!.path)) as ImageProvider,
                       onBackgroundImageError: _imageFile == null
-                          ? (exception, stackTrace) {
-                              print('Failed to load image: $exception');
+                            ? (exception, stackTrace) {
+                              debugPrint('Error loading image: $exception');
                             }
                           : null,
                       child: _imageFile == null

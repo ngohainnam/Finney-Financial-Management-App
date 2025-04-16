@@ -23,7 +23,7 @@ class TransactionItem extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: transaction.iconColor.withOpacity(0.1),
+              color: transaction.iconColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
