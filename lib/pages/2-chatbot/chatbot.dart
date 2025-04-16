@@ -1,8 +1,10 @@
 import 'package:finney/assets/theme/app_color.dart';
 import 'package:finney/pages/2-chatbot/presentation/chat_interface.dart';
-import 'package:finney/pages/2-chatbot/presentation/voicechat_interface.dart'; // Add this import
+import 'package:finney/pages/2-chatbot/presentation/voicechat_interface.dart';
+import 'package:finney/pages/2-chatbot/services/llm_transactionparser.dart';
 import 'package:finney/pages/2-chatbot/services/storage_service.dart';
-import 'package:finney/pages/2-chatbot/utils/chat_constants.dart';
+import 'package:finney/pages/2-chatbot/utils/chat_constants.dart'; 
+import 'package:finney/pages/3-dashboard/services/transaction_services.dart'; 
 import 'package:flutter/material.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
@@ -20,11 +22,16 @@ class Chatbot extends StatefulWidget {
 
 class _ChatbotState extends State<Chatbot> {
   final ChatStorageService _storageService = ChatStorageService();
+  final TransactionService _transactionService = TransactionService();
   late ChatService _chatService;
   final gemini = Gemini.instance;
   bool showWelcomeScreen = true;
   List<ChatMessage> messages = [];
   List<Content> conversationHistory = [];
+  
+  //for transaction handling
+  bool _awaitingTransactionConfirmation = false;
+  Map<String, dynamic>? _pendingTransaction;
 
   @override
   void initState() {
@@ -50,13 +57,17 @@ class _ChatbotState extends State<Chatbot> {
   }
 
   void _sendMessage(ChatMessage chatMessage) async {
+    if (_awaitingTransactionConfirmation) {
+      _handleTransactionConfirmation(chatMessage);
+      return;
+    }
+
     setState(() {
       messages = [chatMessage] + messages;
       showWelcomeScreen = false;
     });
     await _storageService.saveMessage(chatMessage, role: 'user');
 
-    //add a temporary "thinking" message
     final loadingMessage = ChatMessage(
       user: ChatConstants.geminiUser,
       createdAt: DateTime.now(),
@@ -69,6 +80,30 @@ class _ChatbotState extends State<Chatbot> {
     });
 
     final response = await _chatService.sendMessage(chatMessage);
+    
+    if (TransactionParser.hasTransactionInfo(response)) {
+      final transactionData = TransactionParser.extractTransactionFromMessage(response);
+      
+      if (transactionData != null) {
+        _pendingTransaction = transactionData;
+        
+        final message = ChatMessage(
+          user: ChatConstants.geminiUser,
+          createdAt: DateTime.now(),
+          text: response,
+        );
+        
+        setState(() {
+          messages.removeAt(0);
+          messages = [message] + messages;
+        });
+        await _storageService.saveMessage(message, role: 'model');
+        
+        _awaitingTransactionConfirmation = true;
+        return;
+      }
+    }
+
     final message = ChatMessage(
       user: ChatConstants.geminiUser,
       createdAt: DateTime.now(),
@@ -81,6 +116,66 @@ class _ChatbotState extends State<Chatbot> {
     });
     await _storageService.saveMessage(message, role: 'model');
   }
+
+  void _handleTransactionConfirmation(ChatMessage userMessage) async {
+    setState(() {
+      messages = [userMessage] + messages;
+    });
+    
+    String responseText;
+    
+    if (TransactionParser.isConfirmingTransaction(userMessage.text)) {
+      try {
+        final transactionModel = TransactionParser.createTransactionModel(_pendingTransaction!);
+        await _transactionService.addTransaction(transactionModel);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Transaction added successfully'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+        responseText = "Transaction added successfully!";
+      } catch (e) {
+        responseText = "Sorry, I couldn't add the transaction. Please try again later.";
+      }
+    } else if (TransactionParser.isCancelingTransaction(userMessage.text)) {
+      responseText = "No problem, I won't add that transaction.";
+    } 
+    else {
+      responseText = "I'm not sure if you want to add this transaction or not. Please answer with Yes or No.";
+      
+      final message = ChatMessage(
+        user: ChatConstants.geminiUser,
+        createdAt: DateTime.now(),
+        text: responseText,
+      );
+
+      setState(() {
+        messages = [message] + messages;
+      });
+      await _storageService.saveMessage(message, role: 'model');
+      
+      return;
+    }
+    
+    final message = ChatMessage(
+      user: ChatConstants.geminiUser,
+      createdAt: DateTime.now(),
+      text: responseText,
+    );
+
+    setState(() {
+      messages = [message] + messages;
+    });
+    await _storageService.saveMessage(message, role: 'model');
+    
+    _awaitingTransactionConfirmation = false;
+    _pendingTransaction = null;
+  }
+
 
   void _sendMediaMessage() async {
     final picker = ImagePicker();
@@ -120,6 +215,8 @@ class _ChatbotState extends State<Chatbot> {
       messages = [];
       conversationHistory = [];
       showWelcomeScreen = true;
+      _awaitingTransactionConfirmation = false;
+      _pendingTransaction = null;
     });
   }
 
@@ -180,7 +277,6 @@ class _ChatbotState extends State<Chatbot> {
             ],
           ),
           
-          //mimic the floating action button that navigates to the voice chat screen
           //cannot use floatingbutton here (then the floating button in dashboard wont work?)
           Positioned(
             right: 16,

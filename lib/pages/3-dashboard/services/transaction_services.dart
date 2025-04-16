@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+//import 'package:hive_flutter/hive_flutter.dart';
 
 class TransactionService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -27,8 +27,8 @@ class TransactionService {
 
       await _transactionsCollection.add(transaction.toMap());
 
-      var box = await Hive.openBox<TransactionModel>('transactions');
-      await box.add(transaction);
+      //var box = await Hive.openBox<TransactionModel>('transactions');
+      //await box.add(transaction);
     } catch (e) {
       debugPrint('Error adding transaction: $e');
       rethrow;
