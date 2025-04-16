@@ -54,6 +54,7 @@ dependencies:
   flutter_tts: ^4.2.2
   flutter_slidable: ^3.0.1
   url_launcher: ^6.2.5 
+  speech_to_text: ^7.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

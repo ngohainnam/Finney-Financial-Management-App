@@ -35,10 +35,6 @@ class ChatInterface extends StatelessWidget {
             onPressed: onMediaSend,
             icon: Icon(Icons.image, color: AppColors.primary),
           ),
-          IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.mic, color: AppColors.primary),
-          ),
         ],
         inputDecoration: InputDecoration(
           hintText: "Ask me financial question. . .",

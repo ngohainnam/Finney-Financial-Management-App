@@ -34,7 +34,10 @@ class ChatService {
       final value = await gemini.chat(conversationHistory);
       String response = value?.output ?? 'Something went wrong. Please try again later...';
       
-      await TtsService().speak(response);
+      bool isFromVoiceInput = chatMessage.customProperties?['fromVoiceInput'] == true;
+      if (isFromVoiceInput) {
+        await TtsService().speak(response);
+      }
       
       conversationHistory.add(Content(
         parts: [Part.text(response)],
