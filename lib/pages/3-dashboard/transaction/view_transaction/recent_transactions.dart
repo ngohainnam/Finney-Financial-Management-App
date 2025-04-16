@@ -42,6 +42,7 @@ class RecentTransactions extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
+              
               TextButton(
                 onPressed: () {
                   Navigator.push(
