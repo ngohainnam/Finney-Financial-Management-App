@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:finney/assets/theme/app_color.dart';
-import 'package:finney/pages/3-dashboard/transaction/add_saving/saving_goal_page.dart';
+import 'package:finney/pages/3-dashboard/saving/add_saving/saving_goal_page.dart';
 
 class NavigationTiles extends StatelessWidget {
   const NavigationTiles({super.key});

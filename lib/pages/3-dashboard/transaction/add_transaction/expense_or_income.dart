@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:finney/pages/3-dashboard/transaction/add_transaction/add_income_screen.dart';
 import 'package:finney/pages/3-dashboard/transaction/add_transaction/add_expense_screen.dart';
 import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
-import 'package:finney/pages/3-dashboard/transaction/add_saving/add_edit_goal_page.dart';
+import 'package:finney/pages/3-dashboard/saving/add_saving/add_edit_goal_page.dart';
 
 class AddTransactionModal extends StatelessWidget {
   final Function(TransactionModel) onTransactionAdded;

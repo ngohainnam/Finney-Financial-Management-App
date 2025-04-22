@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:finney/pages/3-dashboard/models/saving_goal_model.dart';
 import 'package:finney/pages/3-dashboard/services/saving_goal_service.dart';
-import 'package:finney/pages/3-dashboard/transaction/add_saving/add_edit_goal_page.dart';
+import 'package:finney/pages/3-dashboard/saving/add_saving/add_edit_goal_page.dart';
 import 'package:finney/pages/3-dashboard/widgets/goal_card.dart';
 
 // Color constants
