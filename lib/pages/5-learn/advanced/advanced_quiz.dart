@@ -148,7 +148,8 @@ class _AdvancedQuizState extends State<AdvancedQuiz> {
                       child: Text(answer['text']),
                     ),
                   ),
-                ),
+                )
+                .toList(),
           ],
         ),
       ),

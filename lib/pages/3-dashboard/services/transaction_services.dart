@@ -2,7 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
 import 'package:flutter/material.dart';
-//import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:intl/intl.dart';
 
 class TransactionService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -27,8 +28,8 @@ class TransactionService {
 
       await _transactionsCollection.add(transaction.toMap());
 
-      //var box = await Hive.openBox<TransactionModel>('transactions');
-      //await box.add(transaction);
+      var box = await Hive.openBox<TransactionModel>('transactions');
+      await box.add(transaction);
     } catch (e) {
       debugPrint('Error adding transaction: $e');
       rethrow;
@@ -191,5 +192,40 @@ class TransactionService {
       debugPrint('Error updating transaction: $e');
       rethrow;
     }
+  }
+
+  // Get monthly expenses for the last 6 months
+  Future<List<MonthlyExpense>> getMonthlyExpenses() async {
+    User? user = _auth.currentUser;
+    if (user == null) {
+      throw Exception('No authenticated user found');
+    }
+
+    DateTime now = DateTime.now();
+    List<MonthlyExpense> monthlyExpenses = [];
+
+    for (int i = 0; i < 6; i++) {
+      DateTime firstDayOfMonth = DateTime(now.year, now.month - i, 1);
+      DateTime lastDayOfMonth = DateTime(now.year, now.month - i + 1, 0, 23, 59, 59);
+
+      QuerySnapshot snapshot = await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('transactions')
+          .where('date', isGreaterThanOrEqualTo: firstDayOfMonth)
+          .where('date', isLessThanOrEqualTo: lastDayOfMonth)
+          .where('amount', isLessThan: 0)
+          .get();
+
+      double totalExpense = snapshot.docs.fold<double>(0.0, (total, doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        return total + (data['amount'] as num).abs().toDouble();
+      });
+
+      String monthName = DateFormat('MMM').format(firstDayOfMonth);
+      monthlyExpenses.add(MonthlyExpense(month: monthName, amount: totalExpense));
+    }
+
+    return monthlyExpenses.reversed.toList();
   }
 }

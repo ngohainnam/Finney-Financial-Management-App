@@ -8,6 +8,7 @@ import 'package:finney/assets/theme/app_color.dart';
 import 'package:finney/pages/3-dashboard/widgets/balance_card.dart';
 import 'package:finney/pages/3-dashboard/widgets/charts/spending_bar_chart.dart';
 import 'package:finney/pages/3-dashboard/widgets/charts/category_pie_chart.dart';
+import 'package:finney/pages/3-dashboard/widgets/charts/monthly_expense_chart.dart';
 import 'package:finney/pages/3-dashboard/services/transaction_services.dart';
 import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
 
@@ -21,13 +22,14 @@ class Dashboard extends StatefulWidget {
 class DashboardState extends State<Dashboard> {
   final TransactionService _transactionService = TransactionService();
   final ChartService _chartService = ChartService();
-  
+
   double _currentBalance = 0.0;
   double _monthlyIncome = 0.0;
-  double _monthlyExpenses = 0.0;
+  double _monthlyExpenseTotal = 0.0;
 
   List<WeeklyExpense> _weeklyExpenses = [];
   List<CategoryExpense> _categoryExpenses = [];
+  List<MonthlyExpense> _monthlyExpenseList = [];
   List<TransactionModel> _recentTransactions = [];
 
   bool _isLoading = true;
@@ -53,6 +55,7 @@ class DashboardState extends State<Dashboard> {
         _transactionService.getCurrentMonthExpenses(),
         _transactionService.getWeeklyExpenses(),
         _transactionService.getCategoryExpenses(),
+        _transactionService.getMonthlyExpenses(),
       ]);
 
       if (_recentTransactions.isEmpty) {
@@ -68,10 +71,11 @@ class DashboardState extends State<Dashboard> {
       if (mounted) {
         setState(() {
           _monthlyIncome = results[0] as double;
-          _monthlyExpenses = results[1] as double;
+          _monthlyExpenseTotal = results[1] as double;
           _weeklyExpenses = results[2] as List<WeeklyExpense>;
           _categoryExpenses = results[3] as List<CategoryExpense>;
-          _currentBalance = _monthlyIncome - _monthlyExpenses;
+          _monthlyExpenseList = results[4] as List<MonthlyExpense>;
+          _currentBalance = _monthlyIncome - _monthlyExpenseTotal;
           _isLoading = false;
           _isRefreshing = false;
         });
@@ -97,13 +101,13 @@ class DashboardState extends State<Dashboard> {
   void _handleTransactionAdded(TransactionModel transaction) {
     setState(() {
       _recentTransactions.add(transaction);
-      
+
       if (transaction.isIncome) {
         _monthlyIncome += transaction.amount;
       } else {
-        _monthlyExpenses += transaction.amount.abs();
+        _monthlyExpenseTotal += transaction.amount.abs();
       }
-      _currentBalance = _monthlyIncome - _monthlyExpenses;
+      _currentBalance = _monthlyIncome - _monthlyExpenseTotal;
 
       if (transaction.id != null) {
         _transactionService.addTransaction;
@@ -126,13 +130,13 @@ class DashboardState extends State<Dashboard> {
   void _handleDeleteTransaction(TransactionModel transaction) {
     setState(() {
       _recentTransactions.remove(transaction);
-      
+
       if (transaction.isIncome) {
         _monthlyIncome -= transaction.amount;
       } else {
-        _monthlyExpenses -= transaction.amount.abs();
+        _monthlyExpenseTotal -= transaction.amount.abs();
       }
-      _currentBalance = _monthlyIncome - _monthlyExpenses;
+      _currentBalance = _monthlyIncome - _monthlyExpenseTotal;
 
       if (transaction.id != null) {
         _transactionService.deleteTransaction(transaction.id!);
@@ -176,31 +180,33 @@ class DashboardState extends State<Dashboard> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
-              onRefresh: _loadDashboardData,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    BalanceCard(
-                      balance: _currentBalance,
-                      income: _monthlyIncome,
-                      expenses: _monthlyExpenses,
-                    ),
-                    const SizedBox(height: 20),
-                    const NavigationTiles(),
-                    const SizedBox(height: 20),
-                    SpendingBarChart(weeklyExpenses: _weeklyExpenses),
-                    const SizedBox(height: 20),
-                    CategoryPieChart(categoryExpenses: _categoryExpenses),
-                    const SizedBox(height: 20),
-                    _buildRecentTransactions(),
-                    const SizedBox(height: 80),
-                  ],
-                ),
+        onRefresh: _loadDashboardData,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              BalanceCard(
+                balance: _currentBalance,
+                income: _monthlyIncome,
+                expenses: _monthlyExpenseTotal,
               ),
-            ),
+              const SizedBox(height: 20),
+              const NavigationTiles(),
+              const SizedBox(height: 20),
+              MonthlyExpenseChart(monthlyExpenses: _monthlyExpenseList),
+              const SizedBox(height: 20),
+              SpendingBarChart(weeklyExpenses: _weeklyExpenses),
+              const SizedBox(height: 20),
+              CategoryPieChart(categoryExpenses: _categoryExpenses),
+              const SizedBox(height: 20),
+              _buildRecentTransactions(),
+              const SizedBox(height: 80),
+            ],
+          ),
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primary,
         onPressed: () => _showAddTransactionModal(context),
