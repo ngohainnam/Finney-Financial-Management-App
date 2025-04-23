@@ -131,7 +131,7 @@ class _RecentTransactionsState extends State<RecentTransactions> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                           side: BorderSide(
-                            color: AppColors.primary.withValues(alpha: 128),
+                            color: AppColors.primary,
                           ),
                         ),
                       ),

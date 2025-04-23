@@ -96,16 +96,9 @@ class TransactionItem extends StatelessWidget {
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
-                        color: isIncome ? AppColors.categoryFood : AppColors.categoryHealth,
+                        color: isIncome ? Colors.green : Colors.redAccent,
                       ),
                     ),
-                    if (!isDeleteMode)
-                      IconButton(
-                        onPressed: () => _showEditScreen(context),
-                        icon: const Icon(Icons.edit, color: AppColors.gray),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                      ),
                   ],
                 ),
                 const SizedBox(height: 4),

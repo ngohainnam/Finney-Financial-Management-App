@@ -2,6 +2,7 @@ import 'package:finney/assets/theme/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:finney/pages/2-chatbot/services/stt_service.dart';
+import 'package:finney/pages/2-chatbot/utils/robot_animation.dart'; 
 
 class VoiceChatInterface extends StatefulWidget {
   final ChatUser currentUser;
@@ -104,7 +105,7 @@ class _VoiceChatInterfaceState extends State<VoiceChatInterface> {
       ),
       body: Stack(
         children: [
-          // Main content
+          RobotAnimationHeader(isTyping: _isProcessing),
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -156,7 +157,7 @@ class _VoiceChatInterfaceState extends State<VoiceChatInterface> {
                         ? Colors.orange 
                         : _isListening 
                             ? Colors.redAccent 
-                            : AppColors.primary,
+                            : AppColors.darkBlue,
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(

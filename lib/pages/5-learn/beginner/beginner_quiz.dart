@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:finney/assets/theme/app_color.dart';
 
 class BeginnerQuiz extends StatefulWidget {
   const BeginnerQuiz({super.key});

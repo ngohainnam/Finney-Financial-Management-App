@@ -1,3 +1,4 @@
+import 'package:finney/pages/2-chatbot/utils/robot_animation.dart';
 import 'package:flutter/material.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:finney/assets/theme/app_color.dart';
@@ -7,6 +8,7 @@ class ChatInterface extends StatelessWidget {
   final Function(ChatMessage) onSend;
   final List<ChatMessage> messages;
   final VoidCallback onMediaSend;
+  final bool isAiTyping;
 
   const ChatInterface({
     super.key,
@@ -14,51 +16,55 @@ class ChatInterface extends StatelessWidget {
     required this.onSend,
     required this.messages,
     required this.onMediaSend,
+    this.isAiTyping = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return DashChat(
-      currentUser: currentUser,
-      onSend: onSend,
-      messages: messages,
-      messageOptions: MessageOptions(
-        containerColor: AppColors.softGray,
-        currentUserContainerColor: AppColors.primary,
-        textColor: Colors.black,
-        currentUserTextColor: Colors.white,
-        showTime: true,
-      ),
-      inputOptions: InputOptions(
-        trailing: [
-          IconButton(
-            onPressed: onMediaSend,
-            icon: Icon(Icons.image, color: AppColors.primary),
+    return Column(
+      children: [
+        RobotAnimationHeader(isTyping: isAiTyping),
+        
+        Expanded(
+          child: DashChat(
+            currentUser: currentUser,
+            onSend: onSend,
+            messages: messages,
+            messageOptions: MessageOptions(
+              containerColor: AppColors.softGray,
+              currentUserContainerColor: AppColors.primary,
+              textColor: Colors.black,
+              currentUserTextColor: Colors.white,
+              showTime: false,
+              showOtherUsersName: false,
+              showOtherUsersAvatar: false,
+              showCurrentUserAvatar: false,
+            ),
+            inputOptions: InputOptions(
+              trailing: [
+                IconButton(
+                  onPressed: onMediaSend,
+                  icon: Icon(Icons.image, color: AppColors.darkBlue),
+                ),
+              ],
+              inputDecoration: InputDecoration(
+                hintText: "Ask me financial question...",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none, 
+                ),
+                filled: true,
+                fillColor: AppColors.blurGray.withValues(alpha: 0.2), 
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              ),
+              sendButtonBuilder: (onSend) => IconButton(
+                icon: const Icon(Icons.send_rounded, color: AppColors.darkBlue),
+                onPressed: onSend,
+              ),
+            ),
           ),
-        ],
-        inputDecoration: InputDecoration(
-          hintText: "Ask me financial question. . .",
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(25),
-            borderSide: const BorderSide(color: AppColors.primary),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(25),
-            borderSide: const BorderSide(color: AppColors.blurGray),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(25),
-            borderSide: const BorderSide(color: AppColors.primary, width: 1),
-          ),
-          filled: true,
-          fillColor: Colors.white,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         ),
-        sendButtonBuilder: (onSend) => IconButton(
-          icon: const Icon(Icons.send_rounded, color: AppColors.primary),
-          onPressed: onSend,
-        ),
-      ),
+      ],
     );
   }
 }

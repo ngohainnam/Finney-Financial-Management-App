@@ -1,4 +1,4 @@
-import 'package:finney/assets/path/app_images.dart';
+import 'package:finney/pages/2-chatbot/utils/robot_animation.dart';
 import 'package:flutter/material.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:finney/assets/theme/app_color.dart';
@@ -21,23 +21,30 @@ class WelcomeScreen extends StatelessWidget {
 Widget build(BuildContext context) {
   return Scaffold(
     backgroundColor: Colors.white,
-    body: SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const SizedBox(height: 40),
-            Image.asset(AppImages.appLogo),
-            const SizedBox(height: 30),
-            _buildTryAskingText(),
-            const SizedBox(height: 20),
-            _buildSuggestedQuestions(),
-            const SizedBox(height: 20),
-            _buildSkipButton(),
-          ],
+    body: Column(
+      children: [
+
+        const RobotAnimationHeader(isTyping: false),
+        
+        Expanded(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildTryAskingText(),
+                  const SizedBox(height: 20),
+                  _buildSuggestedQuestions(),
+                  const SizedBox(height: 20),
+                  _buildSkipButton(),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
+          ),
         ),
-      ),
+      ],
     ),
   );
 }

@@ -39,7 +39,7 @@ void signUserIn() async {
 
   if (user != null) {
 
-    var box = await Hive.openBox<UserModel>('userBox'); 
+    var box = Hive.box<UserModel>('userBox'); 
     var storedUser = box.get('user');
     
     if (storedUser != null) {

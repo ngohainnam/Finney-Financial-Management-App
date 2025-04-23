@@ -134,8 +134,7 @@ class _IntermediateQuizState extends State<IntermediateQuiz> {
                       child: Text(answer['text']),
                     ),
                   ),
-                )
-                .toList(),
+                ),
           ],
         ),
       ),

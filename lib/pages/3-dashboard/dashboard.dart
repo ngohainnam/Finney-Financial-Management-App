@@ -208,7 +208,7 @@ class DashboardState extends State<Dashboard> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.primary,
+        backgroundColor: AppColors.darkBlue,
         onPressed: () => _showAddTransactionModal(context),
         child: const Icon(Icons.add, color: Colors.white),
       ),

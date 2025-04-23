@@ -2,6 +2,7 @@ import 'package:finney/assets/theme/app_color.dart';
 import 'package:finney/pages/2-chatbot/models/chat_message_model.dart';
 import 'package:finney/pages/1-auth/auth_page.dart';
 import 'package:finney/assets/path/api.dart';
+import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
@@ -19,8 +20,10 @@ void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(UserModelAdapter());
   Hive.registerAdapter(ChatMessageModelAdapter());
+  Hive.registerAdapter(TransactionModelAdapter());
   await Hive.openBox<UserModel>('userBox');
   await Hive.openBox<ChatMessageModel>('chatMessage');
+  await Hive.openBox<TransactionModel>('transactions');
 
   Gemini.init(
     apiKey: geminiApiKey,
