@@ -8,21 +8,27 @@ class TransactionList extends StatelessWidget {
   final List<TransactionModel> transactions;
   final Function(TransactionModel)? onDeleteTransaction;
   final bool showAll;
+  final bool isDeleteMode;
+  final Set<TransactionModel> selectedTransactions;
+  final Function(TransactionModel)? onTransactionSelected;
 
   const TransactionList({
     super.key,
     required this.transactions,
     this.onDeleteTransaction,
     this.showAll = false,
+    this.isDeleteMode = false,
+    this.selectedTransactions = const {},
+    this.onTransactionSelected,
   });
 
   Map<String, List<TransactionModel>> _groupTransactionsByDate() {
     final groupedTransactions = <String, List<TransactionModel>>{};
-    
-    final transactionList = showAll 
-        ? transactions 
+
+    final transactionList = showAll
+        ? transactions
         : transactions.take(5).toList();
-    
+
     for (var transaction in transactionList) {
       final date = DateFormat('yyyy-MM-dd').format(transaction.date);
       if (!groupedTransactions.containsKey(date)) {
@@ -30,21 +36,21 @@ class TransactionList extends StatelessWidget {
       }
       groupedTransactions[date]!.add(transaction);
     }
-    
+
     final sortedDates = groupedTransactions.keys.toList()
       ..sort((a, b) => b.compareTo(a));
-    
+
     return Map.fromEntries(
-      sortedDates.map((date) => MapEntry(date, groupedTransactions[date]!))
+        sortedDates.map((date) => MapEntry(date, groupedTransactions[date]!))
     );
   }
 
   String _formatDate(String date) {
     final today = DateTime.now();
     final yesterday = today.subtract(const Duration(days: 1));
-    
+
     final transactionDate = DateTime.parse(date);
-    
+
     if (DateFormat('yyyy-MM-dd').format(today) == date) {
       return 'Today';
     } else if (DateFormat('yyyy-MM-dd').format(yesterday) == date) {
@@ -95,6 +101,9 @@ class TransactionList extends StatelessWidget {
                   return TransactionItem(
                     transaction: transaction,
                     onDelete: onDeleteTransaction,
+                    isDeleteMode: isDeleteMode,
+                    isSelected: selectedTransactions.contains(transaction),
+                    onSelected: onTransactionSelected,
                   );
                 }).toList(),
               ),

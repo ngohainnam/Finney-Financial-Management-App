@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:finney/pages/3-dashboard/models/saving_goal_model.dart';
-import 'package:finney/pages/3-dashboard/services/saving_goal_service.dart';
-import 'package:finney/pages/3-dashboard/transaction/add_saving/add_edit_goal_page.dart';
+import 'package:finney/pages/3-dashboard/saving/add_saving/saving_goal_service.dart';
+import 'package:finney/pages/3-dashboard/saving/add_saving/add_edit_goal_page.dart';
 import 'package:finney/pages/3-dashboard/widgets/goal_card.dart';
 
 // Color constants
 const _successColor = Color(0xFF4CAF50);
-const _successDark = Color(0xFF388E3C);
+const _successDark = Color(0xFF4CAF50);
 const _errorColor = Color(0xFFF44336);
 const _infoColor = Color(0xFF2196F3);
 
@@ -58,11 +58,33 @@ class SavingGoalPageState extends State<SavingGoalPage> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text(
-          'My Saving Goals',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'My Saving Goals',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            ElevatedButton.icon(
+              onPressed: _navigateToAddGoal,
+              icon: const Icon(Icons.add_circle_outline, size: 20),
+              label: const Text('New Goal', style: TextStyle(fontSize: 14)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _successDark,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(17.5),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+              ),
+            ),
+          ],
         ),
-        centerTitle: true,
+        centerTitle: false,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded, size: 28),
           onPressed: () => Navigator.of(context).pop(),
@@ -173,15 +195,15 @@ class SavingGoalPageState extends State<SavingGoalPage> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _navigateToAddGoal,
-        icon: const Icon(Icons.add_circle_outline, size: 24),
-        label: const Text('New Goal', style: TextStyle(fontSize: 16)),
-        backgroundColor: Theme.of(context).primaryColor,
-        foregroundColor: Colors.white,
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      ),
+      //floatingActionButton: FloatingActionButton.extended(
+      //onPressed: _navigateToAddGoal,
+      //icon: const Icon(Icons.add_circle_outline, size: 24),
+      //label: const Text('New Goal', style: TextStyle(fontSize: 16)),
+      //backgroundColor: Theme.of(context).primaryColor,
+      //foregroundColor: Colors.white,
+      //elevation: 4,
+      //shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      //),
     );
   }
 

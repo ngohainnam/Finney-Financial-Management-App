@@ -2,12 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:finney/assets/theme/app_color.dart';
 
 class DeleteTransactionDialog extends StatelessWidget {
-  const DeleteTransactionDialog({super.key});
+  final String title;
+  final String message;
+  
+  const DeleteTransactionDialog({
+    super.key,
+    this.title = 'Delete Transaction',
+    this.message = 'This action cannot be undone. Are you sure you want to delete this transaction?',
+  });
 
-  static Future<bool> show(BuildContext context) async {
+  static Future<bool> show(
+    BuildContext context, {
+    String title = 'Delete Transaction',
+    String message = 'This action cannot be undone. Are you sure you want to delete this transaction?',
+  }) async {
     return await showDialog<bool>(
       context: context,
-      builder: (context) => const DeleteTransactionDialog(),
+      builder: (context) => DeleteTransactionDialog(
+        title: title,
+        message: message,
+      ),
     ) ?? false;
   }
 
@@ -33,18 +47,20 @@ class DeleteTransactionDialog extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          const Text(
-            'Delete Transaction',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],
       ),
-      content: const Text(
-        'This action cannot be undone. Are you sure you want to delete this transaction?',
-        style: TextStyle(
+      content: Text(
+        message,
+        style: const TextStyle(
           color: AppColors.blurGray,
           fontSize: 14,
         ),

@@ -1,15 +1,16 @@
+import 'package:finney/components/lanaguage_button.dart';
+import 'package:finney/components/charts/chart_service.dart' as chart_service;
+import 'package:finney/components/time_selector.dart';
+import 'package:finney/pages/2-chatbot/utils/robot_animation.dart';
 import 'package:finney/pages/3-dashboard/widgets/navigation_tiles.dart';
 import 'package:finney/pages/3-dashboard/transaction/add_transaction/expense_or_income.dart';
-import 'package:finney/pages/3-dashboard/services/chart_service.dart';
 import 'package:finney/pages/3-dashboard/utils/dashboard_help.dart';
 import 'package:finney/pages/3-dashboard/transaction/view_transaction/recent_transactions.dart';
 import 'package:flutter/material.dart';
 import 'package:finney/assets/theme/app_color.dart';
 import 'package:finney/pages/3-dashboard/widgets/balance_card.dart';
-import 'package:finney/pages/3-dashboard/widgets/charts/spending_bar_chart.dart';
-import 'package:finney/pages/3-dashboard/widgets/charts/category_pie_chart.dart';
-import 'package:finney/pages/3-dashboard/services/transaction_services.dart';
-import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
+import 'package:finney/pages/3-dashboard/transaction/transaction_services.dart';
+import 'package:finney/pages/3-dashboard/models/transaction_model.dart' hide CategoryExpense;
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -20,16 +21,18 @@ class Dashboard extends StatefulWidget {
 
 class DashboardState extends State<Dashboard> {
   final TransactionService _transactionService = TransactionService();
-  final ChartService _chartService = ChartService();
+  final chart_service.ChartService _chartService = chart_service.ChartService();
+
+  // Current time range for filtering data - make this accessible to other widgets
+  static TimeRangeData currentTimeRange = TimeRangeData.month();
   
   double _currentBalance = 0.0;
   double _monthlyIncome = 0.0;
-  double _monthlyExpenses = 0.0;
+  double _monthlyExpenseTotal = 0.0;
 
-  List<WeeklyExpense> _weeklyExpenses = [];
-  List<CategoryExpense> _categoryExpenses = [];
-  List<TransactionModel> _recentTransactions = [];
-
+  // Raw transaction data - always store all transactions
+  List<TransactionModel> _transactions = [];
+  
   bool _isLoading = true;
   bool _isRefreshing = false;
 
@@ -39,43 +42,65 @@ class DashboardState extends State<Dashboard> {
     _loadDashboardData();
   }
 
+  void _onTimeRangeChanged(TimeRangeData newTimeRange) {
+    setState(() {
+      currentTimeRange = newTimeRange;
+      _updateChartsForTimeRange();
+    });
+  }
+
+  void _updateChartsForTimeRange() {
+    // No data to update
+    if (_transactions.isEmpty) return;
+
+    // Update balance data
+    _updateBalanceData();
+  }
+  
+  void _updateBalanceData() {
+    final filteredTransactions = _chartService.filterTransactionsByTimeRange(
+      _transactions,
+      currentTimeRange,
+    );
+    
+    double income = 0.0;
+    double expenses = 0.0;
+    
+    for (var transaction in filteredTransactions) {
+      if (transaction.amount > 0) {
+        income += transaction.amount;
+      } else {
+        expenses += transaction.amount.abs();
+      }
+    }
+    
+    setState(() {
+      _monthlyIncome = income;
+      _monthlyExpenseTotal = expenses;
+      _currentBalance = income - expenses;
+    });
+  }
+
   Future<void> _loadDashboardData() async {
     if (_isRefreshing) return;
 
     try {
       setState(() {
-        _isLoading = _recentTransactions.isEmpty;
+        _isLoading = _transactions.isEmpty;
         _isRefreshing = true;
       });
 
-      final results = await Future.wait([
-        _transactionService.getCurrentMonthIncome(),
-        _transactionService.getCurrentMonthExpenses(),
-        _transactionService.getWeeklyExpenses(),
-        _transactionService.getCategoryExpenses(),
-      ]);
-
-      if (_recentTransactions.isEmpty) {
-        _transactionService.getTransactions().listen((transactions) {
-          if (mounted) {
-            setState(() {
-              _recentTransactions = transactions;
-            });
-          }
-        });
-      }
-
-      if (mounted) {
-        setState(() {
-          _monthlyIncome = results[0] as double;
-          _monthlyExpenses = results[1] as double;
-          _weeklyExpenses = results[2] as List<WeeklyExpense>;
-          _categoryExpenses = results[3] as List<CategoryExpense>;
-          _currentBalance = _monthlyIncome - _monthlyExpenses;
-          _isLoading = false;
-          _isRefreshing = false;
-        });
-      }
+      // Start listening for all transactions
+      _transactionService.getTransactions().listen((transactions) {
+        if (mounted) {
+          setState(() {
+            _transactions = transactions;
+            _updateChartsForTimeRange();
+            _isLoading = false;
+            _isRefreshing = false;
+          });
+        }
+      });
     } catch (e) {
       debugPrint('Error loading dashboard data: $e');
       if (mounted) {
@@ -96,59 +121,23 @@ class DashboardState extends State<Dashboard> {
 
   void _handleTransactionAdded(TransactionModel transaction) {
     setState(() {
-      _recentTransactions.add(transaction);
-      
-      if (transaction.isIncome) {
-        _monthlyIncome += transaction.amount;
-      } else {
-        _monthlyExpenses += transaction.amount.abs();
-      }
-      _currentBalance = _monthlyIncome - _monthlyExpenses;
+      _transactions.add(transaction);
+      _updateChartsForTimeRange();
 
       if (transaction.id != null) {
-        _transactionService.addTransaction;
+        _transactionService.addTransaction(transaction);
       }
-
-      _weeklyExpenses = _chartService.updateWeeklyExpenses(
-        transaction: transaction,
-        currentWeeklyExpenses: _weeklyExpenses,
-        isDelete: false,
-      );
-
-      _categoryExpenses = _chartService.updateCategoryExpenses(
-        transaction: transaction,
-        currentCategoryExpenses: _categoryExpenses,
-        isDelete: false,
-      );
     });
   }
 
   void _handleDeleteTransaction(TransactionModel transaction) {
     setState(() {
-      _recentTransactions.remove(transaction);
-      
-      if (transaction.isIncome) {
-        _monthlyIncome -= transaction.amount;
-      } else {
-        _monthlyExpenses -= transaction.amount.abs();
-      }
-      _currentBalance = _monthlyIncome - _monthlyExpenses;
+      _transactions.remove(transaction);
+      _updateChartsForTimeRange();
 
       if (transaction.id != null) {
         _transactionService.deleteTransaction(transaction.id!);
       }
-
-      _weeklyExpenses = _chartService.updateWeeklyExpenses(
-        transaction: transaction,
-        currentWeeklyExpenses: _weeklyExpenses,
-        isDelete: true,
-      );
-
-      _categoryExpenses = _chartService.updateCategoryExpenses(
-        transaction: transaction,
-        currentCategoryExpenses: _categoryExpenses,
-        isDelete: true,
-      );
     });
   }
 
@@ -167,42 +156,46 @@ class DashboardState extends State<Dashboard> {
         ),
         automaticallyImplyLeading: true,
         actions: [
+          const Padding(
+            padding: EdgeInsets.only(right: 16),
+            child: LanguageButton(showText: false),
+          ),
           IconButton(
             icon: const Icon(Icons.help_outline),
             onPressed: () => DashboardHelp.show(context),
-          ),
+          ),          
         ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
-              onRefresh: _loadDashboardData,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    BalanceCard(
-                      balance: _currentBalance,
-                      income: _monthlyIncome,
-                      expenses: _monthlyExpenses,
-                    ),
-                    const SizedBox(height: 20),
-                    const NavigationTiles(),
-                    const SizedBox(height: 20),
-                    SpendingBarChart(weeklyExpenses: _weeklyExpenses),
-                    const SizedBox(height: 20),
-                    CategoryPieChart(categoryExpenses: _categoryExpenses),
-                    const SizedBox(height: 20),
-                    _buildRecentTransactions(),
-                    const SizedBox(height: 80),
-                  ],
-                ),
+        onRefresh: _loadDashboardData,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              BalanceCard(
+                balance: _currentBalance,
+                income: _monthlyIncome,
+                expenses: _monthlyExpenseTotal,
+                timeRange: currentTimeRange.label,
               ),
-            ),
+              TimeRangeSelector(
+                initialTimeRange: currentTimeRange,
+                onTimeRangeChanged: _onTimeRangeChanged,
+              ),              
+              RobotAnimationHeader(),
+              const NavigationTiles(),
+              _buildRecentTransactions(),
+              const SizedBox(height: 80),
+            ],
+          ),
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.primary,
+        backgroundColor: AppColors.darkBlue,
         onPressed: () => _showAddTransactionModal(context),
         child: const Icon(Icons.add, color: Colors.white),
       ),
@@ -210,9 +203,17 @@ class DashboardState extends State<Dashboard> {
   }
 
   Widget _buildRecentTransactions() {
+    final filteredTransactions = _chartService.filterTransactionsByTimeRange(
+      _transactions,
+      currentTimeRange,
+    );
+    
+    // Pass time range data and callback
     return RecentTransactions(
-      transactions: _recentTransactions,
+      transactions: filteredTransactions,
       onDeleteTransaction: _handleDeleteTransaction,
+      timeRange: currentTimeRange,
+      onTimeRangeChanged: _onTimeRangeChanged,
     );
   }
 
