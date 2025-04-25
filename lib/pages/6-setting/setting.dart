@@ -1,9 +1,11 @@
 import 'dart:io';
 
+import 'package:finney/localization/locales.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finney/assets/theme/app_color.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:image_picker/image_picker.dart';
 
 class Setting extends StatefulWidget {
@@ -32,7 +34,7 @@ class _SettingState extends State<Setting> {
   final phoneController = TextEditingController();
   final addressController = TextEditingController();
 
-  String selectedLanguage = 'English';
+  String selectedLanguage = 'Bengali';
   String selectedCurrency = 'BDT';
   String selectedTextSize = 'Medium';
 
@@ -44,50 +46,84 @@ class _SettingState extends State<Setting> {
   void initState() {
     super.initState();
     _loadUserData();
+    // Set initial language based on current locale
+    selectedLanguage = FlutterLocalization.instance.currentLocale!.languageCode == 'en'
+        ? 'English'
+        : 'Bengali';
   }
 
   Future<void> _loadUserData() async {
-    final doc = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user?.uid)
-        .get();
-    if (doc.exists) {
-      setState(() {
-        fullName = doc['name'] ?? '';
-        phoneNumber = doc['phone'] ?? '';
-        address = doc['address'] ?? '';
-        nameController.text = fullName;
-        phoneController.text = phoneNumber;
-        addressController.text = address;
-        selectedTextSize = doc['textSize'] ?? 'Medium';
-      });
-    } else {
-      await FirebaseFirestore.instance
+    try {
+      final doc = await FirebaseFirestore.instance
           .collection('users')
           .doc(user?.uid)
-          .set({
-        'name': '',
-        'phone': '',
-        'address': '',
-        'email': user?.email ?? '',
-        'textSize': 'Medium',
-      });
+          .get();
+      if (doc.exists) {
+        setState(() {
+          fullName = doc['name'] ?? '';
+          phoneNumber = doc['phone'] ?? '';
+          address = doc['address'] ?? '';
+          nameController.text = fullName;
+          phoneController.text = phoneNumber;
+          addressController.text = address;
+          selectedTextSize = doc['textSize'] ?? 'Medium';
+          selectedCurrency = doc['currency'] ?? 'BDT';
+          selectedLanguage = doc['language'] ?? (FlutterLocalization.instance.currentLocale!.languageCode == 'en' ? 'English' : 'Bengali');
+        });
+      } else {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user?.uid)
+            .set({
+          'name': '',
+          'phone': '',
+          'address': '',
+          'email': user?.email ?? '',
+          'textSize': 'Medium',
+          'currency': 'BDT',
+          'language': FlutterLocalization.instance.currentLocale!.languageCode == 'en' ? 'English' : 'Bengali',
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              LocaleData.errorLoadingData.getString(context),
+            ),
+          ),
+        );
+      }
     }
   }
 
   Future<void> _saveUserData() async {
-    await FirebaseFirestore.instance.collection('users').doc(user?.uid).set({
-      'name': nameController.text,
-      'phone': phoneController.text,
-      'address': addressController.text,
-      'email': user?.email ?? '',
-      'textSize': selectedTextSize,
-    }, SetOptions(merge: true));
-    setState(() {
-      fullName = nameController.text;
-      phoneNumber = phoneController.text;
-      address = addressController.text;
-    });
+    try {
+      await FirebaseFirestore.instance.collection('users').doc(user?.uid).set({
+        'name': nameController.text,
+        'phone': phoneController.text,
+        'address': addressController.text,
+        'email': user?.email ?? '',
+        'textSize': selectedTextSize,
+        'currency': selectedCurrency,
+        'language': selectedLanguage,
+      }, SetOptions(merge: true));
+      setState(() {
+        fullName = nameController.text;
+        phoneNumber = phoneController.text;
+        address = addressController.text;
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              LocaleData.errorSavingData.getString(context),
+            ),
+          ),
+        );
+      }
+    }
   }
 
   void _showProfileDialog() {
@@ -99,7 +135,8 @@ class _SettingState extends State<Setting> {
           builder: (context, setDialogState) {
             return Dialog(
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
+                borderRadius: BorderRadius.circular(16),
+              ),
               backgroundColor: Colors.grey[200],
               child: Padding(
                 padding: const EdgeInsets.all(20),
@@ -110,7 +147,7 @@ class _SettingState extends State<Setting> {
                     children: [
                       Center(
                         child: Text(
-                          "Profile Information",
+                          LocaleData.profileInformation.getString(context),
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -119,12 +156,29 @@ class _SettingState extends State<Setting> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      _buildEditableField("Full Name", nameController, isEditing),
                       _buildEditableField(
-                          "Phone Number", phoneController, isEditing),
-                      _buildEditableField("Address", addressController, isEditing),
-                      _buildDisplayField("Email", user?.email ?? "Not available"),
-                      _buildDisplayField("User ID", user?.uid ?? "Not available"),
+                        LocaleData.fullName.getString(context),
+                        nameController,
+                        isEditing,
+                      ),
+                      _buildEditableField(
+                        LocaleData.phoneNumber.getString(context),
+                        phoneController,
+                        isEditing,
+                      ),
+                      _buildEditableField(
+                        LocaleData.address.getString(context),
+                        addressController,
+                        isEditing,
+                      ),
+                      _buildDisplayField(
+                        LocaleData.email.getString(context),
+                        user?.email ?? LocaleData.notAvailable.getString(context),
+                      ),
+                      _buildDisplayField(
+                        LocaleData.userId.getString(context),
+                        user?.uid ?? LocaleData.notAvailable.getString(context),
+                      ),
                       const SizedBox(height: 20),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
@@ -138,14 +192,20 @@ class _SettingState extends State<Setting> {
                                 setDialogState(() => isEditing = true);
                               }
                             },
-                            child: Text(isEditing ? "Save" : "Edit"),
+                            child: Text(
+                              isEditing
+                                  ? LocaleData.save.getString(context)
+                                  : LocaleData.edit.getString(context),
+                            ),
                           ),
                           TextButton(
                             onPressed: () {
                               setDialogState(() => isEditing = false);
                               Navigator.pop(context);
                             },
-                            child: const Text("Close"),
+                            child: Text(
+                              LocaleData.close.getString(context),
+                            ),
                           ),
                         ],
                       ),
@@ -166,21 +226,21 @@ class _SettingState extends State<Setting> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text("Set PIN"),
+          title: Text(LocaleData.setPin.getString(context)),
           content: TextField(
             controller: pinController,
             keyboardType: TextInputType.number,
             maxLength: 4,
             obscureText: true,
-            decoration: const InputDecoration(
-              labelText: "Enter 4-digit PIN",
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: LocaleData.enterPin.getString(context),
+              border: const OutlineInputBorder(),
             ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel"),
+              child: Text(LocaleData.cancel.getString(context)),
             ),
             TextButton(
               onPressed: () {
@@ -191,15 +251,23 @@ class _SettingState extends State<Setting> {
                   );
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("PIN saved!")),
+                    SnackBar(
+                      content: Text(
+                        LocaleData.pinSaved.getString(context),
+                      ),
+                    ),
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Please enter a 4-digit PIN")),
+                    SnackBar(
+                      content: Text(
+                        LocaleData.invalidPin.getString(context),
+                      ),
+                    ),
                   );
                 }
               },
-              child: const Text("Save"),
+              child: Text(LocaleData.save.getString(context)),
             ),
           ],
         );
@@ -209,12 +277,23 @@ class _SettingState extends State<Setting> {
 
   void _showHelpSupport() {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Help & Support page coming soon!")),
+      SnackBar(
+        content: Text(
+          LocaleData.helpSupportComingSoon.getString(context),
+        ),
+      ),
     );
   }
 
   Future<void> _signOut() async {
     await FirebaseAuth.instance.signOut();
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(LocaleData.signedOut.getString(context)),
+        ),
+      );
+    }
   }
 
   @override
@@ -233,7 +312,9 @@ class _SettingState extends State<Setting> {
 
     return Builder(
       builder: (context) => MediaQuery(
-        data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(textScaleFactor)),
+        data: MediaQuery.of(context).copyWith(
+          textScaler: TextScaler.linear(textScaleFactor),
+        ),
         child: Scaffold(
           backgroundColor: Colors.white,
           body: SafeArea(
@@ -244,7 +325,7 @@ class _SettingState extends State<Setting> {
                     backgroundColor: Colors.transparent,
                     elevation: 0,
                     title: Text(
-                      'Settings',
+                      LocaleData.settings.getString(context),
                       style: TextStyle(
                         color: AppColors.primary,
                         fontWeight: FontWeight.bold,
@@ -258,13 +339,8 @@ class _SettingState extends State<Setting> {
                       radius: 50,
                       backgroundColor: Colors.grey[300],
                       backgroundImage: _imageFile == null
-                          ? const NetworkImage('https://placehold.co/150x150')
+                          ? const AssetImage('assets/images/placeholder.png')
                           : FileImage(File(_imageFile!.path)) as ImageProvider,
-                      onBackgroundImageError: _imageFile == null
-                            ? (exception, stackTrace) {
-                              debugPrint('Error loading image: $exception');
-                            }
-                          : null,
                       child: _imageFile == null
                           ? const Icon(Icons.camera_alt, color: Colors.white)
                           : null,
@@ -272,22 +348,33 @@ class _SettingState extends State<Setting> {
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    fullName.isEmpty ? 'User' : fullName,
-                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    fullName.isEmpty
+                        ? LocaleData.user.getString(context)
+                        : fullName,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    user?.email ?? 'Email not available',
-                    style: const TextStyle(color: Colors.grey, fontSize: 13),
+                    user?.email ?? LocaleData.notAvailable.getString(context),
+                    style: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 13,
+                    ),
                   ),
                   const SizedBox(height: 15),
                   InkWell(
                     borderRadius: BorderRadius.circular(15),
                     onTap: _showProfileDialog,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                       child: Text(
-                        "View Profile",
+                        LocaleData.viewProfile.getString(context),
                         style: TextStyle(
                           fontSize: 18,
                           color: AppColors.primary,
@@ -303,7 +390,7 @@ class _SettingState extends State<Setting> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Appearance',
+                          LocaleData.appearance.getString(context),
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -313,23 +400,54 @@ class _SettingState extends State<Setting> {
                         const SizedBox(height: 10),
                         _buildDropdownOption(
                           icon: Icons.language,
-                          title: "Language",
+                          title: LocaleData.language.getString(context),
                           value: selectedLanguage,
-                          items: ['English', 'Bengali'],
-                          onChanged: (val) => setState(() => selectedLanguage = val!),
+                          items: [
+                            DropdownMenuItem(
+                              value: 'English',
+                              child: Text(LocaleData.languageEnglish.getString(context)),
+                            ),
+                            DropdownMenuItem(
+                              value: 'Bengali',
+                              child: Text(LocaleData.languageBengali.getString(context)),
+                            ),
+                          ],
+                          onChanged: (val) {
+                            setState(() {
+                              selectedLanguage = val!;
+                              FlutterLocalization.instance.translate(
+                                val == 'English' ? 'en' : 'bn',
+                              );
+                              _saveUserData();
+                            });
+                          },
                         ),
                         const SizedBox(height: 10),
                         _buildDropdownOption(
                           icon: Icons.currency_exchange,
-                          title: "Currency",
+                          title: LocaleData.currency.getString(context),
                           value: selectedCurrency,
-                          items: ['BDT', 'AUD'],
-                          onChanged: (val) => setState(() => selectedCurrency = val!),
+                          items: [
+                            DropdownMenuItem(
+                              value: 'BDT',
+                              child: Text(LocaleData.currencyBDT.getString(context)),
+                            ),
+                            DropdownMenuItem(
+                              value: 'AUD',
+                              child: Text(LocaleData.currencyAUD.getString(context)),
+                            ),
+                          ],
+                          onChanged: (val) {
+                            setState(() {
+                              selectedCurrency = val!;
+                              _saveUserData();
+                            });
+                          },
                         ),
                         const SizedBox(height: 10),
                         _buildDropdownOption(
                           icon: Icons.text_fields,
-                          title: "Text Size",
+                          title: LocaleData.textSize.getString(context),
                           value: selectedTextSize,
                           items: ['Small', 'Medium', 'Large'],
                           onChanged: (val) {
@@ -349,7 +467,7 @@ class _SettingState extends State<Setting> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Management',
+                          LocaleData.management.getString(context),
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -359,21 +477,21 @@ class _SettingState extends State<Setting> {
                         const SizedBox(height: 10),
                         _buildOption(
                           icon: Icons.security,
-                          title: "Security",
-                          subtitle: "Set PIN",
+                          title: LocaleData.security.getString(context),
+                          subtitle: LocaleData.setPin.getString(context),
                           onTap: _showSecuritySettings,
                         ),
                         const SizedBox(height: 10),
                         _buildOption(
                           icon: Icons.help,
-                          title: "Help & Support",
-                          subtitle: "FAQs and Contact",
+                          title: LocaleData.helpSupport.getString(context),
+                          subtitle: LocaleData.helpSupport.getString(context),
                           onTap: _showHelpSupport,
                         ),
                         const SizedBox(height: 10),
                         _buildOption(
                           icon: Icons.logout,
-                          title: "Log Out",
+                          title: LocaleData.logOut.getString(context),
                           subtitle: null,
                           iconColor: Colors.white,
                           textColor: Colors.white,
@@ -392,7 +510,10 @@ class _SettingState extends State<Setting> {
   }
 
   Widget _buildEditableField(
-      String label, TextEditingController controller, bool editable) {
+    String label,
+    TextEditingController controller,
+    bool editable,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Column(
@@ -401,7 +522,7 @@ class _SettingState extends State<Setting> {
           Text(
             label,
             style: const TextStyle(
-              color: AppColors.primary, // Changed to AppColors.primary
+              color: AppColors.primary,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -412,8 +533,10 @@ class _SettingState extends State<Setting> {
             decoration: InputDecoration(
               filled: true,
               fillColor: Colors.white,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 10,
+              ),
               border: OutlineInputBorder(
                 borderSide: BorderSide(color: AppColors.primary),
                 borderRadius: BorderRadius.circular(10),
@@ -439,7 +562,7 @@ class _SettingState extends State<Setting> {
           Text(
             label,
             style: const TextStyle(
-              color: AppColors.primary, // Changed to AppColors.primary
+              color: AppColors.primary,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -467,7 +590,7 @@ class _SettingState extends State<Setting> {
     Color? textColor,
     required VoidCallback onTap,
   }) {
-    final isLogOut = title == "Log Out";
+    final isLogOut = title == LocaleData.logOut.getString(context);
     return InkWell(
       borderRadius: BorderRadius.circular(12),
       onTap: onTap,
@@ -475,17 +598,21 @@ class _SettingState extends State<Setting> {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         decoration: BoxDecoration(
           color: isLogOut ? Colors.red : Colors.white,
-          border: Border.all(color: isLogOut ? Colors.red : AppColors.primary),
+          border: Border.all(
+            color: isLogOut ? Colors.red : AppColors.primary,
+          ),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
-          mainAxisAlignment: isLogOut ? MainAxisAlignment.center : MainAxisAlignment.start,
+          mainAxisAlignment:
+              isLogOut ? MainAxisAlignment.center : MainAxisAlignment.start,
           children: [
             Icon(icon, color: iconColor ?? AppColors.primary),
             if (!isLogOut) const SizedBox(width: 12),
             Expanded(
               child: Column(
-                crossAxisAlignment: isLogOut ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+                crossAxisAlignment:
+                    isLogOut ? CrossAxisAlignment.center : CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
@@ -516,7 +643,7 @@ class _SettingState extends State<Setting> {
     required IconData icon,
     required String title,
     required String value,
-    required List<String> items,
+    required dynamic items,
     required Function(String?) onChanged,
   }) {
     return Container(
@@ -533,17 +660,24 @@ class _SettingState extends State<Setting> {
           Expanded(
             child: Text(
               title,
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           DropdownButton<String>(
             value: value,
-            items: items
-                .map((item) => DropdownMenuItem(
-                      value: item,
-                      child: Text(item),
-                    ))
-                .toList(),
+            items: items is List<DropdownMenuItem<String>>
+                ? items
+                : items
+                    .map<DropdownMenuItem<String>>(
+                      (String item) => DropdownMenuItem<String>(
+                        value: item,
+                        child: Text(item),
+                      ),
+                    )
+                    .toList(),
             onChanged: onChanged,
             underline: const SizedBox(),
           ),
