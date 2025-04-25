@@ -129,7 +129,7 @@ Widget build(BuildContext context) {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
           side: BorderSide(
-            color: AppColors.primary.withValues(alpha: 0.5), // Use withOpacity instead of withValues
+            color: AppColors.primary.withValues(alpha: 0.5), 
           ),
         ),
       ),

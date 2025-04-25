@@ -2,6 +2,7 @@ import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
 import 'package:finney/pages/3-dashboard/transaction/add_transaction/add_expense_screen.dart';
 import 'package:finney/pages/3-dashboard/transaction/add_transaction/add_income_screen.dart';
 import 'package:finney/assets/theme/app_color.dart';
+import 'package:finney/pages/3-dashboard/utils/category.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -23,96 +24,97 @@ class TransactionItem extends StatelessWidget {
     this.onSelected,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    final isIncome = transaction.amount > 0;
+@override
+Widget build(BuildContext context) {
+  final categoryColor = CategoryUtils.getColorForCategory(transaction.category);
+  final deleteBackground = Colors.redAccent.withValues(alpha: 0.1); 
 
-    return InkWell(
-      onTap: isDeleteMode
-          ? () => onSelected?.call(transaction)
-          : () => _showEditScreen(context),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary.withValues(alpha: 26) : null,
-        ),
-        child: Row(
-          children: [
-            if (isDeleteMode)
-              Padding(
-                padding: const EdgeInsets.only(right: 12),
-                child: IconButton(
-                  onPressed: () => onSelected?.call(transaction),
-                  icon: Icon(
-                    isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
-                    color: isSelected ? AppColors.primary : AppColors.gray,
-                  ),
+  return InkWell(
+    onTap: isDeleteMode
+        ? () => onSelected?.call(transaction)
+        : () => _showEditScreen(context),
+    child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: isDeleteMode && isSelected ? deleteBackground : null,
+      ),
+      child: Row(
+        children: [
+          if (isDeleteMode)
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: IconButton(
+                onPressed: () => onSelected?.call(transaction),
+                icon: Icon(
+                  isSelected ? Icons.remove_circle : Icons.radio_button_unchecked,
+                  color: isSelected ? Colors.redAccent : AppColors.gray,
                 ),
               ),
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: isIncome ? AppColors.categoryFood.withValues(alpha: 51) : AppColors.categoryHealth.withValues(alpha: 51),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                transaction.icon,
-                color: isIncome ? AppColors.categoryFood : AppColors.categoryHealth,
-                size: 24,
-              ),
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: categoryColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              transaction.icon,
+              color: categoryColor,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  transaction.name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  transaction.category,
+                  style: TextStyle(
+                    color: Colors.grey.shade600,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Row(
                 children: [
                   Text(
-                    transaction.name,
-                    style: const TextStyle(
+                    transaction.amount > 0
+                        ? '+${NumberFormat.currency(symbol: '\$').format(transaction.amount)}'
+                        : NumberFormat.currency(symbol: '\$').format(transaction.amount),
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    transaction.category,
-                    style: TextStyle(
-                      color: Colors.grey.shade600,
-                      fontSize: 12,
+                      color: transaction.amount > 0 ? Colors.green : Colors.redAccent,
                     ),
                   ),
                 ],
               ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      isIncome
-                          ? '+${NumberFormat.currency(symbol: '\$').format(transaction.amount)}'
-                          : NumberFormat.currency(symbol: '\$').format(transaction.amount),
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: isIncome ? Colors.green : Colors.redAccent,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  DateFormat('h:mm a').format(transaction.date),
-                  style: TextStyle(color: AppColors.gray, fontSize: 12),
-                ),
-              ],
-            ),
-          ],
-        ),
+              const SizedBox(height: 4),
+              Text(
+                DateFormat('h:mm a').format(transaction.date),
+                style: TextStyle(color: AppColors.gray, fontSize: 12),
+              ),
+            ],
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   void _showEditScreen(BuildContext context) {
     final transactionModel = TransactionModel(

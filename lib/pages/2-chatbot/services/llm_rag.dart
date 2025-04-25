@@ -1,5 +1,5 @@
 import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
-import 'package:finney/pages/3-dashboard/services/transaction_services.dart';
+import 'package:finney/pages/3-dashboard/transaction/transaction_services.dart';
 import 'package:intl/intl.dart';
 
 class TransactionRAGService {

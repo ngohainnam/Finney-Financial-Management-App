@@ -1,17 +1,23 @@
 import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
 import 'package:finney/pages/3-dashboard/transaction/view_transaction/all_transactions.dart';
 import 'package:finney/pages/3-dashboard/transaction/widgets/transaction_list.dart';
+import 'package:finney/components/time_selector.dart'; // Add this import
 import 'package:flutter/material.dart';
 import 'package:finney/assets/theme/app_color.dart';
 
 class RecentTransactions extends StatefulWidget {
   final List<TransactionModel> transactions;
   final Function(TransactionModel)? onDeleteTransaction;
+  // Add these parameters
+  final TimeRangeData timeRange;
+  final Function(TimeRangeData) onTimeRangeChanged;
 
   const RecentTransactions({
     super.key,
     required this.transactions,
     this.onDeleteTransaction,
+    required this.timeRange,
+    required this.onTimeRangeChanged,
   });
 
   @override
@@ -24,10 +30,7 @@ class _RecentTransactionsState extends State<RecentTransactions> {
 
   void _toggleDeleteMode() {
     setState(() {
-      // Toggle delete mode
       _isDeleteMode = !_isDeleteMode;
-
-      // If exiting delete mode, clear all selections
       if (!_isDeleteMode) {
         _selectedTransactions.clear();
       }
@@ -77,6 +80,9 @@ class _RecentTransactionsState extends State<RecentTransactions> {
 
   @override
   Widget build(BuildContext context) {
+    // Show only the 5 most recent transactions from the time-filtered list
+    final recentTransactions = widget.transactions.take(5).toList();
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -90,10 +96,11 @@ class _RecentTransactionsState extends State<RecentTransactions> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                _isDeleteMode ? 'Select Items to Delete' : 'Recent Transactions',
+                _isDeleteMode ? 'Select Items to Delete' : 'Transactions',
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
+                  color: AppColors.darkBlue,
                 ),
               ),
               Row(
@@ -101,7 +108,7 @@ class _RecentTransactionsState extends State<RecentTransactions> {
                   if (!_isDeleteMode)
                     IconButton(
                       icon: const Icon(Icons.delete_outline),
-                      onPressed: _toggleDeleteMode,
+                      onPressed: recentTransactions.isEmpty ? null : _toggleDeleteMode,
                     )
                   else ...[
                     IconButton(
@@ -122,6 +129,8 @@ class _RecentTransactionsState extends State<RecentTransactions> {
                             builder: (context) => AllTransactionsScreen(
                               transactions: widget.transactions,
                               onDeleteTransaction: widget.onDeleteTransaction,
+                              timeRange: widget.timeRange,
+                              onTimeRangeChanged: widget.onTimeRangeChanged,
                             ),
                           ),
                         );
@@ -148,14 +157,25 @@ class _RecentTransactionsState extends State<RecentTransactions> {
             ],
           ),
           const SizedBox(height: 16),
-          TransactionList(
-            transactions: widget.transactions,
-            onDeleteTransaction: widget.onDeleteTransaction,
-            showAll: false,
-            isDeleteMode: _isDeleteMode,
-            selectedTransactions: _selectedTransactions,
-            onTransactionSelected: _toggleTransactionSelection,
-          ),
+          if (recentTransactions.isEmpty)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(20),
+                child: Text(
+                  'No transactions in this period',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+            )
+          else
+            TransactionList(
+              transactions: recentTransactions,
+              onDeleteTransaction: widget.onDeleteTransaction,
+              showAll: false,
+              isDeleteMode: _isDeleteMode,
+              selectedTransactions: _selectedTransactions,
+              onTransactionSelected: _toggleTransactionSelection,
+            ),
         ],
       ),
     );

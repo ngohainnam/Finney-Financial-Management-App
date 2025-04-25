@@ -11,13 +11,12 @@ class AppColors {
   static const softGray = Color.fromARGB(255, 250, 251, 253);
   static const userChatColor = Color.fromARGB(255, 85, 147, 234);
   static var ombreBlue = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
     colors: [
-      const Color.fromARGB(255, 7, 90, 158),
-      const Color.fromARGB(255, 18, 112, 219),
-      const Color.fromARGB(255, 42, 146, 231),
-    ],
-    begin: Alignment.centerLeft,
-    end: Alignment.centerRight,
+     AppColors.primary,
+     AppColors.darkBlue,
+   ],
   );
 
   static const Color categoryShopping = Color(0xFFFF9800);

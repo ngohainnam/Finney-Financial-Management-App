@@ -50,7 +50,6 @@ class TransactionParser {
       final descMatch = descRegex.firstMatch(message);
       String description = descMatch?.group(1)?.trim() ?? '';
       
-      // Determine if this is an income transaction based on the category
       bool isIncome = isIncomeCategory(category);
       
       return {
@@ -66,14 +65,13 @@ class TransactionParser {
     }
   }
   
-  // Helper method to determine if a category is an income category
+  //helper method to determine if a category is an income category
   static bool isIncomeCategory(String category) {
     final incomeCategories = ['Salary', 'Investment', 'Business', 'Gift', 'Income', 'Others Income'];
     return incomeCategories.any((c) => category.contains(c));
   }
   
   static TransactionModel createTransactionModel(Map<String, dynamic> data) {
-    // For income, amount should be positive; for expenses, amount should be negative
     double finalAmount = data['isIncome'] ? data['amount'] : -data['amount'];
     
     return TransactionModel(

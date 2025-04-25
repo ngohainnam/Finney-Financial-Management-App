@@ -1,11 +1,12 @@
 import 'package:finney/assets/theme/app_color.dart';
 import 'package:finney/pages/2-chatbot/presentation/chat_interface.dart';
+import 'package:finney/pages/2-chatbot/presentation/transaction_preview.dart';
 import 'package:finney/pages/2-chatbot/presentation/voicechat_interface.dart';
 import 'package:finney/pages/2-chatbot/services/llm_transactionparser.dart';
 import 'package:finney/pages/2-chatbot/services/local_storage_service.dart';
 import 'package:finney/pages/2-chatbot/services/cloud_storage_service.dart'; // Added cloud storage import
 import 'package:finney/pages/2-chatbot/utils/chat_constants.dart'; 
-import 'package:finney/pages/3-dashboard/services/transaction_services.dart'; 
+import 'package:finney/pages/3-dashboard/transaction/transaction_services.dart'; 
 import 'package:flutter/material.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
@@ -16,7 +17,12 @@ import 'utils/chatbot_help.dart';
 import 'dart:async'; 
 
 class Chatbot extends StatefulWidget {
-  const Chatbot({super.key});
+  final String? initialQuestion;
+  
+  const Chatbot({
+    super.key, 
+    this.initialQuestion,
+  });
 
   @override
   State<Chatbot> createState() => _ChatbotState();
@@ -49,6 +55,24 @@ class _ChatbotState extends State<Chatbot> {
   void initState() {
     super.initState();
     _initServices();
+
+    if (widget.initialQuestion != null && widget.initialQuestion!.isNotEmpty) {
+      Future.delayed(const Duration(milliseconds: 100), () {
+        _handleInitialQuestion(widget.initialQuestion!);
+      });
+    }
+  }
+
+  void _handleInitialQuestion(String question) {
+    final chatMessage = ChatMessage(
+      user: ChatConstants.currentUser,
+      createdAt: DateTime.now(),
+      text: question,
+    );
+    _sendMessage(chatMessage);
+    setState(() {
+      showWelcomeScreen = false;
+    });
   }
 
   Future<void> _initServices() async {
@@ -131,14 +155,15 @@ class _ChatbotState extends State<Chatbot> {
     await _cloudStorageService.saveMessage(chatMessage, role: 'user');
     await _localStorageService.saveMessage(chatMessage, role: 'user');
 
-    // We'll no longer add the loading message, the animation will show the AI is thinking
+    // The animation will show the AI is thinking
     final response = await _chatService.sendMessage(chatMessage);
     
     if (TransactionParser.hasTransactionInfo(response)) {
       final transactionData = TransactionParser.extractTransactionFromMessage(response);
       
       if (transactionData != null) {
-        _pendingTransaction = transactionData;
+        // Create transaction model for preview
+        final transactionModel = TransactionParser.createTransactionModel(transactionData);
         
         final message = ChatMessage(
           user: ChatConstants.geminiUser,
@@ -155,7 +180,61 @@ class _ChatbotState extends State<Chatbot> {
         await _cloudStorageService.saveMessage(message, role: 'model');
         await _localStorageService.saveMessage(message, role: 'model');
         
-        _awaitingTransactionConfirmation = true;
+        // Show the transaction preview dialog with simplified interface (no edit)
+        if (mounted) {
+          final confirmed = await TransactionPreviewPopup.show(
+            context: context, 
+            transaction: transactionModel,
+            onConfirm: (confirmedTransaction) async {
+              // Handle confirmation - save the transaction
+              await _transactionService.addTransaction(confirmedTransaction);
+              
+              if (mounted) {
+                // Show success message
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Transaction added successfully'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+                
+                // Add confirmation message to chat
+                final confirmMessage = ChatMessage(
+                  user: ChatConstants.geminiUser,
+                  createdAt: DateTime.now(),
+                  text: "Transaction added successfully!",
+                );
+                
+                setState(() {
+                  messages = [confirmMessage] + messages;
+                });
+                
+                await _cloudStorageService.saveMessage(confirmMessage, role: 'model');
+                await _localStorageService.saveMessage(confirmMessage, role: 'model');
+              }
+            },
+          );
+          
+          // Handle cancellation
+          if (confirmed == false) {
+            if (mounted) {
+              // Add a cancellation message from the bot
+              final cancelMessage = ChatMessage(
+                user: ChatConstants.geminiUser,
+                createdAt: DateTime.now(),
+                text: "No problem, I won't add that transaction.",
+              );
+              
+              setState(() {
+                messages = [cancelMessage] + messages;
+              });
+              
+              await _cloudStorageService.saveMessage(cancelMessage, role: 'model');
+              await _localStorageService.saveMessage(cancelMessage, role: 'model');
+            }
+          }
+        }
+        
         return;
       }
     }
@@ -167,7 +246,7 @@ class _ChatbotState extends State<Chatbot> {
     );
 
     setState(() {
-      _isAiTyping = false;  // Stop the typing animation
+      _isAiTyping = false; 
       messages = [message] + messages;
     });
     
@@ -186,65 +265,129 @@ class _ChatbotState extends State<Chatbot> {
     await _cloudStorageService.saveMessage(userMessage, role: 'user');
     await _localStorageService.saveMessage(userMessage, role: 'user');
     
-    String responseText;
     
-    if (TransactionParser.isConfirmingTransaction(userMessage.text)) {
-      try {
-        final transactionModel = TransactionParser.createTransactionModel(_pendingTransaction!);
-        await _transactionService.addTransaction(transactionModel);
+    if (_pendingTransaction != null) {
+      final transactionModel = TransactionParser.createTransactionModel(_pendingTransaction!);
+      
+      if (TransactionParser.isConfirmingTransaction(userMessage.text)) {
+        try {
+          await _transactionService.addTransaction(transactionModel);
 
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Transaction added successfully'),
+                backgroundColor: Colors.green,
+              ),
+            );
+          }
+          
+          final message = ChatMessage(
+            user: ChatConstants.geminiUser,
+            createdAt: DateTime.now(),
+            text: "Transaction added successfully!",
+          );
+          
+          setState(() {
+            _isAiTyping = false;
+            messages = [message] + messages;
+          });
+          
+          await _cloudStorageService.saveMessage(message, role: 'model');
+          await _localStorageService.saveMessage(message, role: 'model');
+          
+        } catch (e) {
+          final message = ChatMessage(
+            user: ChatConstants.geminiUser,
+            createdAt: DateTime.now(),
+            text: "Sorry, I couldn't add the transaction. Please try again later.",
+          );
+          
+          setState(() {
+            _isAiTyping = false;
+            messages = [message] + messages;
+          });
+          
+          await _cloudStorageService.saveMessage(message, role: 'model');
+          await _localStorageService.saveMessage(message, role: 'model');
+        }
+      } else if (TransactionParser.isCancelingTransaction(userMessage.text)) {
+        final message = ChatMessage(
+          user: ChatConstants.geminiUser,
+          createdAt: DateTime.now(),
+          text: "No problem, I won't add that transaction.",
+        );
+        
+        setState(() {
+          _isAiTyping = false;
+          messages = [message] + messages;
+        });
+        
+        await _cloudStorageService.saveMessage(message, role: 'model');
+        await _localStorageService.saveMessage(message, role: 'model');
+      } else {
+        // If the user's response wasn't clear, show the popup
+        final message = ChatMessage(
+          user: ChatConstants.geminiUser,
+          createdAt: DateTime.now(),
+          text: "I'm not sure what you want to do with this transaction. Let me show you the options.",
+        );
+        
+        setState(() {
+          _isAiTyping = false;
+          messages = [message] + messages;
+        });
+        
+        await _cloudStorageService.saveMessage(message, role: 'model');
+        await _localStorageService.saveMessage(message, role: 'model');
+        
+        // Show the popup
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Transaction added successfully'),
-              backgroundColor: Colors.green,
-            ),
+          await TransactionPreviewPopup.show(
+            context: context,
+            transaction: transactionModel,
+            onConfirm: (confirmedTransaction) async {
+              await _transactionService.addTransaction(confirmedTransaction);
+              
+              if (mounted) {
+                final confirmMessage = ChatMessage(
+                  user: ChatConstants.geminiUser,
+                  createdAt: DateTime.now(),
+                  text: "Transaction added successfully!",
+                );
+                
+                setState(() {
+                  messages = [confirmMessage] + messages;
+                });
+                
+                await _cloudStorageService.saveMessage(confirmMessage, role: 'model');
+                await _localStorageService.saveMessage(confirmMessage, role: 'model');
+              }
+            },
           );
         }
-        responseText = "Transaction added successfully!";
-      } catch (e) {
-        responseText = "Sorry, I couldn't add the transaction. Please try again later.";
       }
-    } else if (TransactionParser.isCancelingTransaction(userMessage.text)) {
-      responseText = "No problem, I won't add that transaction.";
-    } 
-    else {
-      responseText = "I'm not sure if you want to add this transaction or not. Please answer with Yes or No.";
-      
+    } else {
+      // If somehow _pendingTransaction is null
       final message = ChatMessage(
         user: ChatConstants.geminiUser,
         createdAt: DateTime.now(),
-        text: responseText,
+        text: "I don't have any transaction to confirm at the moment.",
       );
-
+      
       setState(() {
-        _isAiTyping = false;  // Stop typing animation
+        _isAiTyping = false;
         messages = [message] + messages;
       });
       
       await _cloudStorageService.saveMessage(message, role: 'model');
       await _localStorageService.saveMessage(message, role: 'model');
-      
-      return;
     }
-    
-    final message = ChatMessage(
-      user: ChatConstants.geminiUser,
-      createdAt: DateTime.now(),
-      text: responseText,
-    );
-
-    setState(() {
-      _isAiTyping = false;  // Stop typing animation
-      messages = [message] + messages;
-    });
-    
-    await _cloudStorageService.saveMessage(message, role: 'model');
-    await _localStorageService.saveMessage(message, role: 'model');
     
     _awaitingTransactionConfirmation = false;
     _pendingTransaction = null;
   }
+
 
   void _sendMediaMessage() async {
     final picker = ImagePicker();
@@ -280,7 +423,7 @@ class _ChatbotState extends State<Chatbot> {
 
   Future<void> clearChat() async {
     await _cloudStorageService.clearChat();
-    await _localStorageService.clearChat(); // Also clear local for consistency
+    await _localStorageService.clearChat(); 
     
     setState(() {
       messages = [];
@@ -346,7 +489,7 @@ class _ChatbotState extends State<Chatbot> {
                         onSend: _sendMessage,
                         messages: messages,
                         onMediaSend: _sendMediaMessage,
-                        isAiTyping: _isAiTyping,  // Pass the typing state to ChatInterface
+                        isAiTyping: _isAiTyping, 
                       ),
               ),
             ],
@@ -354,7 +497,7 @@ class _ChatbotState extends State<Chatbot> {
           
           Positioned(
             right: 16,
-            bottom: 60,
+            bottom: 80,
             child: Material(
               elevation: 4.0,
               shape: const CircleBorder(),

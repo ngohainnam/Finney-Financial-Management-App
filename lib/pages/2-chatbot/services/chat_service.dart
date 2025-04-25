@@ -16,13 +16,13 @@ class ChatService {
     required this.conversationHistory,
   });
   
-  // Add this method to update conversation history
+  //update conversation history
   void updateConversationHistory(List<Content> newHistory) {
     conversationHistory = newHistory;
   }
 
   Future<String> sendMessage(ChatMessage chatMessage) async {
-    // Check if this message relates to transaction data
+    //check if this message relates to transaction data
     bool needsTransactionContext = _messageNeedsTransactionContext(chatMessage.text);
     String transactionContext = '';
     
@@ -78,7 +78,7 @@ User Question: ${chatMessage.text}""";
   }
   
   bool _messageNeedsTransactionContext(String message) {
-    // List of keywords that indicate the user is asking about their transaction data
+    //list of keywords that indicate the user is asking about their transaction data
     final List<String> transactionKeywords = [
       'transaction', 'spent', 'spend', 'spending', 'income', 'expense', 'expenses',
       'how much', 'balance', 'budget', 'category', 'money', 'financial', 'summary',
@@ -88,7 +88,7 @@ User Question: ${chatMessage.text}""";
     
     message = message.toLowerCase();
     
-    // Check if the message contains any keywords
+    //check if the message contains any keywords
     return transactionKeywords.any((keyword) => message.contains(keyword));
   }
 }

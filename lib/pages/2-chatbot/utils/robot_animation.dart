@@ -14,13 +14,8 @@ class RobotAnimationHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.only(top: 5, bottom: 16),
       decoration: BoxDecoration(
-        color: AppColors.softGray.withValues(alpha: 0.5),
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(20),
-          bottomRight: Radius.circular(20),
-        ),
+        color: Colors.white,
       ),
 
       child: SafeArea(

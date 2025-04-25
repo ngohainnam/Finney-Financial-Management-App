@@ -1,4 +1,3 @@
-import 'package:finney/assets/path/app_images.dart';
 import 'package:flutter/material.dart';
 import 'package:finney/assets/theme/app_color.dart';
 import 'package:intl/intl.dart';
@@ -7,81 +6,70 @@ class BalanceCard extends StatelessWidget {
   final double balance;
   final double income;
   final double expenses;
+  final String timeRange;
 
   const BalanceCard({
     super.key,
     required this.balance,
     required this.income,
     required this.expenses,
+    this.timeRange = 'This Month',
   });
 
   @override
   Widget build(BuildContext context) {
     final currencyFormat = NumberFormat.currency(symbol: '\$');
-    
+
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: AppColors.ombreBlue,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Total Balance',
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              Image.asset(AppImages.appLogo, width: 50, height: 50),
-            ],
+          Text(
+            'Balance ($timeRange)',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 17,
+              fontWeight: FontWeight.w500,
+            ),
           ),
-
+          const SizedBox(height: 8),
           Text(
             currencyFormat.format(balance),
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 36,
+              fontSize: 32,
               fontWeight: FontWeight.bold,
-              letterSpacing: 1,
             ),
           ),
-  
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha:0.2),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildIncomeExpenseIndicator(
-                  Icons.add_circle_outline,
-                  'Income',
-                  currencyFormat.format(income),
-                  Colors.greenAccent,
-                ),
-                Container(
-                  width: 1,
-                  height: 40,
-                  color: Colors.white.withValues(alpha:0.2),
-                ),
-                _buildIncomeExpenseIndicator(
-                  Icons.remove_circle_outline,
-                  'Expenses',
-                  currencyFormat.format(expenses),
-                  Colors.redAccent,
-                ),
-              ],
-            ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              _buildIncomeExpenseIndicator(
+                Icons.add_circle_outline,
+                'Income',
+                currencyFormat.format(income),
+                Colors.greenAccent,
+              ),
+              const SizedBox(width: 40),
+              _buildIncomeExpenseIndicator(
+                Icons.remove_circle_outline,
+                'Expenses',
+                currencyFormat.format(expenses),
+                Colors.redAccent,
+              ),
+            ],
           ),
         ],
       ),
@@ -117,7 +105,7 @@ class BalanceCard extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                color: Colors.white.withValues(alpha:0.8),
+                color: Colors.white.withValues(alpha: 0.8), 
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
