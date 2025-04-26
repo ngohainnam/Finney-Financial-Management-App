@@ -20,7 +20,7 @@ class _MainLayoutState extends State<MainLayout> {
     Dashboard(),
     Chatbot(),
     Report(),
-	Learn(),
+    Learn(),
     Setting(),
   ];
 
@@ -28,6 +28,14 @@ class _MainLayoutState extends State<MainLayout> {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  void _handleSearchSubmitted(String question) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => Chatbot(initialQuestion: question),
+      ),
+    );
   }
 
   @override
@@ -40,6 +48,7 @@ class _MainLayoutState extends State<MainLayout> {
       bottomNavigationBar: AppNavbar(
         selectedIndex: _selectedIndex,
         onTabChange: _handleNavigation,
+        onSearchSubmitted: _handleSearchSubmitted,
       ),
     );
   }

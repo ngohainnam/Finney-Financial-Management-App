@@ -13,7 +13,7 @@ class CategoryUtils {
     'Transport',
     'Health',
     'Utilities',
-    'Others'
+    'Others',
   ];
 
   // Income categories
@@ -22,7 +22,7 @@ class CategoryUtils {
     'Investment',
     'Business',
     'Gift',
-    'Others'
+    'Others',
   ];
 
   static IconData getIconForCategory(String category) {
@@ -35,17 +35,23 @@ class CategoryUtils {
       // Expense icons
       case 'Shopping':
         icon = Icons.shopping_bag;
+        break;
       case 'Food':
         icon = Icons.restaurant;
+        break;
       case 'Entertainment':
         icon = Icons.movie;
+        break;
       case 'Transport':
         icon = Icons.directions_car;
+        break;
       case 'Health':
         icon = Icons.medical_services;
+        break;
       case 'Utilities':
         icon = Icons.phone;
-      
+        break;
+
       // Income icons
       case 'Salary':
         icon = Icons.work;
@@ -55,7 +61,7 @@ class CategoryUtils {
         icon = Icons.business;
       case 'Gift':
         icon = Icons.card_giftcard;
-      
+
       // Default icon
       default:
         icon = Icons.category_outlined;
@@ -75,17 +81,23 @@ class CategoryUtils {
       // Expense colors
       case 'Shopping':
         color = AppColors.categoryShopping;
+        break;
       case 'Food':
         color = AppColors.categoryFood;
+        break;
       case 'Entertainment':
         color = AppColors.categoryEntertainment;
+        break;
       case 'Transport':
         color = AppColors.categoryTransport;
+        break;
       case 'Health':
         color = AppColors.categoryHealth;
+        break;
       case 'Utilities':
         color = AppColors.categoryUtilities;
-      
+        break;
+
       // Income colors
       case 'Salary':
         color = AppColors.categorySalary;
@@ -95,7 +107,7 @@ class CategoryUtils {
         color = AppColors.categoryBusiness;
       case 'Gift':
         color = AppColors.categoryGift;
-      
+
       // Default color
       default:
         color = AppColors.categoryDefault;

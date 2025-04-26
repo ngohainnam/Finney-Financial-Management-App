@@ -13,26 +13,24 @@ import 'package:finney/pages/5-learn/quiz/quiz_result_model.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase with platform options
+  // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
   // Initialize Hive
   await Hive.initFlutter();
-
-  // Register your Hive adapters
   Hive.registerAdapter(UserModelAdapter());
   Hive.registerAdapter(ChatMessageModelAdapter());
   Hive.registerAdapter(QuizResultAdapter());
 
-  // Open the required Hive boxes
+  // Open boxes
   await Hive.openBox<UserModel>('userBox');
   await Hive.openBox<ChatMessageModel>('chatMessage');
   await Hive.openBox('learning_progress');
   await Hive.openBox<QuizResult>('quiz_results');
 
-  // Initialize Gemini AI
+  // Initialize Gemini
   Gemini.init(apiKey: geminiApiKey);
 
   runApp(const MyApp());
