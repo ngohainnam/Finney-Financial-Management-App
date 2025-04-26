@@ -15,14 +15,16 @@ class _SavingMoneyEasyState extends State<SavingMoneyEasy> {
 
   final List<Map<String, String>> steps = [
     {
-      'title': 'Why Saving is Important',
-      'description': 'Learn the importance of saving for emergencies and goals.',
-      'videoId': 'TYQRN0jUQFQ',
+      'title': 'সঞ্চয়ের অভ্যাস গড়া',
+      'description':
+          'নিয়মিত সঞ্চয় করা বুদ্ধিমানের কাজ এবং অভ্যাসে পরিণত করা উচিত। খরচের আগে সঞ্চয়ের পরিকল্পনা করাই হলো স্মার্ট আর্থিক আচরণ।',
+      'videoId': 'RUz9yjgnGi8', // https://www.youtube.com/watch?v=RUz9yjgnGi8
     },
     {
-      'title': 'Easy Saving Tips',
-      'description': 'Simple habits to help you save more money every week.',
-      'videoId': 'NRIx4ErEt6U',
+      'title': 'সঞ্চয়ের গুরুত্ব',
+      'description':
+          'জরুরি সময়ের জন্য সঞ্চয় রাখা অত্যন্ত জরুরি। আয় থেকে শুরুতেই টাকা আলাদা করে রাখার অভ্যাস আমাদের ভবিষ্যতকে নিরাপদ রাখে।',
+      'videoId': 'QNu4u0XsIoM', // https://www.youtube.com/watch?v=QNu4u0XsIoM
     },
   ];
 

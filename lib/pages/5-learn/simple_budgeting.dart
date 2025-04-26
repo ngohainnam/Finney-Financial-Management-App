@@ -15,14 +15,16 @@ class _SimpleBudgetingState extends State<SimpleBudgeting> {
 
   final List<Map<String, String>> steps = [
     {
-      'title': 'Understanding Your Expenses',
-      'description': 'Break down your monthly costs and categorize them.',
-      'videoId': '3mVxyEln6j0',
+      'title': 'মাসিক আয়ের বুদ্ধিমান বণ্টন',
+      'description':
+          '৫৫% প্রয়োজনীয় খরচে, ১০% দীর্ঘমেয়াদি বিনিয়োগে, ১০% ভবিষ্যতের লক্ষ্যে, ১০% নিজের দক্ষতায় এবং ১৫% আনন্দ-দানে ব্যয় করুন।',
+      'videoId': 'ycPRDF4WOhw', // https://www.youtube.com/watch?v=ycPRDF4WOhw
     },
     {
-      'title': 'Creating a Budget Plan',
-      'description': 'Learn to allocate your income effectively.',
-      'videoId': '1ROzGReu4N0',
+      'title': 'নিজের উপর বিনিয়োগই সবচেয়ে লাভজনক',
+      'description':
+          '১০,০০০ টাকা দিয়ে ব্যবসা নয়, স্কিল ডেভেলপ করুন। বই পড়ুন, অনলাইন কোর্স করুন, দক্ষতা দিয়ে আয়ের পথ খুঁজে নিন।',
+      'videoId': 'ngVpfw8K7K8', // https://youtu.be/ngVpfw8K7K8
     },
   ];
 

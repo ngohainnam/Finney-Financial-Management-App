@@ -15,18 +15,20 @@ class _SmartSpendingTipsState extends State<SmartSpendingTips> {
 
   final List<Map<String, String>> steps = [
     {
-      'title': 'Needs vs Wants',
-      'description': 'Understand the difference between essentials and extras in daily expenses.',
-      'videoId': 'kS7I9RxvCTI',
+      'title': 'টাকা ম্যানেজ, গ্রো, ইনভেস্ট ও প্রটেক্ট করুন',
+      'description':
+          'যতটুকুই আয় করেন না কেন, ঠিকভাবে ম্যানেজ করে, ইনকাম বাড়িয়ে, ইনভেস্ট করে এবং সুরক্ষা করলে ভবিষ্যত নিরাপদ হবে।',
+      'videoId': 'Vwb07EXFgfA', // https://www.youtube.com/watch?v=Vwb07EXFgfA
     },
     {
-      'title': 'Make Small Changes',
-      'description': 'Even small adjustments can save big money over time.',
-      'videoId': 'Abz9qnb3uPA',
+      'title': 'স্মার্ট ইনভেস্টমেন্ট: জমিতে বিনিয়োগ',
+      'description':
+          'জমি হলো নিরাপদ ও লাভজনক ইনভেস্টমেন্ট। নিজের এলাকায় কাগজপত্র দেখে বুঝে ইনভেস্ট করুন। ফ্ল্যাট বা ক্রিপ্টোর চেয়ে বেশি ফ্লেক্সিবল।',
+      'videoId': 'f-FMn43hR34', // https://www.youtube.com/watch?v=f-FMn43hR34
     },
   ];
 
-  final Color contentColor = Color(0xFFB3E5FC); // Light cyan/blue hue
+  final Color contentColor = Color(0xFFE0E7FA); // Light Lavender Blue
 
   late List<YoutubePlayerController> _controllers;
   late List<bool> _completed;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'quiz_questions.dart';
 import 'quiz_result_model.dart';
-import 'quiz_results_page.dart';
+import 'quiz_result.dart';
 import 'package:hive/hive.dart';
 
 class QuizPage extends StatefulWidget {
@@ -17,12 +17,24 @@ class _QuizPageState extends State<QuizPage> {
   int? _selectedIndex;
   bool _answered = false;
 
+  late List<QuizQuestion> selectedQuestions;
+  late List<int?> _userAnswers;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedQuestions = List.from(quizQuestions)..shuffle();
+    selectedQuestions = selectedQuestions.take(10).toList();
+    _userAnswers = List.filled(selectedQuestions.length, null);
+  }
+
   void _handleAnswer(int index) {
     if (_answered) return;
     setState(() {
       _selectedIndex = index;
       _answered = true;
-      if (index == quizQuestions[_currentIndex].correctAnswerIndex) {
+      _userAnswers[_currentIndex] = index;
+      if (index == selectedQuestions[_currentIndex].correctAnswerIndex) {
         _score++;
       }
     });
@@ -31,7 +43,7 @@ class _QuizPageState extends State<QuizPage> {
   void _nextQuestion() {
     if (!_answered) return;
 
-    if (_currentIndex + 1 < quizQuestions.length) {
+    if (_currentIndex + 1 < selectedQuestions.length) {
       setState(() {
         _currentIndex++;
         _selectedIndex = null;
@@ -41,7 +53,13 @@ class _QuizPageState extends State<QuizPage> {
       _saveResult();
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const QuizResultsPage()),
+        MaterialPageRoute(
+          builder: (_) => QuizResultPage(
+            score: _score,
+            total: selectedQuestions.length,
+            userAnswers: _userAnswers,
+          ),
+        ),
       );
     }
   }
@@ -50,7 +68,7 @@ class _QuizPageState extends State<QuizPage> {
     final box = await Hive.openBox<QuizResult>('quiz_results');
     final result = QuizResult(
       score: _score,
-      totalQuestions: quizQuestions.length,
+      totalQuestions: selectedQuestions.length,
       timestamp: DateTime.now(),
     );
     box.add(result);
@@ -58,15 +76,15 @@ class _QuizPageState extends State<QuizPage> {
 
   @override
   Widget build(BuildContext context) {
-    final question = quizQuestions[_currentIndex];
-    double progress = (_currentIndex + 1) / quizQuestions.length;
+    final question = selectedQuestions[_currentIndex];
+    double progress = (_currentIndex + 1) / selectedQuestions.length;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFE1EBF5), // Soft pastel blue
+      backgroundColor: const Color(0xFFE1EBF5),
       body: SafeArea(
         child: Column(
           children: [
-            // Top controls
+            // UI: AppBar replacement
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
@@ -83,7 +101,7 @@ class _QuizPageState extends State<QuizPage> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: const Text(
-                      "Smart Spending",
+                      "Test Your Knowledge",
                       style: TextStyle(
                         color: Colors.black87,
                         fontWeight: FontWeight.w500,
@@ -95,7 +113,6 @@ class _QuizPageState extends State<QuizPage> {
               ),
             ),
 
-            // Progress bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 6),
               child: LinearProgressIndicator(
@@ -107,16 +124,12 @@ class _QuizPageState extends State<QuizPage> {
 
             const SizedBox(height: 8),
             Text(
-              "Question ${_currentIndex + 1}/${quizQuestions.length}",
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
+              "Question ${_currentIndex + 1}/${selectedQuestions.length}",
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
-
             const SizedBox(height: 24),
 
-            // Card with question + options
+            // UI: Quiz Card
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -136,7 +149,6 @@ class _QuizPageState extends State<QuizPage> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Question capsule
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
@@ -154,14 +166,14 @@ class _QuizPageState extends State<QuizPage> {
                       ),
                       const SizedBox(height: 24),
 
-                      // Options
+                      // ✅ Answer Options with color feedback
                       ...List.generate(question.options.length, (index) {
                         final isCorrect = index == question.correctAnswerIndex;
                         final isSelected = index == _selectedIndex;
 
                         Color bgColor = Colors.white;
                         if (_answered) {
-                          if (isSelected && isCorrect) {
+                          if (isCorrect) {
                             bgColor = Colors.green[100]!;
                           } else if (isSelected && !isCorrect) {
                             bgColor = Colors.red[100]!;
@@ -169,29 +181,20 @@ class _QuizPageState extends State<QuizPage> {
                         }
 
                         return GestureDetector(
-                          onTap: () => _handleAnswer(index),
+                          onTap: _answered ? null : () => _handleAnswer(index),
                           child: Container(
                             width: double.infinity,
                             margin: const EdgeInsets.only(bottom: 12),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 14,
-                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                             decoration: BoxDecoration(
                               color: bgColor,
                               borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                color: Colors.grey.shade300,
-                                width: 1.4,
-                              ),
+                              border: Border.all(color: Colors.grey.shade300, width: 1.4),
                             ),
                             child: Text(
                               question.options[index],
                               textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: Colors.black87,
-                              ),
+                              style: const TextStyle(fontSize: 16, color: Colors.black87),
                             ),
                           ),
                         );
@@ -203,16 +206,13 @@ class _QuizPageState extends State<QuizPage> {
                         onPressed: _answered ? _nextQuestion : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blueAccent,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 40,
-                            vertical: 14,
-                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
                         ),
                         child: Text(
-                          _currentIndex + 1 == quizQuestions.length ? "Finish" : "Next",
+                          _currentIndex + 1 == selectedQuestions.length ? "Finish" : "Next",
                           style: const TextStyle(fontSize: 16),
                         ),
                       ),
