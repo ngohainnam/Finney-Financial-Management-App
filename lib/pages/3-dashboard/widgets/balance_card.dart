@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:finney/assets/theme/app_color.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:finney/localization/locales.dart';
+import 'package:finney/components/time_selector.dart';
 
 class BalanceCard extends StatelessWidget {
   final double balance;
   final double income;
   final double expenses;
-  final String timeRange;
+  final TimeRangeData timeRange;
 
   const BalanceCard({
     super.key,
     required this.balance,
     required this.income,
     required this.expenses,
-    this.timeRange = 'This Month',
+    required this.timeRange,
   });
 
   @override
@@ -37,7 +40,7 @@ class BalanceCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Balance ($timeRange)',
+            '${LocaleData.balance.getString(context)} (${timeRange.getLocalizedLabel(context)})',
             style: const TextStyle(
               color: Colors.white,
               fontSize: 17,
@@ -58,14 +61,14 @@ class BalanceCard extends StatelessWidget {
             children: [
               _buildIncomeExpenseIndicator(
                 Icons.add_circle_outline,
-                'Income',
+                LocaleData.income.getString(context),
                 currencyFormat.format(income),
                 Colors.greenAccent,
               ),
               const SizedBox(width: 40),
               _buildIncomeExpenseIndicator(
                 Icons.remove_circle_outline,
-                'Expenses',
+                LocaleData.expenses.getString(context),
                 currencyFormat.format(expenses),
                 Colors.redAccent,
               ),

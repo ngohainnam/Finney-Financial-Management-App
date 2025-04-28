@@ -2,6 +2,8 @@ import 'package:finney/pages/2-chatbot/utils/robot_animation.dart';
 import 'package:flutter/material.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:finney/assets/theme/app_color.dart';
+import 'package:finney/localization/locales.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 
 class ChatInterface extends StatelessWidget {
   final ChatUser currentUser;
@@ -48,7 +50,7 @@ class ChatInterface extends StatelessWidget {
                 ),
               ],
               inputDecoration: InputDecoration(
-                hintText: "Ask me financial question...",
+                hintText: LocaleData.chatInputHint.getString(context),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none, 

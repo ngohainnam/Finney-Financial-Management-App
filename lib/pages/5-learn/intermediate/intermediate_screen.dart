@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:finney/pages/5-learn/intermediate/intermediate_quiz.dart';
+import 'package:finney/assets/theme/app_color.dart';
+import 'package:finney/localization/locales.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 
 class IntermediateScreen extends StatelessWidget {
   const IntermediateScreen({super.key});
@@ -8,40 +11,45 @@ class IntermediateScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Intermediate Financial Skills'),
+        title: Text(getSafeString(context, LocaleData.intermediateScreenTitle)),
         backgroundColor: Colors.white,
         elevation: 1,
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: const IconThemeData(color: AppColors.darkBlue),
       ),
-      backgroundColor: const Color(0xFFF7F6FA),
+      backgroundColor: AppColors.softGray,
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           _buildLessonCard(
+            context: context,
             icon: Icons.pie_chart,
-            title: 'Advanced Budgeting',
-            points: [
-              'Creating a monthly budget plan',
-              'Setting financial goals',
-              'Managing irregular income',
+            titleKey: LocaleData.advancedBudgetingTitle,
+            pointKeys: [
+              LocaleData.advancedBudgetingPoint1,
+              LocaleData.advancedBudgetingPoint2,
+              LocaleData.advancedBudgetingPoint3,
             ],
+            onTap: () {
+            },
           ),
           _buildLessonCard(
+            context: context,
             icon: Icons.credit_card,
-            title: 'Credit Basics',
-            points: [
-              'Understanding credit scores',
-              'Responsible credit card use',
-              'Avoiding debt traps',
+            titleKey: LocaleData.creditBasicsTitle,
+            pointKeys: [
+              LocaleData.creditBasicsPoint1,
+              LocaleData.creditBasicsPoint2,
+              LocaleData.creditBasicsPoint3,
             ],
           ),
           _buildLessonCard(
+            context: context,
             icon: Icons.savings,
-            title: 'Saving Strategies',
-            points: [
-              'Emergency funds (3-6 months)',
-              'Saving for big purchases',
-              'Automating your savings',
+            titleKey: LocaleData.savingStrategiesTitle,
+            pointKeys: [
+              LocaleData.savingStrategiesPoint1,
+              LocaleData.savingStrategiesPoint2,
+              LocaleData.savingStrategiesPoint3,
             ],
           ),
           const SizedBox(height: 24),
@@ -56,7 +64,7 @@ class IntermediateScreen extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
+                backgroundColor: AppColors.primary,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 32,
                   vertical: 16,
@@ -65,9 +73,9 @@ class IntermediateScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: const Text(
-                'Take Intermediate Quiz',
-                style: TextStyle(fontSize: 16),
+              child: Text(
+                getSafeString(context, LocaleData.takeIntermediateQuiz),
+                style: const TextStyle(fontSize: 16, color: Colors.white),
               ),
             ),
           ),
@@ -77,48 +85,60 @@ class IntermediateScreen extends StatelessWidget {
   }
 
   Widget _buildLessonCard({
+    required BuildContext context,
     required IconData icon,
-    required String title,
-    required List<String> points,
+    required String titleKey,
+    required List<String> pointKeys,
+    VoidCallback? onTap,
   }) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(icon, color: Colors.blue, size: 28),
-                const SizedBox(width: 12),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(icon, color: AppColors.primary, size: 28),
+                  const SizedBox(width: 12),
+                  Text(
+                    getSafeString(context, titleKey),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.darkBlue,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              ...pointKeys.map(
+                (pointKey) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.circle, size: 8, color: AppColors.primary),
+                      const SizedBox(width: 8),
+                      Expanded(child: Text(getSafeString(context, pointKey))),
+                    ],
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            ...points.map(
-              (point) => Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Icon(Icons.circle, size: 8, color: Colors.blue),
-                    const SizedBox(width: 8),
-                    Expanded(child: Text(point)),
-                  ],
-                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  // Fallback mechanism for missing translations
+  String getSafeString(BuildContext context, String key) {
+    final translation = key.getString(context);
+    return translation == key ? 'Translation missing for $key' : translation;
   }
 }

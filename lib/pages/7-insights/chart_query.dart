@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:finney/assets/theme/app_color.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
+import 'package:finney/localization/locales.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 
 class ChartQuery extends StatefulWidget {
   final Map<String, dynamic> chartData;
@@ -30,45 +32,47 @@ class _ChartQueryState extends State<ChartQuery> {
     _questionController.dispose();
     super.dispose();
   }
+  String sprintf(String format, List<dynamic> args) {
+  String result = format;
+  for (int i = 0; i < args.length; i++) {
+    result = result.replaceFirst('%s', args[i].toString());
+  }
+  return result;
+  }
 
   Future<void> _askQuestion() async {
-    if (_questionController.text.trim().isEmpty) return;
+  if (_questionController.text.trim().isEmpty) return;
+
+  setState(() {
+    _isLoading = true;
+  });
+
+  try {
+    // Create context for the LLM about the chart data
+    final String chartContext = sprintf(
+      LocaleData.chartContext.getString(context),
+      [widget.chartType, widget.viewType, widget.chartData.toString()],
+    );
+
+    final prompt = sprintf(
+      LocaleData.queryPrompt.getString(context),
+      [chartContext, _questionController.text],
+    );
+
+    final response = await _gemini.prompt(
+      parts: [Part.text(prompt)],
+    );
 
     setState(() {
-      _isLoading = true;
+      _answer = response?.output ?? LocaleData.queryError.getString(context);
+      _isLoading = false;
     });
-
-    try {
-      //create context for the LLM about the chart data
-      final String chartContext = """
-I'm looking at a ${widget.chartType} chart showing my ${widget.viewType} data.
-The chart data is: ${widget.chartData.toString()}.
-      """;
-
-      final prompt = """
-You are a helpful financial assistant. Answer the following question about the chart data.
-Keep your answer brief (under 100 words) and focused on the chart data.
-If you can't answer from the data provided, state that clearly.
-
-Chart context: $chartContext
-
-Question: ${_questionController.text}
-      """;
-
-      final response = await _gemini.prompt(
-        parts:[Part.text(prompt)]
-      );
-      
-      setState(() {
-        _answer = response?.output ?? 'Sorry, I couldn\'t process that question.';
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _answer = 'Sorry, an error occurred: $e';
-        _isLoading = false;
-      });
-    }
+  } catch (e) {
+    setState(() {
+      _answer = sprintf(LocaleData.queryErrorWithMessage.getString(context), [e.toString()]);
+      _isLoading = false;
+    });
+  }
   }
 
   @override
@@ -79,7 +83,6 @@ Question: ${_questionController.text}
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Toggle button to show/hide query field
           GestureDetector(
             onTap: () {
               setState(() {
@@ -106,7 +109,9 @@ Question: ${_questionController.text}
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    _showQueryField ? "Hide Assistant" : "Ask about this chart",
+                    _showQueryField 
+                      ? LocaleData.hideAssistant.getString(context)
+                      : LocaleData.askAboutChart.getString(context),
                     style: TextStyle(
                       color: _showQueryField ? Colors.white : Colors.black87,
                       fontWeight: FontWeight.w500,
@@ -123,7 +128,7 @@ Question: ${_questionController.text}
             TextField(
               controller: _questionController,
               decoration: InputDecoration(
-                hintText: 'Ask about this chart...',
+                hintText: LocaleData.askAboutChartHint.getString(context),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none, 
@@ -168,7 +173,7 @@ Question: ${_questionController.text}
                                 size: 16),
                               const SizedBox(width: 8),
                               Text(
-                                'Assistant',
+                                LocaleData.assistant.getString(context),
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: AppColors.primary,

@@ -5,6 +5,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:finney/pages/3-dashboard/utils/category.dart';
 import 'package:finney/pages/7-insights/insights.dart'; 
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:finney/localization/locales.dart';
 
 class CategoryPieChart extends StatelessWidget {
   final List<dynamic> categoryData;
@@ -18,8 +20,8 @@ class CategoryPieChart extends StatelessWidget {
 
   Color get _themeColor {
     return viewType == ChartViewType.income
-        ? Colors.green  // Green for income
-        : Colors.redAccent;  // Red accent for expense
+        ? Colors.green 
+        : Colors.redAccent; 
   }
 
   @override
@@ -53,15 +55,15 @@ class CategoryPieChart extends StatelessWidget {
             children: [
               Text(
                 viewType == ChartViewType.expenses 
-                    ? 'Expense Categories' 
-                    : 'Income Sources',
+                    ? LocaleData.categoryBreakdown.getString(context)
+                    : LocaleData.incomeAnalysis.getString(context),
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
-                'Total: ${currencyFormat.format(total)}',
+                 '${LocaleData.total.getString(context)}: ${currencyFormat.format(total)}',
                 style: TextStyle(
                   color: _themeColor,
                   fontWeight: FontWeight.bold,
@@ -74,7 +76,7 @@ class CategoryPieChart extends StatelessWidget {
 
           //Chart container
           if (categoryData.isEmpty)
-            _buildEmptyState(viewType)
+            _buildEmptyState(viewType, context)
           else
             Container(
               height: 220, 
@@ -117,7 +119,7 @@ class CategoryPieChart extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState(ChartViewType viewType) {
+  Widget _buildEmptyState(ChartViewType viewType, context) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(40.0),
@@ -133,8 +135,8 @@ class CategoryPieChart extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               viewType == ChartViewType.expenses
-                  ? 'No expense data for this period'
-                  : 'No income data for this period',
+                  ? LocaleData.noExpenseData.getString(context)
+                  : LocaleData.noIncomeData.getString(context),
               style: TextStyle(
                 color: Colors.grey.shade600,
                 fontSize: 16,

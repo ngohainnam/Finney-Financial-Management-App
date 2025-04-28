@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:finney/pages/5-learn/beginner/beginner_quiz.dart';
 import 'package:finney/pages/5-learn/intermediate/intermediate_quiz.dart';
 import 'package:finney/pages/5-learn/advanced/advanced_quiz.dart';
+import 'package:finney/localization/locales.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 
 class QuizHomeScreen extends StatelessWidget {
   const QuizHomeScreen({super.key});
@@ -9,14 +11,14 @@ class QuizHomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Financial Knowledge Quiz')),
+      appBar: AppBar( title: Text(LocaleData.quizHomeTitle.getString(context)),),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _buildQuizOption(
               context,
-              level: 'Beginner',
+              level: LocaleData.beginnerLevelQuiz,
               color: Colors.green,
               onTap:
                   () => Navigator.push(
@@ -28,7 +30,7 @@ class QuizHomeScreen extends StatelessWidget {
             ),
             _buildQuizOption(
               context,
-              level: 'Intermediate',
+              level: LocaleData.intermediateLevelQuiz,
               color: Colors.blue,
               onTap:
                   () => Navigator.push(
@@ -40,7 +42,7 @@ class QuizHomeScreen extends StatelessWidget {
             ),
             _buildQuizOption(
               context,
-              level: 'Advanced',
+              level: LocaleData.advancedLevelQuiz,
               color: Colors.purple,
               onTap:
                   () => Navigator.push(

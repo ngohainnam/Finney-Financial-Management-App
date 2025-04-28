@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
 import 'package:finney/pages/3-dashboard/transaction/transaction_services.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:finney/localization/locales.dart';
 
 abstract class BaseTransactionScreen extends StatefulWidget {
   final Function? onTransactionAdded;
@@ -59,23 +61,23 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
 Future<void> _saveTransaction() async {
   // Validate amount
   if (_amountController.text == '0.00' || _amountController.text.isEmpty) {
-    _showErrorSnackBar('Please enter a valid amount');
+    _showErrorSnackBar(LocaleData.pleaseEnterValidAmount.getString(context));
     return;
   }
 
   try {
     double amount = double.parse(_amountController.text);
     if (amount <= 0) {
-      _showErrorSnackBar('Please enter a positive amount');
+      _showErrorSnackBar(LocaleData.pleaseEnterPositiveAmount.getString(context));
       return;
     }
   } catch (e) {
-    _showErrorSnackBar('Please enter a valid number');
+    _showErrorSnackBar(LocaleData.pleaseEnterValidNumber.getString(context));
     return;
   }
 
   if (_selectedCategory.isEmpty) {
-    _showErrorSnackBar('Please select a category');
+    _showErrorSnackBar(LocaleData.pleaseSelectCategory.getString(context));
     return;
   }
 
@@ -105,8 +107,8 @@ Future<void> _saveTransaction() async {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(widget.existingTransaction != null 
-            ? 'Transaction updated successfully' 
-            : 'Transaction saved successfully'),
+            ? LocaleData.transactionUpdated.getString(context)
+            : LocaleData.transactionSaved.getString(context)),
           backgroundColor: Colors.green,
         ),
       );
@@ -130,7 +132,7 @@ Future<void> _saveTransaction() async {
       setState(() {
         _isSaving = false;
       });
-      _showErrorSnackBar('Failed to save transaction. Please try again.');
+      _showErrorSnackBar(LocaleData.failedToSaveTransaction.getString(context));
     }
   }
 }
@@ -182,7 +184,7 @@ Future<void> _saveTransaction() async {
               decoration: InputDecoration(
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.zero,
-                hintText: '0.00',
+                hintText: LocaleData.amountHint.getString(context),
                 prefixText: '\$',
                 prefixStyle: TextStyle(
                   color: amountColor,
@@ -205,8 +207,8 @@ Future<void> _saveTransaction() async {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Category section
-                  const Text(
-                    'Category',
+                  Text(
+                    LocaleData.category.getString(context),
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -241,8 +243,8 @@ Future<void> _saveTransaction() async {
                   const SizedBox(height: 20),
 
                   // Date selector
-                  const Text(
-                    'Date',
+                  Text(
+                    LocaleData.date.getString(context),
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -283,8 +285,8 @@ Future<void> _saveTransaction() async {
                   const SizedBox(height: 20),
 
                   // Description field
-                  const Text(
-                    'Description',
+                  Text(
+                    LocaleData.description.getString(context),
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -295,7 +297,7 @@ Future<void> _saveTransaction() async {
                   TextField(
                     controller: _descriptionController,
                     decoration: InputDecoration(
-                      hintText: 'Enter description (optional)',
+                      hintText: LocaleData.descriptionHint.getString(context),
                       hintStyle: const TextStyle(
                         color: Color(0xFFBDBDBD),
                         fontSize: 14,

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finney/pages/3-dashboard/models/saving_goal_model.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:finney/localization/locales.dart';
 
 class AddEditGoalPage extends StatefulWidget {
   final SavingGoal? existingGoal;
@@ -65,7 +67,7 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
       try {
         final amount = double.tryParse(_targetAmountController.text);
         if (amount == null || amount <= 0) {
-          _showErrorMessage('Please enter a valid positive amount');
+          _showErrorMessage(LocaleData.pleaseEnterPositiveAmount.getString(context));
           return;
         }
 
@@ -91,8 +93,8 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
 
         _showSuccessMessage(
           widget.existingGoal == null
-              ? 'Goal "${goal.title}" created!'
-              : 'Goal "${goal.title}" updated!',
+              ? LocaleData.goalCreated.getString(context).replaceFirst('%s', goal.title)
+              : LocaleData.goalUpdated.getString(context).replaceFirst('%s', goal.title),
         );
 
         if (widget.onGoalSaved != null) {
@@ -101,7 +103,7 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
 
         Navigator.of(context).pop();
       } catch (e) {
-        _showErrorMessage('Error saving goal. Please try again.');
+        _showErrorMessage(LocaleData.errorSavingGoal.getString(context));
       }
     }
   }
@@ -133,7 +135,9 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          widget.existingGoal == null ? 'Add Saving Goal' : 'Edit Saving Goal',
+          widget.existingGoal == null 
+            ? LocaleData.addSavingGoal.getString(context)
+            : LocaleData.editSavingGoal.getString(context),
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
         ),
         centerTitle: true,
@@ -174,10 +178,10 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF4CAF50),
                       ),
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.zero,
-                        hintText: '0.00',
+                        hintText: LocaleData.amountHint.getString(context),
                         hintStyle: TextStyle(
                           color: Color(0xFF4CAF50),
                           fontWeight: FontWeight.bold,
@@ -186,14 +190,14 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter an amount';
+                          return LocaleData.pleaseEnterAmount.getString(context);
                         }
                         final amount = double.tryParse(value);
                         if (amount == null) {
-                          return 'Please enter a valid number';
+                          return LocaleData.pleaseEnterValidNumber.getString(context);
                         }
                         if (amount <= 0) {
-                          return 'Please enter a positive amount';
+                          return LocaleData.pleaseEnterPositiveAmount.getString(context);
                         }
                         return null;
                       },
@@ -204,15 +208,15 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
               const SizedBox(height: 20),
 
               // Goal Name Field
-              const Text(
-                'Saving Goal Purpose',
+              Text(
+                LocaleData.savingGoalPurpose.getString(context),
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const SizedBox(height: 10),
               TextFormField(
                 controller: _titleController,
                 decoration: InputDecoration(
-                  hintText: 'e.g. Saving for new Car...',
+                  hintText: LocaleData.savingGoalHint.getString(context),
                   filled: true,
                   fillColor: const Color(0xFFF5F5F5),
                   border: OutlineInputBorder(
@@ -224,14 +228,14 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                 validator:
                     (value) =>
                         value == null || value.isEmpty
-                            ? 'Please enter a saving goal name'
+                            ? LocaleData.pleaseEnterSavingGoalName.getString(context)
                             : null,
               ),
               const SizedBox(height: 20),
 
               // Date Field
-              const Text(
-                'Target Date',
+              Text(
+                LocaleData.targetDate.getString(context),
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const SizedBox(height: 10),
@@ -267,15 +271,15 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
               const SizedBox(height: 20),
 
               // Description Field
-              const Text(
-                'Description',
+              Text(
+                LocaleData.description.getString(context),
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const SizedBox(height: 10),
               TextField(
                 controller: _descriptionController,
                 decoration: InputDecoration(
-                  hintText: 'Enter description (optional)',
+                  hintText: LocaleData.descriptionHint.getString(context),
                   hintStyle: const TextStyle(
                     color: Color(0xFFBDBDBD),
                     fontSize: 14,
@@ -304,8 +308,8 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: const Text(
-                    'SAVE GOAL',
+                  child:  Text(
+                    LocaleData.saveGoal.getString(context),
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,

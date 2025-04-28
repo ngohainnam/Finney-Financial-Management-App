@@ -3,6 +3,9 @@ import 'package:finney/pages/3-dashboard/saving/add_saving/saving_goal_page.dart
 import 'package:finney/pages/7-insights/insights.dart';
 import 'package:flutter/material.dart';
 import 'package:finney/assets/theme/app_color.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:finney/localization/locales.dart';
+
 
 class NavigationTiles extends StatelessWidget {
   const NavigationTiles({super.key});
@@ -15,7 +18,7 @@ class NavigationTiles extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(left: 16, bottom: 12),
           child: Text(
-            'AI-Powered Features',
+            LocaleData.aiPoweredFeatures.getString(context),
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -58,7 +61,7 @@ class NavigationTiles extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(left: 16, top: 24, bottom: 12),
           child: Text(
-            'Money Tools',
+            LocaleData.moneyTools.getString(context),
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -89,6 +92,19 @@ class NavigationTiles extends StatelessWidget {
     );
   }
 
+  String _getLocalizedTitle(BuildContext context, String title) {
+    switch (title) {
+      case 'Insights':
+        return LocaleData.insights.getString(context);
+      case 'AI Assistant':
+        return LocaleData.aiAssistant.getString(context);
+      case 'Goals':
+        return LocaleData.goals.getString(context);
+      default:
+        return title;
+    }
+  }
+
   Widget _buildNavigationTile(
     BuildContext context,
     String title,
@@ -112,7 +128,7 @@ class NavigationTiles extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            title,
+            _getLocalizedTitle(context, title),
             style: TextStyle(
               fontSize: 12,
               color: AppColors.darkBlue,

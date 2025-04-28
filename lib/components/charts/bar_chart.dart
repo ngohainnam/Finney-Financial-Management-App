@@ -6,6 +6,8 @@ import 'package:finney/pages/7-insights/insights.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
+import 'package:finney/localization/locales.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 
 class UnifiedBarChart extends StatefulWidget {
   final String title;
@@ -123,7 +125,7 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> {
           ),
         ),
         Text(
-          'Total: ${currencyFormat.format(totalAmount)}',
+          '${LocaleData.total.getString(context)}: ${currencyFormat.format(totalAmount)}',
           style: TextStyle(
             color: _barColor, // Use dynamic color based on type
             fontWeight: FontWeight.bold,
@@ -139,8 +141,8 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> {
         padding: const EdgeInsets.all(40.0),
         child: Text(
           widget.viewType == ChartViewType.income
-              ? 'No income data for this period yet'
-              : 'No expense data for this period yet',
+              ? LocaleData.noIncomeData.getString(context)
+              : LocaleData.noExpenseData.getString(context),
           style: const TextStyle(color: Colors.grey),
         ),
       ),
@@ -280,7 +282,7 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> {
       ),
     );
   }
-
+  
   Widget _buildPagination() {
     return Padding(
       padding: const EdgeInsets.only(top: 16.0),
@@ -290,19 +292,19 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> {
           IconButton(
             icon: Icon(
               Icons.arrow_back_ios,
-              color: _currentPage > 0 ? _barColor : Colors.grey.shade300, // Use dynamic color
+              color: _currentPage > 0 ? _barColor : Colors.grey.shade300,
               size: 18,
             ),
             onPressed: _currentPage > 0 ? _previousPage : null,
           ),
           Text(
-            'Page ${_currentPage + 1} of $_totalPages',
+            LocaleData.pagination.getString(context).replaceAll('%d', '${_currentPage + 1}').replaceAll('%d', '$_totalPages'),
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           IconButton(
             icon: Icon(
               Icons.arrow_forward_ios,
-              color: _currentPage < _totalPages - 1 ? _barColor : Colors.grey.shade300, // Use dynamic color
+              color: _currentPage < _totalPages - 1 ? _barColor : Colors.grey.shade300,
               size: 18,
             ),
             onPressed: _currentPage < _totalPages - 1 ? _nextPage : null,

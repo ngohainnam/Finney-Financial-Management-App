@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:finney/pages/3-dashboard/models/saving_goal_model.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:finney/localization/locales.dart';
 
 class GoalCard extends StatelessWidget {
   final SavingGoal goal;
@@ -76,17 +78,26 @@ class GoalCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Saved: \$${goal.savedAmount.toStringAsFixed(2)}',
+                    LocaleData.savedAmount.getString(context).replaceFirst(
+                      '%s',
+                      '\$${goal.savedAmount.toStringAsFixed(2)}',
+                    ),
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   Text(
-                    'Target: \$${goal.targetAmount.toStringAsFixed(2)}',
+                    LocaleData.targetAmount.getString(context).replaceFirst(
+                      '%s',
+                      '\$${goal.targetAmount.toStringAsFixed(2)}',
+                    ),
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
               Text(
-                '${goal.progressPercentage.toStringAsFixed(1)}% completed',
+                LocaleData.percentCompleted.getString(context).replaceFirst(
+                  '%s',
+                  goal.progressPercentage.toStringAsFixed(1),
+                ),
                 style: TextStyle(
                   color: goal.isCompleted ? Colors.green : Colors.blue,
                   fontWeight: FontWeight.bold,
@@ -94,8 +105,13 @@ class GoalCard extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'Target date: ${DateFormat('dd/MM/yyyy').format(goal.targetDate)} '
-                '(${isOverdue ? '${daysRemaining.abs()} days overdue' : '$daysRemaining days left'})',
+                '${LocaleData.targetDate.getString(context).replaceFirst(
+                  '%s',
+                  DateFormat('dd/MM/yyyy').format(goal.targetDate),
+                )} '
+                '(${isOverdue
+                    ? LocaleData.daysOverdue.getString(context).replaceFirst('%d', daysRemaining.abs().toString())
+                    : LocaleData.daysLeft.getString(context).replaceFirst('%d', daysRemaining.toString())})',
                 style: TextStyle(color: isOverdue ? Colors.red : null),
               ),
               if (goal.description?.isNotEmpty ?? false) ...[
@@ -115,7 +131,7 @@ class GoalCard extends StatelessWidget {
                         backgroundColor: Colors.blue,
                         foregroundColor: Colors.white,
                       ),
-                      child: const Text('Add Savings'),
+                      child: Text(LocaleData.addSavings.getString(context)),
                     ),
                   ),
                 ],
@@ -135,27 +151,27 @@ class GoalCard extends StatelessWidget {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('Add to Savings'),
+            title: Text(LocaleData.addToSavings.getString(context)),
             content: Form(
               key: formKey,
               child: TextFormField(
                 controller: amountController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Amount',
+                decoration: InputDecoration(
+                  labelText: LocaleData.amount.getString(context),
                   prefixText: '\$',
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter an amount';
+                    return LocaleData.pleaseEnterAmount.getString(context);
                   }
                   final amount = double.tryParse(value);
                   if (amount == null) {
-                    return 'Please enter a valid number';
+                    return LocaleData.pleaseEnterValidNumber.getString(context);
                   }
                   if (amount <= 0) {
-                    return 'Amount must be positive';
+                    return LocaleData.amountMustBePositive.getString(context);
                   }
                   return null;
                 },
@@ -164,7 +180,7 @@ class GoalCard extends StatelessWidget {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel'),
+                child: Text(LocaleData.cancel.getString(context)),
               ),
               ElevatedButton(
                 onPressed: () {
@@ -174,7 +190,7 @@ class GoalCard extends StatelessWidget {
                     onAddSavings(amount);
                   }
                 },
-                child: const Text('Add'),
+                child: Text(LocaleData.add.getString(context)),
               ),
             ],
           ),
@@ -186,12 +202,14 @@ class GoalCard extends StatelessWidget {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('Delete Goal'),
-            content: Text('Are you sure you want to delete "${goal.title}"?'),
+            title: Text(LocaleData.deleteGoal.getString(context)),
+            content: Text(
+              LocaleData.confirmDeleteGoal.getString(context).replaceFirst('%s', goal.title),
+            ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel'),
+                child: Text(LocaleData.cancel.getString(context)),
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -202,7 +220,7 @@ class GoalCard extends StatelessWidget {
                   Navigator.pop(context);
                   onDelete();
                 },
-                child: const Text('Delete'),
+                child: Text(LocaleData.delete.getString(context)),
               ),
             ],
           ),

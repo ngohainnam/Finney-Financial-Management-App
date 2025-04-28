@@ -1,6 +1,7 @@
 import 'package:finney/components/lanaguage_button.dart';
 import 'package:finney/components/charts/chart_service.dart' as chart_service;
 import 'package:finney/components/time_selector.dart';
+import 'package:finney/localization/locales.dart';
 import 'package:finney/pages/2-chatbot/utils/robot_animation.dart';
 import 'package:finney/pages/3-dashboard/widgets/navigation_tiles.dart';
 import 'package:finney/pages/3-dashboard/transaction/add_transaction/expense_or_income.dart';
@@ -11,6 +12,7 @@ import 'package:finney/assets/theme/app_color.dart';
 import 'package:finney/pages/3-dashboard/widgets/balance_card.dart';
 import 'package:finney/pages/3-dashboard/transaction/transaction_services.dart';
 import 'package:finney/pages/3-dashboard/models/transaction_model.dart' hide CategoryExpense;
+import 'package:flutter_localization/flutter_localization.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -111,7 +113,7 @@ class DashboardState extends State<Dashboard> {
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to load dashboard data: $e'),
+            content: Text(LocaleData.failedToLoadDashboardData.getString(context)),
             backgroundColor: Colors.red,
           ),
         );
@@ -148,7 +150,7 @@ class DashboardState extends State<Dashboard> {
       appBar: AppBar(
         backgroundColor: AppColors.lightBackground,
         title: Text(
-          'Finney AI',
+          LocaleData.chatbotTitle.getString(context),
           style: TextStyle(
             color: AppColors.primary,
             fontWeight: FontWeight.bold,
@@ -180,7 +182,7 @@ class DashboardState extends State<Dashboard> {
                 balance: _currentBalance,
                 income: _monthlyIncome,
                 expenses: _monthlyExpenseTotal,
-                timeRange: currentTimeRange.label,
+                timeRange: currentTimeRange,
               ),
               TimeRangeSelector(
                 initialTimeRange: currentTimeRange,

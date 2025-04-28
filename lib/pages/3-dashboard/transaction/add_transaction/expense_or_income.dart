@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:finney/pages/3-dashboard/transaction/add_transaction/add_income_screen.dart';
 import 'package:finney/pages/3-dashboard/transaction/add_transaction/add_expense_screen.dart';
 import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:finney/localization/locales.dart';
 
 class AddTransactionModal extends StatelessWidget {
   final Function(TransactionModel) onTransactionAdded;
@@ -21,8 +23,8 @@ class AddTransactionModal extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text(
-            'Add New',
+          Text(
+            LocaleData.addNew.getString(context),
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 30),
@@ -30,21 +32,21 @@ class AddTransactionModal extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               OptionButton(
-                label: 'Income',
+                label: LocaleData.income.getString(context),
                 icon: Icons.add_circle_outline,
                 color: Colors.green,
                 onTap: () => _navigateToIncomeScreen(context),
               ),
               OptionButton(
-                label: 'Expense',
+                label: LocaleData.expense.getString(context),
                 icon: Icons.remove_circle_outline,
                 color: Colors.red,
                 onTap: () => _navigateToExpenseScreen(context),
               ),
               OptionButton(
-                label: 'Savings',
-                icon: Icons.savings_outlined, // More appropriate icon
-                color: Colors.blue, // Distinct color for savings
+                label: LocaleData.savings.getString(context),
+                icon: Icons.savings_outlined,
+                color: Colors.blue,
                 onTap: () => _navigateToAddEditGoalPage(context),
               ),
             ],
@@ -86,9 +88,6 @@ class AddTransactionModal extends StatelessWidget {
       MaterialPageRoute(
         builder:
             (context) => AddEditGoalPage(
-              // Add any required parameters for AddEditGoalPage here
-              // For example, if you need to pass a callback:
-              // onGoalAdded: (goal) { /* handle goal addition */ },
             ),
       ),
     );

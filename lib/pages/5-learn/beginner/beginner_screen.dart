@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:finney/pages/5-learn/beginner/beginner_quiz.dart';
 import 'package:finney/pages/5-learn/models/resource.dart';
+import 'package:finney/localization/locales.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 
 class BeginnerScreen extends StatelessWidget {
   const BeginnerScreen({super.key});
@@ -10,7 +12,7 @@ class BeginnerScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Beginner Financial Skills'),
+        title: Text(LocaleData.beginnerScreenTitle.getString(context)),
         backgroundColor: Colors.white,
         elevation: 1,
         iconTheme: const IconThemeData(color: Colors.black),
@@ -22,11 +24,11 @@ class BeginnerScreen extends StatelessWidget {
           _buildLessonCard(
             context: context,
             icon: Icons.attach_money,
-            title: 'Understanding Money',
+            title: LocaleData.understandingMoneyTitle.getString(context),
             points: [
-              'What is money and how it works',
-              'Different types of money (cash, digital)',
-              'Basic needs vs wants',
+              LocaleData.understandingMoneyPoint1.getString(context),
+              LocaleData.understandingMoneyPoint2.getString(context),
+              LocaleData.understandingMoneyPoint3.getString(context),
             ],
             resources: [
               Resource(
@@ -45,11 +47,11 @@ class BeginnerScreen extends StatelessWidget {
           _buildLessonCard(
             context: context,
             icon: Icons.account_balance_wallet,
-            title: 'Simple Budgeting',
+            title:  LocaleData.simpleBudgetingTitle.getString(context),
             points: [
-              'Tracking daily expenses',
-              'The 50-30-20 rule simplified',
-              'Saving small amounts regularly',
+              LocaleData.simpleBudgetingPoint1.getString(context),
+              LocaleData.simpleBudgetingPoint2.getString(context),
+              LocaleData.simpleBudgetingPoint3.getString(context),
             ],
             resources: [
               Resource(
@@ -68,11 +70,11 @@ class BeginnerScreen extends StatelessWidget {
           _buildLessonCard(
             context: context,
             icon: Icons.account_balance,
-            title: 'Bank Accounts',
+            title: LocaleData.bankAccountsTitle.getString(context),
             points: [
-              'Types of bank accounts',
-              'How to deposit and withdraw money',
-              'Understanding bank statements',
+              LocaleData.bankAccountsPoint1.getString(context),
+              LocaleData.bankAccountsPoint2.getString(context),
+              LocaleData.bankAccountsPoint3.getString(context),
             ],
             resources: [
               Resource(
@@ -107,8 +109,8 @@ class BeginnerScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: const Text(
-                'Take Beginner Quiz',
+              child: Text(
+                LocaleData.takeBeginnerQuiz.getString(context),
                 style: TextStyle(fontSize: 16),
               ),
             ),
@@ -163,8 +165,8 @@ class BeginnerScreen extends StatelessWidget {
 
             if (resources.isNotEmpty) ...[
               const SizedBox(height: 12),
-              const Text(
-                'Learn More:',
+              Text(
+                LocaleData.learnMore.getString(context),
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -218,7 +220,9 @@ class BeginnerScreen extends StatelessWidget {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Could not open resource: ${e.toString()}'),
+          content: Text(
+            LocaleData.resourceError.getString(context).replaceFirst('%s', e.toString()),
+          ),
           backgroundColor: Colors.red,
         ),
       );
