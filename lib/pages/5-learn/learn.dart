@@ -7,6 +7,7 @@ import 'package:finney/pages/5-learn/saving_money_easy.dart';
 import 'package:finney/pages/5-learn/learn_progress.dart';
 import 'package:finney/pages/5-learn/quiz/quiz.dart';
 import 'package:finney/pages/5-learn/quiz/quiz_results_page.dart';
+import 'package:finney/pages/5-learn/savings_coach.dart';
 
 class Learn extends StatefulWidget {
   const Learn({Key? key}) : super(key: key);
@@ -56,6 +57,16 @@ class _LearnState extends State<Learn> {
       'totalVideos': 2,
       'page': const SavingMoneyEasy(),
     },
+    {
+      'title': 'Savings Coach',
+      'icon': LucideIcons.coins,
+      'color': const Color(0xFFFFF7E6),
+      'subtitle': 'Cut costs, not dreams',
+      'lessonKey': 'savings_coach',
+      'totalVideos': 0,
+      'status': 'activity',
+      'page': SavingsCoach(),
+    },
   ];
 
   final List<Map<String, dynamic>> _quizItems = [
@@ -87,22 +98,28 @@ class _LearnState extends State<Learn> {
 
   void _updateLessonStatuses() {
     for (var lesson in _lessons) {
-      final completed = LearnProgress.getCompletedCount(
-        lesson['lessonKey'],
-        lesson['totalVideos'],
-      );
-      final isDone = LearnProgress.isLessonCompleted(
-        lesson['lessonKey'],
-        lesson['totalVideos'],
-      );
-      lesson['progress'] = completed / lesson['totalVideos'];
+      if (lesson['status'] == 'activity') {
+        lesson['progress'] = 0.0;
+        continue;
+      }
+      final int total = lesson['totalVideos'];
+      if (total == 0) {
+        lesson['progress'] = 0.0;
+        lesson['status'] = 'all';
+        continue;
+      }
+      final completed = LearnProgress.getCompletedCount(lesson['lessonKey'], total);
+      final isDone = LearnProgress.isLessonCompleted(lesson['lessonKey'], total);
+      lesson['progress'] = completed / total;
       lesson['status'] = isDone ? 'completed' : (completed > 0 ? 'ongoing' : 'all');
     }
   }
 
   void _resetAllProgress() {
-    LearnProgress.resetAll(_lessons.map((e) => e['lessonKey'] as String).toList());
-    setState(() => _updateLessonStatuses());
+    LearnProgress.resetAll(
+      _lessons.where((e) => e['totalVideos'] > 0).map((e) => e['lessonKey'] as String).toList(),
+    );
+    setState(_updateLessonStatuses);
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Learning progress reset.")),
     );
@@ -174,7 +191,7 @@ class _LearnState extends State<Learn> {
                               context,
                               MaterialPageRoute(builder: (_) => item['page']),
                             );
-                            setState(() => _updateLessonStatuses());
+                            setState(_updateLessonStatuses);
                           },
                           child: _buildLessonCard(
                             title: item['title'],
@@ -248,7 +265,6 @@ class _LearnState extends State<Learn> {
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 5)],
       ),
       padding: const EdgeInsets.all(16),
       child: Row(
