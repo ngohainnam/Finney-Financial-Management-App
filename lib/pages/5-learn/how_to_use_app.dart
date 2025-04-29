@@ -4,7 +4,7 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'learn_progress.dart';
 
 class HowToUseApp extends StatefulWidget {
-  const HowToUseApp({Key? key}) : super(key: key);
+  const HowToUseApp({super.key});
 
   @override
   State<HowToUseApp> createState() => _HowToUseAppState();

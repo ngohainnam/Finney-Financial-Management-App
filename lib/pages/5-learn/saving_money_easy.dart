@@ -4,7 +4,7 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'learn_progress.dart';
 
 class SavingMoneyEasy extends StatefulWidget {
-  const SavingMoneyEasy({Key? key}) : super(key: key);
+  const SavingMoneyEasy({super.key});
 
   @override
   State<SavingMoneyEasy> createState() => _SavingMoneyEasyState();

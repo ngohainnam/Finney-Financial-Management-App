@@ -10,7 +10,7 @@ import 'package:finney/pages/5-learn/quiz/quiz_results_page.dart';
 import 'package:finney/pages/5-learn/savings_coach.dart';
 
 class Learn extends StatefulWidget {
-  const Learn({Key? key}) : super(key: key);
+  const Learn({super.key});
 
   @override
   State<Learn> createState() => _LearnState();

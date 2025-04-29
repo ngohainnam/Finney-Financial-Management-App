@@ -4,7 +4,7 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'learn_progress.dart';
 
 class SmartSpendingTips extends StatefulWidget {
-  const SmartSpendingTips({Key? key}) : super(key: key);
+  const SmartSpendingTips({super.key});
 
   @override
   State<SmartSpendingTips> createState() => _SmartSpendingTipsState();

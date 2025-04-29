@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
 class SavingsCoach extends StatefulWidget {
+  const SavingsCoach({super.key});
+
   @override
-  _SavingsCoachState createState() => _SavingsCoachState();
+  SavingsCoachState createState() => SavingsCoachState();
 }
 
-class _SavingsCoachState extends State<SavingsCoach> {
+class SavingsCoachState extends State<SavingsCoach> {
   int currentStep = 0;
   String selectedOption = '';
   TextEditingController otherController = TextEditingController();
@@ -123,7 +125,7 @@ class _SavingsCoachState extends State<SavingsCoach> {
                 margin: const EdgeInsets.only(bottom: 12),
                 padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                 decoration: BoxDecoration(
-                  color: selectedOption == option ? Colors.blueAccent.withOpacity(0.2) : Colors.white,
+                  color: selectedOption == option ? Colors.blueAccent.withValues(alpha: 0.2) : Colors.white,
                   border: Border.all(color: Colors.black12),
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -203,12 +205,12 @@ class _SavingsCoachState extends State<SavingsCoach> {
 class ResultScreen extends StatelessWidget {
   final List<String> userAnswers;
 
-  const ResultScreen({Key? key, required this.userAnswers}) : super(key: key);
+  const ResultScreen({super.key, required this.userAnswers});
 
   String generateAdvice() {
     String savingRange = userAnswers[1];
     String spendingRange = userAnswers[2];
-    String dreamSave = userAnswers[3];
+    //String dreamSave = userAnswers[3];
     String bigSpendArea = userAnswers[5];
     String tracksExpenses = userAnswers[6];
     String willingToAdjust = userAnswers[7];

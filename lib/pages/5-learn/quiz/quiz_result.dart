@@ -10,11 +10,11 @@ class QuizResultPage extends StatefulWidget {
   final List<int?> userAnswers;
 
   const QuizResultPage({
-    Key? key,
+    super.key,
     required this.score,
     required this.total,
     required this.userAnswers,
-  }) : super(key: key);
+  });
 
   @override
   State<QuizResultPage> createState() => _QuizResultPageState();
