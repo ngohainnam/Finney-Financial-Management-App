@@ -2,7 +2,7 @@ import 'package:finney/pages/3-dashboard/utils/category.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
-import 'package:finney/pages/3-dashboard/services/transaction_services.dart';
+import 'package:finney/pages/3-dashboard/transaction/transaction_services.dart';
 
 abstract class BaseTransactionScreen extends StatefulWidget {
   final Function? onTransactionAdded;

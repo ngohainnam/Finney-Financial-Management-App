@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:finney/pages/2-chatbot/services/llm_rag.dart';
 import 'package:finney/pages/2-chatbot/services/tts_service.dart';
 import 'package:finney/pages/2-chatbot/utils/chat_constants.dart';
 import 'package:flutter/foundation.dart';
@@ -7,15 +8,41 @@ import 'package:dash_chat_2/dash_chat_2.dart';
 
 class ChatService {
   final Gemini gemini;
-  final List<Content> conversationHistory;
-
+  List<Content> conversationHistory;
+  final TransactionRAGService _transactionRAGService = TransactionRAGService();
+  
   ChatService({
     required this.gemini,
     required this.conversationHistory,
   });
+  
+  //update conversation history
+  void updateConversationHistory(List<Content> newHistory) {
+    conversationHistory = newHistory;
+  }
 
   Future<String> sendMessage(ChatMessage chatMessage) async {
-    String augmentedQuestion = "${ChatConstants.systemPrompt}\n\nUser Question: ${chatMessage.text}";
+    //check if this message relates to transaction data
+    bool needsTransactionContext = _messageNeedsTransactionContext(chatMessage.text);
+    String transactionContext = '';
+    
+    if (needsTransactionContext) {
+      transactionContext = await _transactionRAGService.getTransactionContext();
+    }
+    
+    String augmentedQuestion;
+    
+    if (needsTransactionContext) {
+      augmentedQuestion = """${ChatConstants.systemPrompt}
+
+User's Transaction Data Context:
+$transactionContext
+
+User Question: ${chatMessage.text}""";
+    } else {
+      augmentedQuestion = "${ChatConstants.systemPrompt}\n\nUser Question: ${chatMessage.text}";
+    }
+    
     List<Part> parts = [];
     
     if (chatMessage.medias?.isNotEmpty ?? false) {
@@ -34,7 +61,10 @@ class ChatService {
       final value = await gemini.chat(conversationHistory);
       String response = value?.output ?? 'Something went wrong. Please try again later...';
       
-      await TtsService().speak(response);
+      bool isFromVoiceInput = chatMessage.customProperties?['fromVoiceInput'] == true;
+      if (isFromVoiceInput) {
+        await TtsService().speak(response);
+      }
       
       conversationHistory.add(Content(
         parts: [Part.text(response)],
@@ -45,5 +75,20 @@ class ChatService {
     } catch (e) {
       return 'An error occurred. Please try again after 1 minute.';
     }
+  }
+  
+  bool _messageNeedsTransactionContext(String message) {
+    //list of keywords that indicate the user is asking about their transaction data
+    final List<String> transactionKeywords = [
+      'transaction', 'spent', 'spend', 'spending', 'income', 'expense', 'expenses',
+      'how much', 'balance', 'budget', 'category', 'money', 'financial', 'summary',
+      'report', 'analytics', 'analysis', 'history', 'account', 'payment', 'purchase',
+      'bought', 'paid', 'finance', 'statistics', 'total', 'spend'
+    ];
+    
+    message = message.toLowerCase();
+    
+    //check if the message contains any keywords
+    return transactionKeywords.any((keyword) => message.contains(keyword));
   }
 }

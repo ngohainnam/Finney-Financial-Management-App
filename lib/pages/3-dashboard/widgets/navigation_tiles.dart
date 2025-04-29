@@ -1,3 +1,6 @@
+import 'package:finney/pages/2-chatbot/chatbot.dart';
+import 'package:finney/pages/3-dashboard/saving/add_saving/saving_goal_page.dart';
+import 'package:finney/pages/7-insights/insights.dart';
 import 'package:flutter/material.dart';
 import 'package:finney/assets/theme/app_color.dart';
 
@@ -6,43 +9,89 @@ class NavigationTiles extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _buildNavigationTile(
-            context,
-            'Reports',
-            Icons.bar_chart,
-            () => Navigator.pushNamed(context, '/reports'), //the link is just a placeholder (same with the other links)
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 16, bottom: 12),
+          child: Text(
+            'AI-Powered Features',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: AppColors.darkBlue,
+            ),
           ),
-          _buildNavigationTile(
-            context,
-            'Budgets',
-            Icons.account_balance_wallet,
-            () => Navigator.pushNamed(context, '/budgets'),
+        ),
+        
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: [
+              Expanded(
+                child: _buildNavigationTile(
+                  context,
+                  'Insights',
+                  Icons.bar_chart,
+                  () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const Insights()),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _buildNavigationTile(
+                  context,
+                  'AI Assistant',
+                  Icons.support_agent_rounded,
+                  () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const Chatbot()),
+                  ),
+                ),
+              ),
+            ],
           ),
-          _buildNavigationTile(
-            context,
-            'AI Assistant',
-            Icons.support_agent_rounded,
-            () => Navigator.pushNamed(context, '/ai'),
+        ),
+        
+        Padding(
+          padding: const EdgeInsets.only(left: 16, top: 24, bottom: 12),
+          child: Text(
+            'Money Tools',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: AppColors.darkBlue,
+            ),
           ),
-          _buildNavigationTile(
-            context,
-            'Goals',
-            Icons.flag,
-            () => Navigator.pushNamed(context, '/goals'),
+        ),
+        
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: [
+              Expanded(
+                child: _buildNavigationTile(
+                  context,
+                  'Goals',
+                  Icons.flag,
+                  () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const SavingGoalPage()),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   Widget _buildNavigationTile(
-    BuildContext context, 
-    String title, 
+    BuildContext context,
+    String title,
     IconData icon,
     VoidCallback onTap,
   ) {
@@ -59,11 +108,7 @@ class NavigationTiles extends StatelessWidget {
               color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Icon(
-              icon,
-              color: AppColors.primary,
-              size: 28,
-            ),
+            child: Icon(icon, color: AppColors.primary, size: 28),
           ),
           const SizedBox(height: 8),
           Text(

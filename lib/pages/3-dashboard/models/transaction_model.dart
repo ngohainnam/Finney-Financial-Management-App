@@ -1,16 +1,31 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:finney/pages/3-dashboard/utils/category.dart';
+import 'package:hive/hive.dart';
 
-class TransactionModel {
-  final String? id;
+part 'transaction_model.g.dart';
+
+@HiveType(typeId: 2)
+class TransactionModel extends HiveObject {
+  @HiveField(0)
+  String? id;
+  
+  @HiveField(1)
   final String name;
+  
+  @HiveField(2)
   final String category;
+  
+  @HiveField(3)
   final double amount;
+  
+  @HiveField(4)
   final DateTime date;
+  
+  @HiveField(5)
   final String? description;
 
-  const TransactionModel({
+  TransactionModel({
     this.id,
     required this.name,
     required this.category,
@@ -41,7 +56,9 @@ class TransactionModel {
       name: map['name'] ?? '',
       category: map['category'] ?? '',
       amount: (map['amount'] ?? 0.0).toDouble(),
-      date: (map['date'] as Timestamp).toDate(),
+      date: (map['date'] is Timestamp) 
+          ? (map['date'] as Timestamp).toDate()
+          : map['date'] ?? DateTime.now(),
       description: map['description'],
     );
   }
@@ -82,4 +99,14 @@ class CategoryExpense {
   CategoryExpense(this.name, this.amount)
       : color = CategoryUtils.getColorForCategory(name),
         icon = CategoryUtils.getIconForCategory(name);
+}
+
+class MonthlyExpense {
+  final String month;
+  final double amount;
+
+  MonthlyExpense({
+    required this.month,
+    required this.amount,
+  });
 }

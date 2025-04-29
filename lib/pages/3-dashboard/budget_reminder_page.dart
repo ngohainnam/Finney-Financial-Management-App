@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'package:finney/pages/3-dashboard/services/transaction_services.dart';
+import 'package:finney/pages/3-dashboard/transaction/transaction_services.dart';
 import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
 
 
