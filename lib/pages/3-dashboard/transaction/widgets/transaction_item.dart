@@ -77,7 +77,7 @@ Widget build(BuildContext context) {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  transaction.category,
+                  CategoryUtils.getLocalizedCategoryName(transaction.category, context),
                   style: TextStyle(
                     color: Colors.grey.shade600,
                     fontSize: 12,

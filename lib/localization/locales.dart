@@ -792,6 +792,7 @@ mixin LocaleData {
     chatInputHint: 'Ask me a financial question...',
     nonFinancialQuestion: 'I\'m here to help with your financial questions. What money matters can I assist with?',
     nonFinancialImage: 'I can only analyze financial documents or receipts. Need help with something financial?',
+    addNew : 'Add New',
   };
 
   static const Map<String, String> bd = {
@@ -1170,6 +1171,7 @@ mixin LocaleData {
     chatbotsuggestedQuestion1:  "এই মাসের আমার খরচের সারসংক্ষেপ লিখুন",
     chatbotsuggestedQuestion2: 'আমার সর্বোচ্চ ব্যয়ের বিভাগ কোনটি?',
     chatbotsuggestedQuestion3: 'আমার দৈনন্দিন খরচ কমানোর টিপস',
+    addNew : 'নতুন যোগ করুন',
   };
 }
 

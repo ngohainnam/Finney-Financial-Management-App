@@ -374,7 +374,7 @@ Future<void> _saveTransaction() async {
           ),
           const SizedBox(height: 8),
           Text(
-            name,
+            CategoryUtils.getLocalizedCategoryName(name, context),
             style: TextStyle(
               fontSize: 12,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
