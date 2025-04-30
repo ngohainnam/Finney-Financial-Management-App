@@ -24,17 +24,21 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
   final _titleController = TextEditingController();
   final _targetAmountController = TextEditingController();
   final _descriptionController = TextEditingController();
-  DateTime _selectedDate = DateTime.now().add(const Duration(days: 30));
+  DateTime _selectedDate = DateTime.now(); // Initialize with current date
 
   @override
   void initState() {
     super.initState();
     if (widget.existingGoal != null) {
+      // If editing existing goal, populate fields with its data
       _titleController.text = widget.existingGoal!.title;
       _targetAmountController.text =
           widget.existingGoal!.targetAmount.toString();
       _descriptionController.text = widget.existingGoal!.description ?? '';
       _selectedDate = widget.existingGoal!.targetDate;
+    } else {
+      // For new goal, set default target date to 30 days from now
+      _selectedDate = DateTime.now().add(const Duration(days: 30));
     }
   }
 
@@ -50,7 +54,7 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: _selectedDate,
-      firstDate: DateTime.now(),
+      firstDate: DateTime.now(), // Can't select dates before today
       lastDate: DateTime(2100),
     );
     if (picked != null && picked != _selectedDate) {
@@ -69,6 +73,7 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
           return;
         }
 
+        // Create goal object with current date as creation date
         final goal = SavingGoal(
           id:
               widget.existingGoal?.id ??
@@ -81,24 +86,28 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
               _descriptionController.text.isNotEmpty
                   ? _descriptionController.text
                   : null,
-          createdAt: widget.existingGoal?.createdAt ?? DateTime.now(),
+          createdAt:
+              widget.existingGoal?.createdAt ??
+              DateTime.now(), // Set current time for new goals
         );
 
+        // Save to Firestore
         await FirebaseFirestore.instance
             .collection('goals')
             .doc(goal.id)
             .set(goal.toMap());
 
+        // Show success message
         _showSuccessMessage(
           widget.existingGoal == null
               ? 'Goal "${goal.title}" created!'
               : 'Goal "${goal.title}" updated!',
         );
 
+        // Callback and close
         if (widget.onGoalSaved != null) {
           widget.onGoalSaved!(goal);
         }
-
         Navigator.of(context).pop();
       } catch (e) {
         _showErrorMessage('Error saving goal. Please try again.');
@@ -150,7 +159,6 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Amount Field
-              // Replace the Amount Field section with this:
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
