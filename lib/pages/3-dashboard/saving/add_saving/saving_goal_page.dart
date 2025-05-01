@@ -302,19 +302,22 @@ class SavingGoalPageState extends State<SavingGoalPage> {
   }
 
   Future<void> _addToSavings(SavingGoal goal, double amount) async {
-    if (amount <= 0) {
-      _showErrorMessage(LocaleData.amountGreaterThanZero.getString(context));
-      return;
-    }
     try {
-      await _goalService.addToSavings(goal.id, amount);
+      final success = await _goalService.addToSavings(goal.id, amount);
+      
+      if (success) {
       _showSuccessMessage(
-        LocaleData.addedToSavings.getString(context)
-        .replaceFirst('%s', amount.toStringAsFixed(2))
-        .replaceFirst('%s', goal.title),
+          LocaleData.savingsAddedSuccessfully.getString(context).replaceFirst('%s', amount.toString()),
+        );
+      } else {
+        _showErrorMessage(
+          LocaleData.insufficientBalance.getString(context),
       );
+      }
     } catch (e) {
-      _showErrorMessage(LocaleData.couldNotAddSavings.getString(context));
+      _showErrorMessage(
+        LocaleData.errorAddingSavings.getString(context),
+      );
     }
   }
 

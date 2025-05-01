@@ -221,6 +221,9 @@ mixin LocaleData {
   static const String setTargetDates = 'setTargetDates';
   static const String setTargetDatesDescription = 'setTargetDatesDescription';
   static const String gotIt = 'gotIt';
+  static const String savingsAddedSuccessfully = 'savingsAddedSuccessfully';
+  static const String insufficientBalance = 'insufficientBalance';
+  static const String errorAddingSavings = 'errorAddingSavings';
   // add income
   static const String addExpense = 'addExpense';
   static const String editExpense = 'editExpense';
@@ -1168,10 +1171,7 @@ mixin LocaleData {
     chatInputHint: 'আমাকে একটি আর্থিক প্রশ্ন জিজ্ঞাসা করুন...',
     nonFinancialQuestion: 'আমি আপনার আর্থিক প্রশ্নগুলির সাথে সাহায্য করতে এখানে আছি। কোন অর্থের বিষয়ে আমি সহায়তা করতে পারি?',
     nonFinancialImage: 'আমি কেবল আর্থিক নথি বা রসিদ বিশ্লেষণ করতে পারি। আর্থিক কিছু নিয়ে সাহায্য প্রয়োজন?',
-    chatbotsuggestedQuestion1:  "এই মাসের আমার খরচের সারসংক্ষেপ লিখুন",
-    chatbotsuggestedQuestion2: 'আমার সর্বোচ্চ ব্যয়ের বিভাগ কোনটি?',
-    chatbotsuggestedQuestion3: 'আমার দৈনন্দিন খরচ কমানোর টিপস',
-    addNew : 'নতুন যোগ করুন',
+    addNew : 'Add New',
   };
 }
 

@@ -125,9 +125,9 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> {
           ),
         ),
         Text(
-          '${LocaleData.total.getString(context)}: ${currencyFormat.format(totalAmount)}',
+          '${LocaleData.total.getString(context)}: ${totalAmount.toStringAsFixed(2)}',
           style: TextStyle(
-            color: _barColor, // Use dynamic color based on type
+            color: _barColor,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -272,7 +272,7 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> {
         getTooltipItem: (group, groupIndex, rod, rodIndex) {
           final period = _currentPageData[groupIndex].period;
           return BarTooltipItem(
-            '${currencyFormat.format(rod.toY)}\n$period',
+            '${rod.toY.toStringAsFixed(2)}\n$period',
             const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,

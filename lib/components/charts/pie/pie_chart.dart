@@ -63,7 +63,7 @@ class CategoryPieChart extends StatelessWidget {
                 ),
               ),
               Text(
-                 '${LocaleData.total.getString(context)}: ${currencyFormat.format(total)}',
+                 '${LocaleData.total.getString(context)}: ${total.toStringAsFixed(2)}',
                 style: TextStyle(
                   color: _themeColor,
                   fontWeight: FontWeight.bold,
