@@ -4,11 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:finney/pages/3-dashboard/utils/category.dart';
-import 'package:finney/pages/7-insights/insights.dart'; 
+import 'package:finney/pages/7-insights/insights.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/localization/locales.dart';
+import 'package:sprintf/sprintf.dart';
 
-class CategoryPieChart extends StatelessWidget {
+class CategoryPieChart extends StatefulWidget {
   final List<dynamic> categoryData;
   final ChartViewType viewType;
 
@@ -18,20 +19,25 @@ class CategoryPieChart extends StatelessWidget {
     required this.viewType,
   });
 
+  @override
+  State<CategoryPieChart> createState() => _CategoryPieChartState();
+}
+
+class _CategoryPieChartState extends State<CategoryPieChart> {
   Color get _themeColor {
-    return viewType == ChartViewType.income
-        ? Colors.green 
-        : Colors.redAccent; 
+    return widget.viewType == ChartViewType.income
+        ? Colors.green
+        : Colors.redAccent;
   }
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormat = NumberFormat.currency(symbol: '\$');
-    
+    final currencyFormat = NumberFormat.currency(symbol: '৳');
+
     // Handle empty data case
-    final total = categoryData.isEmpty
+    final total = widget.categoryData.isEmpty
         ? 0.0
-        : categoryData.fold(0.0, (sum, category) => sum + category['amount']);
+        : widget.categoryData.fold(0.0, (sum, category) => sum + category['amount']);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -54,7 +60,7 @@ class CategoryPieChart extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                viewType == ChartViewType.expenses 
+                widget.viewType == ChartViewType.expenses
                     ? LocaleData.categoryBreakdown.getString(context)
                     : LocaleData.incomeAnalysis.getString(context),
                 style: const TextStyle(
@@ -63,7 +69,7 @@ class CategoryPieChart extends StatelessWidget {
                 ),
               ),
               Text(
-                 '${LocaleData.total.getString(context)}: ${total.toStringAsFixed(2)}',
+                '${LocaleData.total.getString(context)}: ${currencyFormat.format(total)}',
                 style: TextStyle(
                   color: _themeColor,
                   fontWeight: FontWeight.bold,
@@ -71,63 +77,80 @@ class CategoryPieChart extends StatelessWidget {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 20),
 
           //Chart container
-          if (categoryData.isEmpty)
-            _buildEmptyState(viewType, context)
+          if (widget.categoryData.isEmpty)
+            _buildEmptyState(widget.viewType, context)
           else
-            Container(
-              height: 220, 
-              width: double.infinity,
-              padding: const EdgeInsets.only(top: 10, bottom: 20),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Center(
-                child: SizedBox(
-                  height: 180,
-                  width: 180,
-                  child: PieChart(
-                    PieChartData(
-                      sections: _createPieChartSections(categoryData),
-                      sectionsSpace: 2,
-                      centerSpaceRadius: 40,
-                      startDegreeOffset: -90,
+            Column(
+              children: [
+                Container(
+                  height: 220,
+                  width: double.infinity,
+                  padding: const EdgeInsets.only(top: 10, bottom: 20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Center(
+                    child: SizedBox(
+                      height: 180,
+                      width: 180,
+                      child: PieChart(
+                        PieChartData(
+                          sections: _createPieChartSections(widget.categoryData, currencyFormat),
+                          sectionsSpace: 2,
+                          centerSpaceRadius: 40,
+                          startDegreeOffset: -90,
+                          pieTouchData: PieTouchData(
+                            touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                              if (!event.isInterestedForInteractions ||
+                                  pieTouchResponse == null ||
+                                  pieTouchResponse.touchedSection == null) {
+                                return;
+                              }
+                            },
+                            enabled: true,
+                            mouseCursorResolver: (FlTouchEvent touchEvent, PieTouchResponse? pieTouchResponse) {
+                              return SystemMouseCursors.click;
+                            },
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
+                _buildSummaryText(currencyFormat),
+              ],
             ),
-          
+
           const SizedBox(height: 30),
-        
+
           // Category legends below chart
-          ...categoryData.isEmpty 
-            ? []
-            : _buildCategoryList(categoryData, total, currencyFormat),
-          
+          ...widget.categoryData.isEmpty
+              ? []
+              : _buildCategoryList(widget.categoryData, total, currencyFormat),
+
           ChartQuery(
             chartData: _getChartDataForLLM(),
             chartType: 'pie chart',
-            viewType: viewType == ChartViewType.expenses ? 'expenses' : 'income',
+            viewType: widget.viewType == ChartViewType.expenses ? 'expenses' : 'income',
           ),
         ],
-        
       ),
     );
   }
 
-  Widget _buildEmptyState(ChartViewType viewType, context) {
+  Widget _buildEmptyState(ChartViewType viewType, BuildContext context) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(40.0),
         child: Column(
           children: [
             Icon(
-              viewType == ChartViewType.expenses 
-                  ? Icons.remove_shopping_cart 
+              viewType == ChartViewType.expenses
+                  ? Icons.remove_shopping_cart
                   : Icons.account_balance_wallet,
               size: 48,
               color: Colors.grey.shade400,
@@ -153,10 +176,10 @@ class CategoryPieChart extends StatelessWidget {
     // Sort categories by amount (highest first)
     final sortedCategories = List<dynamic>.from(categories)
       ..sort((a, b) => b['amount'].compareTo(a['amount']));
-      
+
     return sortedCategories.map((category) {
       final percentage = total > 0 ? (category['amount'] / total * 100) : 0;
-      
+
       return CategoryExpenseItem(
         color: category['color'],
         name: category['name'],
@@ -168,7 +191,7 @@ class CategoryPieChart extends StatelessWidget {
     }).toList();
   }
 
-  List<PieChartSectionData> _createPieChartSections(List<dynamic> data) {
+  List<PieChartSectionData> _createPieChartSections(List<dynamic> data, NumberFormat currencyFormat) {
     if (data.isEmpty) {
       return [
         PieChartSectionData(
@@ -194,20 +217,75 @@ class CategoryPieChart extends StatelessWidget {
 
   Map<String, dynamic> _getChartDataForLLM() {
     final Map<String, dynamic> data = {};
-    
-    if (categoryData.isEmpty) {
+
+    if (widget.categoryData.isEmpty) {
       return {'empty': true};
     }
-    
+
     // Create a simplified version of the chart data for the LLM
-    data['categories'] = categoryData.map((category) => {
+    data['categories'] = widget.categoryData.map((category) => {
       'name': category['name'],
       'amount': category['amount'],
     }).toList();
-    
-    data['total'] = categoryData.fold(
-      0.0, (sum, category) => sum + category['amount']);
-      
+
+    data['total'] = widget.categoryData.fold(
+        0.0, (sum, category) => sum + category['amount']);
+
     return data;
+  }
+
+  Widget _buildSummaryText(NumberFormat currencyFormat) {
+    if (widget.categoryData.isEmpty) return const SizedBox.shrink();
+
+    // Sort categories by amount
+    final sortedCategories = List<dynamic>.from(widget.categoryData)
+      ..sort((a, b) => b['amount'].compareTo(a['amount']));
+
+    final topCategory = sortedCategories.first;
+    final topCategoryAmount = currencyFormat.format(topCategory['amount']);
+    final topCategoryName = topCategory['name'];
+    final total = widget.categoryData.fold(0.0, (sum, category) => sum + category['amount']);
+    final topCategoryPercentage = (topCategory['amount'] / total * 100).toStringAsFixed(1);
+
+    String summary = '';
+    if (widget.viewType == ChartViewType.expenses) {
+      summary = sprintf(
+        FlutterLocalization.instance.currentLocale!.languageCode == 'en' 
+            ? LocaleData.en['expenseCategorySummary']! 
+            : LocaleData.bd['expenseCategorySummary']!,
+        [
+          topCategoryName,
+          topCategoryAmount,
+          topCategoryPercentage,
+        ],
+      );
+    } else {
+      summary = sprintf(
+        FlutterLocalization.instance.currentLocale!.languageCode == 'en' 
+            ? LocaleData.en['incomeCategorySummary']! 
+            : LocaleData.bd['incomeCategorySummary']!,
+        [
+          topCategoryName,
+          topCategoryAmount,
+          topCategoryPercentage,
+        ],
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        summary,
+        style: const TextStyle(
+          fontSize: 14,
+          height: 1.5,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
   }
 }

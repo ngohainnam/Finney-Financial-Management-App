@@ -419,6 +419,8 @@ mixin LocaleData {
   // New ChatConstants non-financial response keys
   static const String nonFinancialQuestion = 'non_financial_question';
   static const String nonFinancialImage = 'non_financial_image';
+  static const String categorySpentAmount = 'categorySpentAmount';
+  static const String categoryEarnedAmount = 'categoryEarnedAmount';
 
   static const Map<String, String> en = {
     appTitle: 'Finney',
@@ -796,6 +798,12 @@ mixin LocaleData {
     nonFinancialQuestion: 'I\'m here to help with your financial questions. What money matters can I assist with?',
     nonFinancialImage: 'I can only analyze financial documents or receipts. Need help with something financial?',
     addNew : 'Add New',
+    categorySpentAmount: 'Spent %s in %s category (%s%%)',
+    categoryEarnedAmount: 'Earned %s from %s category (%s%%)',
+    'expenseSummary': 'Total expenses: %s, average: %s. Highest expense: %s on %s, and lowest expense: %s on %s.',
+    'incomeSummary': 'Total income: %s, average: %s. Highest income: %s on %s, and lowest income: %s on %s.',
+    'expenseCategorySummary': 'Highest expense is in %s category, which is %s (%s%%).',
+    'incomeCategorySummary': 'Highest income is from %s category, which is %s (%s%%).',
   };
 
   static const Map<String, String> bd = {
@@ -1172,6 +1180,12 @@ mixin LocaleData {
     nonFinancialQuestion: 'আমি আপনার আর্থিক প্রশ্নগুলির সাথে সাহায্য করতে এখানে আছি। কোন অর্থের বিষয়ে আমি সহায়তা করতে পারি?',
     nonFinancialImage: 'আমি কেবল আর্থিক নথি বা রসিদ বিশ্লেষণ করতে পারি। আর্থিক কিছু নিয়ে সাহায্য প্রয়োজন?',
     addNew : 'Add New',
+    categorySpentAmount: '%s টাকা %s বিভাগে খরচ হয়েছে (%s%%)',
+    categoryEarnedAmount: '%s টাকা %s বিভাগ থেকে আয় হয়েছে (%s%%)',
+    'expenseSummary': 'মোট খরচ হয়েছে %s, গড়ে %s। সর্বোচ্চ খরচ হয়েছে %s %s তারিখে, এবং সর্বনিম্ন খরচ হয়েছে %s %s তারিখে।',
+    'incomeSummary': 'মোট আয় হয়েছে %s, গড়ে %s। সর্বোচ্চ আয় হয়েছে %s %s তারিখে, এবং সর্বনিম্ন আয় হয়েছে %s %s তারিখে।',
+    'expenseCategorySummary': 'সর্বোচ্চ খরচ হয়েছে %s বিভাগে, যা %s (%s%%)।',
+    'incomeCategorySummary': 'সর্বোচ্চ আয় হয়েছে %s বিভাগ থেকে, যা %s (%s%%)।',
   };
 }
 
