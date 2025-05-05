@@ -966,7 +966,7 @@ mixin LocaleData {
     addSavings: 'সঞ্চয় যোগ করুন',
     addToSavings: 'সঞ্চয়ে যোগ করুন',
     amount: 'পরিমাণ',
-    savings: 'সঞ্চয়',
+    //savings: 'সঞ্চয়',
     pleaseEnterAmount: 'অনুগ্রহ করে একটি পরিমাণ লিখুন',
     pleaseEnterValidNumber: 'অনুগ্রহ করে একটি বৈধ সংখ্যা লিখুন',
     amountMustBePositive: 'পরিমাণ অবশ্যই ধনাত্মক হতে হবে',
