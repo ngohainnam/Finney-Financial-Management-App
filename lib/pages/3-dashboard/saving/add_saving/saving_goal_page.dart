@@ -270,18 +270,17 @@ class SavingGoalPageState extends State<SavingGoalPage> {
   }
 
   void _navigateToAddGoal() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder:
-            (_) => AddEditGoalPage(
-              onGoalSaved: (SavingGoal goal) {
-                _showSuccessMessage(LocaleData.goalCreated.getString(context).replaceFirst('%s', goal.title),);
-              },
-            ),
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => AddEditGoalPage(
+        onGoalSaved: (SavingGoal goal) {
+          _showSuccessMessage("Saving added successfully"); // Changed message
+        },
       ),
-    );
-  }
+    ),
+  );
+}
 
   void _navigateToEditGoal(SavingGoal goal) {
     Navigator.push(
@@ -300,26 +299,23 @@ class SavingGoalPageState extends State<SavingGoalPage> {
       ),
     );
   }
-
-  Future<void> _addToSavings(SavingGoal goal, double amount) async {
-    try {
-      final success = await _goalService.addToSavings(goal.id, amount);
-      
-      if (success) {
-      _showSuccessMessage(
-          LocaleData.savingsAddedSuccessfully.getString(context).replaceFirst('%s', amount.toString()),
-        );
-      } else {
-        _showErrorMessage(
-          LocaleData.insufficientBalance.getString(context),
-      );
-      }
-    } catch (e) {
+Future<void> _addToSavings(SavingGoal goal, double amount) async {
+  try {
+    final success = await _goalService.addToSavings(goal.id, amount);
+    
+    if (success) {
+      _showSuccessMessage("Saving added successfully"); // Changed message
+    } else {
       _showErrorMessage(
-        LocaleData.errorAddingSavings.getString(context),
+        LocaleData.insufficientBalance.getString(context),
       );
     }
+  } catch (e) {
+    _showErrorMessage(
+      LocaleData.errorAddingSavings.getString(context),
+    );
   }
+}
 
   Future<void> _deleteGoal(SavingGoal goal) async {
     final confirmed = await showDialog<bool>(
