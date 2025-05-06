@@ -1,4 +1,7 @@
 import 'package:dash_chat_2/dash_chat_2.dart';
+import 'package:finney/localization/locales.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:intl/intl.dart';
 
 class ChatConstants {
@@ -7,7 +10,7 @@ class ChatConstants {
     return DateFormat('yyyy-MM-dd').format(now);
   }
 
-static String get systemPrompt {
+  static String get systemPrompt {
     return """You are Finney AI, a friendly financial assistant developed by P26 Team.
     
     Today's date is $currentDate.
@@ -40,11 +43,14 @@ static String get systemPrompt {
     """;
   }
 
-  static final List<String> suggestedQuestions = [
-    "Summatize my spending for this month",
-    "What is my highest spending category?",
-    "Tips for reducing my daily expenses",
-  ];
+  // Method to get localized suggested questions
+  static List<String> getSuggestedQuestions(BuildContext context) {
+    return [
+      LocaleData.suggestedQuestion1.getString(context),
+      LocaleData.suggestedQuestion2.getString(context),
+      LocaleData.suggestedQuestion3.getString(context),
+    ];
+  }
 
   static final ChatUser currentUser = ChatUser(id: '0', firstName: 'User');
   static final ChatUser geminiUser = ChatUser(id: '1', firstName: 'Finney AI');

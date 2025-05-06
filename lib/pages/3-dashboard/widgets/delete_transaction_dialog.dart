@@ -1,30 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:finney/assets/theme/app_color.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:finney/localization/locales.dart';
 
 class DeleteTransactionDialog extends StatelessWidget {
   final String title;
   final String message;
   
-  const DeleteTransactionDialog({
-    super.key,
-    this.title = 'Delete Transaction',
-    this.message = 'This action cannot be undone. Are you sure you want to delete this transaction?',
-  });
+  DeleteTransactionDialog({
+  super.key,
+  String? title,
+  String? message,
+  required BuildContext context,
+  }) : title = title ?? LocaleData.deleteTransaction.getString(context),
+      message = message ?? LocaleData.confirmDeleteSingleTransaction.getString(context);
 
   static Future<bool> show(
     BuildContext context, {
-    String title = 'Delete Transaction',
-    String message = 'This action cannot be undone. Are you sure you want to delete this transaction?',
+    String? title,
+    String? message,
   }) async {
     return await showDialog<bool>(
       context: context,
       builder: (context) => DeleteTransactionDialog(
+        context: context,
         title: title,
         message: message,
       ),
     ) ?? false;
   }
-
+  
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -82,7 +87,7 @@ class DeleteTransactionDialog extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  'Cancel',
+                  LocaleData.cancel.getString(context),
                   style: TextStyle(
                     color: AppColors.primary,
                     fontWeight: FontWeight.w600,
@@ -101,8 +106,8 @@ class DeleteTransactionDialog extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: const Text(
-                  'Delete',
+                child: Text(
+                  LocaleData.delete.getString(context),
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,

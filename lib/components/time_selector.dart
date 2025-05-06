@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:finney/assets/theme/app_color.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:finney/localization/locales.dart';
 
 enum TimeRange {
   week,
   month,
   year,
-  allTime,  // Added All Time option
+  allTime,
 }
 
 class TimeRangeData {
@@ -13,7 +15,7 @@ class TimeRangeData {
   final DateTime startDate;
   final DateTime endDate;
   final String label;
-  final int? year;  // Added to track year for All Time
+  final int? year;
 
   TimeRangeData({
     required this.range,
@@ -31,7 +33,7 @@ class TimeRangeData {
       range: TimeRange.week,
       startDate: startDate,
       endDate: now,
-      label: 'This Week',
+      label: 'thisWeek',
     );
   }
 
@@ -42,7 +44,7 @@ class TimeRangeData {
       range: TimeRange.month,
       startDate: start,
       endDate: now,
-      label: 'This Month',
+      label: 'thisMonth',
     );
   }
 
@@ -53,24 +55,22 @@ class TimeRangeData {
       range: TimeRange.year,
       startDate: start,
       endDate: now,
-      label: 'This Year',
+      label: 'thisYear',
     );
   }
 
   factory TimeRangeData.allTime({int? year}) {
     final now = DateTime.now();
     final selectedYear = year ?? now.year;
-    
     final start = DateTime(selectedYear, 1, 1);
-    final end = selectedYear == now.year 
-        ? now 
+    final end = selectedYear == now.year
+        ? now
         : DateTime(selectedYear, 12, 31);
-        
     return TimeRangeData(
       range: TimeRange.allTime,
       startDate: start,
       endDate: end,
-      label: 'All Time ($selectedYear)',
+      label: 'allTime',
       year: selectedYear,
     );
   }
@@ -78,12 +78,23 @@ class TimeRangeData {
   // Helper to create a new instance with a different year
   TimeRangeData copyWithYear(int newYear) {
     if (range != TimeRange.allTime) return this;
-    
     return TimeRangeData.allTime(year: newYear);
   }
 
-  @override
-  String toString() => label;
+  String getLocalizedLabel(BuildContext context) {
+    switch (label) {
+      case 'thisWeek':
+        return LocaleData.thisWeek.getString(context);
+      case 'thisMonth':
+        return LocaleData.thisMonth.getString(context);
+      case 'thisYear':
+        return LocaleData.thisYear.getString(context);
+      case 'allTime':
+        return '${LocaleData.allTime.getString(context)} (${year ?? DateTime.now().year})';
+      default:
+        return label;
+    }
+  }
 }
 
 class TimeRangeSelector extends StatelessWidget {
@@ -130,7 +141,7 @@ class TimeRangeSelector extends StatelessWidget {
             onPressed: () => _showTimeRangeModal(context),
             icon: const Icon(Icons.calendar_today, size: 18, color: AppColors.primary),
             label: Text(
-              initialTimeRange.label,
+              initialTimeRange.getLocalizedLabel(context),
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -147,18 +158,17 @@ class TimeRangeSelector extends StatelessWidget {
               ),
             ),
           ),
-          
-          if (initialTimeRange.range == TimeRange.allTime) 
+          if (initialTimeRange.range == TimeRange.allTime)
             _buildYearNavigationButtons(context),
         ],
       ),
     );
   }
-  
+
   Widget _buildYearNavigationButtons(BuildContext context) {
     final currentYear = initialTimeRange.year ?? DateTime.now().year;
     final isCurrentYear = DateTime.now().year == currentYear;
-    
+
     return Row(
       children: [
         // Previous year button
@@ -172,7 +182,7 @@ class TimeRangeSelector extends StatelessWidget {
             onTimeRangeChanged(initialTimeRange.copyWithYear(currentYear - 1));
           },
         ),
-        
+
         // Year display
         Text(
           currentYear.toString(),
@@ -180,7 +190,7 @@ class TimeRangeSelector extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        
+
         // Next year button (disable if at current year)
         IconButton(
           icon: Icon(
@@ -188,8 +198,8 @@ class TimeRangeSelector extends StatelessWidget {
             color: isCurrentYear ? Colors.grey.shade300 : AppColors.primary,
             size: 16,
           ),
-          onPressed: isCurrentYear 
-              ? null 
+          onPressed: isCurrentYear
+              ? null
               : () {
                   if (currentYear < DateTime.now().year) {
                     onTimeRangeChanged(initialTimeRange.copyWithYear(currentYear + 1));
@@ -233,9 +243,9 @@ class _TimeRangeOptionsSheetState extends State<TimeRangeOptionsSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Center( 
+          Center(
             child: Text(
-              'Select Time Period',
+              LocaleData.selectTimePeriod.getString(context),
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -244,25 +254,25 @@ class _TimeRangeOptionsSheetState extends State<TimeRangeOptionsSheet> {
           ),
           const SizedBox(height: 16),
           _buildTimeRangeOption(
-            'This Week',
+            LocaleData.thisWeek.getString(context),
             Icons.view_week,
             TimeRangeData.week(),
           ),
           _buildDivider(),
           _buildTimeRangeOption(
-            'This Month',
+            LocaleData.thisMonth.getString(context),
             Icons.calendar_view_month,
             TimeRangeData.month(),
           ),
           _buildDivider(),
           _buildTimeRangeOption(
-            'This Year',
+            LocaleData.thisYear.getString(context),
             Icons.calendar_today,
             TimeRangeData.year(),
           ),
           _buildDivider(),
           _buildTimeRangeOption(
-            'All Time',
+            LocaleData.allTime.getString(context),
             Icons.all_inclusive,
             TimeRangeData.allTime(),
           ),
@@ -273,15 +283,13 @@ class _TimeRangeOptionsSheetState extends State<TimeRangeOptionsSheet> {
   }
 
   Widget _buildTimeRangeOption(String title, IconData icon, TimeRangeData timeRange) {
-    // For All Time, just check the type, not the specific year
-    final isSelected = timeRange.range == TimeRange.allTime 
-        ? _selectedTimeRange.range == TimeRange.allTime 
+    final isSelected = timeRange.range == TimeRange.allTime
+        ? _selectedTimeRange.range == TimeRange.allTime
         : _selectedTimeRange.range == timeRange.range;
-    
+
     return InkWell(
       onTap: () {
         setState(() {
-          // If selecting All Time and already in All Time mode, keep the year
           if (timeRange.range == TimeRange.allTime && _selectedTimeRange.range == TimeRange.allTime) {
             _selectedTimeRange = TimeRangeData.allTime(year: _selectedTimeRange.year);
           } else {

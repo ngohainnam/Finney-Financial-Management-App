@@ -1,14 +1,15 @@
 import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
 import 'package:finney/pages/3-dashboard/transaction/view_transaction/all_transactions.dart';
 import 'package:finney/pages/3-dashboard/transaction/widgets/transaction_list.dart';
-import 'package:finney/components/time_selector.dart'; // Add this import
+import 'package:finney/components/time_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:finney/assets/theme/app_color.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:finney/localization/locales.dart';
 
 class RecentTransactions extends StatefulWidget {
   final List<TransactionModel> transactions;
   final Function(TransactionModel)? onDeleteTransaction;
-  // Add these parameters
   final TimeRangeData timeRange;
   final Function(TimeRangeData) onTimeRangeChanged;
 
@@ -53,14 +54,16 @@ class _RecentTransactionsState extends State<RecentTransactions> {
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Transactions'),
+        title: Text(LocaleData.deleteTransactions.getString(context)),
         content: Text(
-          'Are you sure you want to delete ${_selectedTransactions.length} transaction(s)?',
+          LocaleData.confirmDeleteTransactions
+            .getString(context)
+            .replaceFirst('%d', _selectedTransactions.length.toString()),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(LocaleData.cancel.getString(context)),
           ),
           TextButton(
             onPressed: () {
@@ -71,7 +74,9 @@ class _RecentTransactionsState extends State<RecentTransactions> {
               _toggleDeleteMode();
               Navigator.pop(context);
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            child: Text(
+              LocaleData.delete.getString(context),
+              style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -80,7 +85,6 @@ class _RecentTransactionsState extends State<RecentTransactions> {
 
   @override
   Widget build(BuildContext context) {
-    // Show only the 5 most recent transactions from the time-filtered list
     final recentTransactions = widget.transactions.take(5).toList();
 
     return Container(
@@ -96,7 +100,9 @@ class _RecentTransactionsState extends State<RecentTransactions> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                _isDeleteMode ? 'Select Items to Delete' : 'Transactions',
+                _isDeleteMode 
+                  ? LocaleData.selectItemsToDelete.getString(context)
+                  : LocaleData.transactions.getString(context),
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -145,7 +151,7 @@ class _RecentTransactionsState extends State<RecentTransactions> {
                         ),
                       ),
                       child: Text(
-                        'See All',
+                        LocaleData.seeAll.getString(context),
                         style: TextStyle(
                           color: AppColors.primary,
                           fontWeight: FontWeight.w600,
@@ -158,11 +164,11 @@ class _RecentTransactionsState extends State<RecentTransactions> {
           ),
           const SizedBox(height: 16),
           if (recentTransactions.isEmpty)
-            const Center(
+            Center(
               child: Padding(
                 padding: EdgeInsets.all(20),
                 child: Text(
-                  'No transactions in this period',
+                  LocaleData.noTransactionsInThisPeriod.getString(context),
                   style: TextStyle(color: Colors.grey),
                 ),
               ),

@@ -1,34 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:finney/assets/widgets/common/help_dialog.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:finney/localization/locales.dart';
 
 class DashboardHelp {
   static void show(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => AppDialog(
-        title: "How to use the Dashboard",
-        subtitle: "Track your finances easily",
+        title:  LocaleData.dashboardHelpTitle.getString(context),
+        subtitle: LocaleData.dashboardHelpSubtitle.getString(context),
         headerIcon: Icons.dashboard_rounded,
         instructions: const [
           AppDialogInstruction(
             icon: Icons.account_balance_wallet,
-            text: "View your current balance, income, and expenses at a glance",
+            text: LocaleData.dashboardHelpBalance,
           ),
           AppDialogInstruction(
             icon: Icons.add_circle_outline,
-            text: "Add new transactions using the + button",
+            text: LocaleData.dashboardHelpAddTransaction,
           ),
           AppDialogInstruction(
             icon: Icons.swap_horiz,
-            text: "Swipe left on transactions to delete them",
+            text: LocaleData.dashboardHelpDeleteTransaction,
           ),
           AppDialogInstruction(
             icon: Icons.bar_chart,
-            text: "Monitor weekly spending patterns and category breakdown",
+            text:  LocaleData.dashboardHelpSpendingPatterns,
           ),
           AppDialogInstruction(
             icon: Icons.refresh,
-            text: "Pull down to refresh your financial data",
+            text:  LocaleData.dashboardHelpRefresh,
           ),
         ],
       ),

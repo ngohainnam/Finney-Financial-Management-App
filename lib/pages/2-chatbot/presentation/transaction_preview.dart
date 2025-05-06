@@ -3,6 +3,8 @@ import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
 import 'package:finney/pages/3-dashboard/utils/category.dart'; // Import CategoryUtils
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:finney/localization/locales.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 
 class TransactionPreviewPopup extends StatelessWidget {
   final TransactionModel transaction;
@@ -36,8 +38,8 @@ class TransactionPreviewPopup extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'Transaction Preview',
+            Text(
+              LocaleData.transactionPreviewTitle.getString(context),
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -142,7 +144,7 @@ class TransactionPreviewPopup extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        'Cancel',
+                        LocaleData.transactionPreviewCancel.getString(context),
                         style: TextStyle(
                           color: AppColors.primary,
                           fontWeight: FontWeight.w600,
@@ -162,7 +164,7 @@ class TransactionPreviewPopup extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: const Text('Confirm'),
+                  child: Text( LocaleData.transactionPreviewConfirm.getString(context),),
                 ),
               ],
             ),

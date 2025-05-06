@@ -3,6 +3,8 @@ import 'package:finney/pages/3-dashboard/models/saving_goal_model.dart';
 import 'package:finney/pages/3-dashboard/saving/add_saving/saving_goal_service.dart';
 import 'package:finney/pages/3-dashboard/saving/add_saving/add_edit_goal_page.dart';
 import 'package:finney/pages/3-dashboard/widgets/goal_card.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:finney/localization/locales.dart';
 
 // Color constants
 const _successColor = Color(0xFF4CAF50);
@@ -61,14 +63,16 @@ class SavingGoalPageState extends State<SavingGoalPage> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'My Saving Goals',
+            Text(
+              LocaleData.mySavingGoals.getString(context),
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             ElevatedButton.icon(
               onPressed: _navigateToAddGoal,
               icon: const Icon(Icons.add_circle_outline, size: 20),
-              label: const Text('New Goal', style: TextStyle(fontSize: 14)),
+              label: Text(
+                LocaleData.newGoal.getString(context),
+                style: TextStyle(fontSize: 14)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: _successDark,
                 foregroundColor: Colors.white,
@@ -107,7 +111,7 @@ class SavingGoalPageState extends State<SavingGoalPage> {
                   const CircularProgressIndicator(),
                   const SizedBox(height: 20),
                   Text(
-                    'Loading your goals...',
+                    LocaleData.loadingGoals.getString(context),
                     style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                   ),
                 ],
@@ -127,14 +131,14 @@ class SavingGoalPageState extends State<SavingGoalPage> {
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    'No saving goals yet',
+                    LocaleData.noSavingGoals.getString(context),
                     style: TextStyle(fontSize: 18, color: Colors.grey[700]),
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton.icon(
                     onPressed: _navigateToAddGoal,
                     icon: const Icon(Icons.add_circle_outline),
-                    label: const Text('Create Your First Goal'),
+                    label: Text(LocaleData.createFirstGoal.getString(context)),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24,
@@ -195,15 +199,6 @@ class SavingGoalPageState extends State<SavingGoalPage> {
           );
         },
       ),
-      //floatingActionButton: FloatingActionButton.extended(
-      //onPressed: _navigateToAddGoal,
-      //icon: const Icon(Icons.add_circle_outline, size: 24),
-      //label: const Text('New Goal', style: TextStyle(fontSize: 16)),
-      //backgroundColor: Theme.of(context).primaryColor,
-      //foregroundColor: Colors.white,
-      //elevation: 4,
-      //shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      //),
     );
   }
 
@@ -220,8 +215,8 @@ class SavingGoalPageState extends State<SavingGoalPage> {
           children: [
             Icon(Icons.bar_chart_rounded, color: _infoColor, size: 24),
             const SizedBox(width: 8),
-            const Text(
-              'TOTAL SAVINGS PROGRESS',
+            Text(
+              LocaleData.totalSavingsProgress.getString(context),
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
@@ -243,7 +238,10 @@ class SavingGoalPageState extends State<SavingGoalPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '$percentage% Complete',
+              LocaleData.percentComplete.getString(context).replaceFirst(
+                '%s',
+                percentage,
+              ),
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
@@ -251,7 +249,13 @@ class SavingGoalPageState extends State<SavingGoalPage> {
               ),
             ),
             Text(
-              '\$${totalSaved.toStringAsFixed(2)} of \$${totalTarget.toStringAsFixed(2)}',
+              LocaleData.savingsOfTarget.getString(context).replaceFirst(
+                '%s',
+                totalSaved.toStringAsFixed(2),
+              ).replaceFirst(
+                '%s',
+                totalTarget.toStringAsFixed(2),
+              ),
               style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
             ),
           ],
@@ -261,23 +265,22 @@ class SavingGoalPageState extends State<SavingGoalPage> {
   }
 
   Future<void> _refreshGoals() async {
-    _showInfoMessage("Your goals have been refreshed");
+    _showInfoMessage(LocaleData.goalsRefreshed.getString(context));
     setState(() {});
   }
 
   void _navigateToAddGoal() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder:
-            (_) => AddEditGoalPage(
-              onGoalSaved: (SavingGoal goal) {
-                _showSuccessMessage('"${goal.title}" goal created!');
-              },
-            ),
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => AddEditGoalPage(
+        onGoalSaved: (SavingGoal goal) {
+          _showSuccessMessage("Saving added successfully"); // Changed message
+        },
       ),
-    );
-  }
+    ),
+  );
+}
 
   void _navigateToEditGoal(SavingGoal goal) {
     Navigator.push(
@@ -287,30 +290,32 @@ class SavingGoalPageState extends State<SavingGoalPage> {
             (_) => AddEditGoalPage(
               existingGoal: goal,
               onGoalSaved: (SavingGoal updatedGoal) {
-                _showSuccessMessage('"${updatedGoal.title}" goal updated!');
+                _showSuccessMessage(LocaleData.goalUpdated.getString(context).replaceFirst('%s', updatedGoal.title),);
               },
               onGoalDeleted: () {
-                _showErrorMessage('Goal was deleted');
+                _showErrorMessage(LocaleData.goalWasDeleted.getString(context));
               },
             ),
       ),
     );
   }
-
-  Future<void> _addToSavings(SavingGoal goal, double amount) async {
-    if (amount <= 0) {
-      _showErrorMessage('Please enter an amount greater than zero');
-      return;
-    }
-    try {
-      await _goalService.addToSavings(goal.id, amount);
-      _showSuccessMessage(
-        'Added \$${amount.toStringAsFixed(2)} to "${goal.title}"',
+Future<void> _addToSavings(SavingGoal goal, double amount) async {
+  try {
+    final success = await _goalService.addToSavings(goal.id, amount);
+    
+    if (success) {
+      _showSuccessMessage("Saving added successfully"); // Changed message
+    } else {
+      _showErrorMessage(
+        LocaleData.insufficientBalance.getString(context),
       );
-    } catch (e) {
-      _showErrorMessage('Could not add to savings. Please try again.');
     }
+  } catch (e) {
+    _showErrorMessage(
+      LocaleData.errorAddingSavings.getString(context),
+    );
   }
+}
 
   Future<void> _deleteGoal(SavingGoal goal) async {
     final confirmed = await showDialog<bool>(
@@ -324,20 +329,23 @@ class SavingGoalPageState extends State<SavingGoalPage> {
               children: [
                 Icon(Icons.warning_amber_rounded, color: _errorColor),
                 const SizedBox(width: 12),
-                const Text('Delete Goal?'),
+                Text(LocaleData.deleteGoalQuestion.getString(context)),
               ],
             ),
-            content: Text('This will permanently delete "${goal.title}"'),
+            content: Text(LocaleData.confirmDeleteGoalPermanent.getString(context).replaceFirst(
+              '%s',
+              goal.title,
+            ),),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancel'),
+                child: Text(LocaleData.cancel.getString(context)),
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: _errorColor),
                 onPressed: () => Navigator.pop(context, true),
-                child: const Text(
-                  'Delete',
+                child: Text(
+                  LocaleData.delete.getString(context),
                   style: TextStyle(color: Colors.white),
                 ),
               ),
@@ -348,9 +356,9 @@ class SavingGoalPageState extends State<SavingGoalPage> {
     if (confirmed == true) {
       try {
         await _goalService.deleteGoal(goal.id);
-        _showSuccessMessage('"${goal.title}" was deleted');
+        _showSuccessMessage(LocaleData.goalDeleted.getString(context).replaceFirst('%s', goal.title),);
       } catch (e) {
-        _showErrorMessage('Could not delete goal. Please try again.');
+        _showErrorMessage(LocaleData.couldNotDeleteGoal.getString(context));
       }
     }
   }
@@ -373,7 +381,7 @@ class SavingGoalPageState extends State<SavingGoalPage> {
                       Icon(Icons.savings_rounded, size: 32, color: _infoColor),
                       const SizedBox(width: 12),
                       Text(
-                        'About Saving Goals',
+                        LocaleData.aboutSavingGoals.getString(context),
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -385,20 +393,20 @@ class SavingGoalPageState extends State<SavingGoalPage> {
                   const SizedBox(height: 24),
                   _buildInfoTip(
                     Icons.track_changes_rounded,
-                    'Track your progress',
-                    'See how close you are to reaching each goal',
+                    LocaleData.trackProgress.getString(context),
+                    LocaleData.trackProgressDescription.getString(context),
                   ),
                   const SizedBox(height: 16),
                   _buildInfoTip(
                     Icons.attach_money_rounded,
-                    'Add money anytime',
-                    'Contribute to your goals whenever you save money',
+                    LocaleData.addMoneyAnytime.getString(context),
+                    LocaleData.addMoneyAnytimeDescription.getString(context),
                   ),
                   const SizedBox(height: 16),
                   _buildInfoTip(
                     Icons.calendar_today_rounded,
-                    'Set target dates',
-                    'Stay motivated with clear deadlines',
+                    LocaleData.setTargetDates.getString(context),
+                    LocaleData.setTargetDatesDescription.getString(context),
                   ),
                   const SizedBox(height: 24),
                   SizedBox(
@@ -412,8 +420,8 @@ class SavingGoalPageState extends State<SavingGoalPage> {
                         ),
                       ),
                       onPressed: () => Navigator.pop(context),
-                      child: const Text(
-                        'GOT IT',
+                      child: Text(
+                        LocaleData.gotIt.getString(context),
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

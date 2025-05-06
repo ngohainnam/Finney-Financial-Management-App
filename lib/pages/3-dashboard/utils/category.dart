@@ -1,5 +1,7 @@
 import 'package:finney/assets/theme/app_color.dart';
 import 'package:flutter/material.dart';
+import 'package:finney/localization/locales.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 
 class CategoryUtils {
   static final Map<String, IconData> _categoryIconCache = {};
@@ -24,6 +26,61 @@ class CategoryUtils {
     'Gift',
     'Others',
   ];
+
+  // Get localized category name
+  static String getLocalizedCategoryName(String category, BuildContext context) {
+    switch (category) {
+      case 'Shopping':
+        return LocaleData.shopping.getString(context);
+      case 'Food':
+        return LocaleData.food.getString(context);
+      case 'Entertainment':
+        return LocaleData.entertainment.getString(context);
+      case 'Transport':
+        return LocaleData.transport.getString(context);
+      case 'Health':
+        return LocaleData.health.getString(context);
+      case 'Utilities':
+        return LocaleData.utilities.getString(context);
+      case 'Salary':
+        return LocaleData.salary.getString(context);
+      case 'Investment':
+        return LocaleData.investment.getString(context);
+      case 'Business':
+        return LocaleData.business.getString(context);
+      case 'Gift':
+        return LocaleData.gift.getString(context);
+      case 'Others':
+        return LocaleData.others.getString(context);
+      default:
+        return category;
+    }
+  }
+
+  // Get category from localized name
+  static String getCategoryFromLocalizedName(String localizedName, BuildContext context) {
+    // Check expense categories
+    for (String category in expenseCategories) {
+      if (getLocalizedCategoryName(category, context) == localizedName) {
+        return category;
+      }
+    }
+    
+    // Check income categories
+    for (String category in incomeCategories) {
+      if (getLocalizedCategoryName(category, context) == localizedName) {
+        return category;
+      }
+    }
+    
+    return localizedName;
+  }
+
+  // Get localized categories based on transaction type
+  static List<String> getLocalizedCategoriesForType(bool isExpense, BuildContext context) {
+    List<String> categories = isExpense ? expenseCategories : incomeCategories;
+    return categories.map((e) => getLocalizedCategoryName(e, context)).toList();
+  }
 
   static IconData getIconForCategory(String category) {
     if (_categoryIconCache.containsKey(category)) {
@@ -55,12 +112,16 @@ class CategoryUtils {
       // Income icons
       case 'Salary':
         icon = Icons.work;
+        break;  // Added missing break
       case 'Investment':
         icon = Icons.trending_up;
+        break;  // Added missing break
       case 'Business':
         icon = Icons.business;
+        break;  // Added missing break
       case 'Gift':
         icon = Icons.card_giftcard;
+        break;  // Added missing break
 
       // Default icon
       default:
@@ -101,12 +162,16 @@ class CategoryUtils {
       // Income colors
       case 'Salary':
         color = AppColors.categorySalary;
+        break;  // Added missing break
       case 'Investment':
         color = AppColors.categoryInvestment;
+        break;  // Added missing break
       case 'Business':
         color = AppColors.categoryBusiness;
+        break;  // Added missing break
       case 'Gift':
         color = AppColors.categoryGift;
+        break;  // Added missing break
 
       // Default color
       default:

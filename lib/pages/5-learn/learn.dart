@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:finney/pages/5-learn/how_to_use_app.dart';
 import 'package:finney/pages/5-learn/smart_spending_tips.dart';
 import 'package:finney/pages/5-learn/simple_budgeting.dart';
 import 'package:finney/pages/5-learn/saving_money_easy.dart';
 import 'package:finney/pages/5-learn/learn_progress.dart';
+import 'package:finney/pages/5-learn/app_tour/dashboard_edu.dart';
+import 'package:finney/pages/5-learn/app_tour/expense_tracking_edu.dart';
+import 'package:finney/pages/5-learn/app_tour/saving_goals_edu.dart';
+import 'package:finney/pages/5-learn/app_tour/budget_reminder_edu.dart';
+import 'package:finney/pages/5-learn/app_tour/chatbot_edu.dart';
+import 'package:finney/pages/5-learn/app_tour/report_edu.dart';
+import 'package:finney/pages/5-learn/app_tour/learnhub_module_edu.dart';
+import 'package:finney/pages/5-learn/app_tour/settings_edu.dart';
 import 'package:finney/pages/5-learn/quiz/quiz.dart';
 import 'package:finney/pages/5-learn/quiz/quiz_results_page.dart';
 import 'package:finney/pages/5-learn/savings_coach.dart';
@@ -18,18 +25,9 @@ class Learn extends StatefulWidget {
 
 class _LearnState extends State<Learn> {
   final TextEditingController _searchController = TextEditingController();
-  String _selectedTab = 'All';
+  String _selectedTab = 'Lessons';
 
   final List<Map<String, dynamic>> _lessons = [
-    {
-      'title': 'How to Use the App',
-      'icon': LucideIcons.smartphone,
-      'color': const Color(0xFFE3F2FD),
-      'subtitle': 'Start here',
-      'lessonKey': 'how_to_use_app',
-      'totalVideos': 3,
-      'page': const HowToUseApp(),
-    },
     {
       'title': 'Smart Spending Tips',
       'icon': LucideIcons.badgeDollarSign,
@@ -60,7 +58,7 @@ class _LearnState extends State<Learn> {
     {
       'title': 'Savings Coach',
       'icon': LucideIcons.coins,
-      'color': const Color(0xFFFFF7E6),
+      'color': const Color(0xFFDFF8EB),
       'subtitle': 'Cut costs, not dreams',
       'lessonKey': 'savings_coach',
       'totalVideos': 0,
@@ -69,11 +67,86 @@ class _LearnState extends State<Learn> {
     },
   ];
 
+  final List<Map<String, dynamic>> _appTourLessons = [
+    {
+      'title': 'Dashboard',
+      'icon': LucideIcons.layoutDashboard,
+      'color': const Color(0xFFBBDEFB),
+      'subtitle': 'Explore the main overview',
+      'lessonKey': 'dashboard_edu',
+      'totalVideos': 1,
+      'page': const DashboardEduPage(),
+    },
+    {
+      'title': 'Expense Tracking',
+      'icon': LucideIcons.fileSpreadsheet,
+      'color': const Color(0xFFB2EBF2),
+      'subtitle': 'Track your daily spending',
+      'lessonKey': 'expense_tracking_edu',
+      'totalVideos': 1,
+      'page': const ExpenseTrackingEduPage(),
+    },
+    {
+      'title': 'Saving Goals',
+      'icon': LucideIcons.flag,
+      'color': const Color(0xFFC5CAE9),
+      'subtitle': 'Set and smash goals',
+      'lessonKey': 'saving_goals_edu',
+      'totalVideos': 1,
+      'page': const SavingGoalsEduPage(),
+    },
+    {
+      'title': 'Budget Reminder',
+      'icon': LucideIcons.bell,
+      'color': const Color(0xFFDCEDC8),
+      'subtitle': 'Stay within budget',
+      'lessonKey': 'budget_reminder_edu',
+      'totalVideos': 1,
+      'page': const BudgetReminderEduPage(),
+    },
+    {
+      'title': 'Chatbot',
+      'icon': LucideIcons.messageSquare,
+      'color': const Color(0xFFFFCDD2),
+      'subtitle': 'Your friendly guide',
+      'lessonKey': 'chatbot_edu',
+      'totalVideos': 1,
+      'page': const ChatbotEduPage(),
+    },
+    {
+      'title': 'Report',
+      'icon': LucideIcons.barChart,
+      'color': const Color(0xFFC8E6C9),
+      'subtitle': 'See the full picture',
+      'lessonKey': 'report_edu',
+      'totalVideos': 1,
+      'page': const ReportEduPage(),
+    },
+    {
+      'title': 'LearnHub',
+      'icon': LucideIcons.bookOpenCheck,
+      'color': const Color(0xFFB3E5FC),
+      'subtitle': 'Central learning area',
+      'lessonKey': 'learnhub_module_edu',
+      'totalVideos': 1,
+      'page': const LearnhubModuleEduPage(),
+    },
+    {
+      'title': 'Settings',
+      'icon': LucideIcons.settings,
+      'color': const Color(0xFFB39DDB),
+      'subtitle': 'Adjust preferences',
+      'lessonKey': 'settings_edu',
+      'totalVideos': 1,
+      'page': const SettingsEduPage(),
+    },
+  ];
+
   final List<Map<String, dynamic>> _quizItems = [
     {
       'title': 'Take the Quiz',
       'icon': LucideIcons.bookOpen,
-      'color': const Color(0xFFFFF3E0),
+      'color': const Color(0xFFE1BEE7),
       'subtitle': 'Test your knowledge',
       'lessonKey': 'quiz_section',
       'totalVideos': 0,
@@ -89,7 +162,6 @@ class _LearnState extends State<Learn> {
       'page': const QuizResultsPage(),
     },
   ];
-
   @override
   void initState() {
     super.initState();
@@ -97,7 +169,7 @@ class _LearnState extends State<Learn> {
   }
 
   void _updateLessonStatuses() {
-    for (var lesson in _lessons) {
+    for (var lesson in [..._lessons, ..._appTourLessons]) {
       if (lesson['status'] == 'activity') {
         lesson['progress'] = 0.0;
         continue;
@@ -117,7 +189,10 @@ class _LearnState extends State<Learn> {
 
   void _resetAllProgress() {
     LearnProgress.resetAll(
-      _lessons.where((e) => e['totalVideos'] > 0).map((e) => e['lessonKey'] as String).toList(),
+      [..._lessons, ..._appTourLessons]
+          .where((e) => e['totalVideos'] > 0)
+          .map((e) => e['lessonKey'] as String)
+          .toList(),
     );
     setState(_updateLessonStatuses);
     ScaffoldMessenger.of(context).showSnackBar(
@@ -128,16 +203,30 @@ class _LearnState extends State<Learn> {
   @override
   Widget build(BuildContext context) {
     final isQuizTab = _selectedTab == 'Quiz';
-    final filteredList = isQuizTab
-        ? _quizItems
-        : _lessons.where((item) {
-            final searchText = _searchController.text.toLowerCase();
-            final matchesSearch = item['title'].toLowerCase().contains(searchText);
-            final matchesTab = _selectedTab == 'All'
-                ? true
-                : _selectedTab.toLowerCase() == item['status'];
-            return matchesSearch && matchesTab;
-          }).toList();
+    final isAppTourTab = _selectedTab == 'App Tour';
+    final isLessonsTab = _selectedTab == 'Lessons';
+    final isProgressTab = _selectedTab == 'Progress';
+
+    final allItems = [..._lessons, ..._appTourLessons];
+    final ongoingLessons = allItems.where((e) => e['status'] == 'ongoing').toList();
+    final completedLessons = allItems.where((e) => e['status'] == 'completed').toList();
+
+    final searchText = _searchController.text.toLowerCase();
+
+    final filteredList = searchText.isNotEmpty
+        ? [
+            ..._lessons,
+            ..._appTourLessons,
+            ..._quizItems,
+          ].where((item) =>
+              item['title'].toLowerCase().contains(searchText)).toList()
+        : isQuizTab
+            ? _quizItems
+            : isAppTourTab
+                ? _appTourLessons
+                : isLessonsTab
+                    ? _lessons
+                    : [];
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FB),
@@ -154,7 +243,7 @@ class _LearnState extends State<Learn> {
         ),
         automaticallyImplyLeading: false,
         actions: [
-          if (_selectedTab == 'All')
+          if (_selectedTab == 'Lessons' || _selectedTab == 'App Tour')
             IconButton(
               icon: const Icon(Icons.refresh, color: Colors.blueAccent),
               onPressed: _resetAllProgress,
@@ -168,9 +257,9 @@ class _LearnState extends State<Learn> {
           children: [
             Row(
               children: [
-                _buildTab('All'),
-                _buildTab('Ongoing'),
-                _buildTab('Completed'),
+                _buildTab('Lessons'),
+                _buildTab('App Tour'),
+                _buildTab('Progress'),
                 _buildTab('Quiz'),
               ],
             ),
@@ -178,38 +267,43 @@ class _LearnState extends State<Learn> {
             _buildSearchBar(),
             const SizedBox(height: 16),
             Expanded(
-              child: filteredList.isEmpty
-                  ? const Center(child: Text('No results found.'))
-                  : ListView.separated(
-                      itemCount: filteredList.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 16),
-                      itemBuilder: (context, index) {
-                        final item = filteredList[index];
-                        return GestureDetector(
-                          onTap: () async {
-                            await Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => item['page']),
-                            );
-                            setState(_updateLessonStatuses);
-                          },
-                          child: _buildLessonCard(
-                            title: item['title'],
-                            icon: item['icon'],
-                            backgroundColor: item['color'],
-                            subtitle: item['subtitle'],
-                            progress: item['progress'] ?? 0.0,
-                          ),
-                        );
-                      },
-                    ),
+              child: isProgressTab
+                  ? ListView(
+                      padding: const EdgeInsets.only(bottom: 24),
+                      children: [
+                        const Text("Ongoing", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                        const SizedBox(height: 12),
+                        ...ongoingLessons
+                            .map((item) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 16),
+                                  child: _buildCardItem(item),
+                                ))
+                            .toList(),
+                        const SizedBox(height: 24),
+                        const Text("Completed", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                        const SizedBox(height: 12),
+                        ...completedLessons
+                            .map((item) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 16),
+                                  child: _buildCardItem(item),
+                                ))
+                            .toList(),
+                      ],
+                    )
+
+                  : filteredList.isEmpty
+                      ? const Center(child: Text('No results found.'))
+                      : ListView.separated(
+                          itemCount: filteredList.length,
+                          separatorBuilder: (_, __) => const SizedBox(height: 16),
+                          itemBuilder: (context, index) => _buildCardItem(filteredList[index]),
+                        ),
             ),
           ],
         ),
       ),
     );
   }
-
   Widget _buildTab(String label) {
     final isActive = _selectedTab == label;
     return Padding(
@@ -250,6 +344,25 @@ class _LearnState extends State<Learn> {
           hintText: 'Search for topics...',
           border: InputBorder.none,
         ),
+      ),
+    );
+  }
+
+  Widget _buildCardItem(Map<String, dynamic> item) {
+    return GestureDetector(
+      onTap: () async {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => item['page']),
+        );
+        setState(_updateLessonStatuses);
+      },
+      child: _buildLessonCard(
+        title: item['title'],
+        icon: item['icon'],
+        backgroundColor: item['color'],
+        subtitle: item['subtitle'],
+        progress: item['progress'] ?? 0.0,
       ),
     );
   }

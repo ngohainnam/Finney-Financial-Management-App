@@ -8,6 +8,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   firebase_auth
   firebase_core
   flutter_inappwebview_windows
+  flutter_localization
   flutter_tts
   url_launcher_windows
 )

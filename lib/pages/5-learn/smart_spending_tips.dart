@@ -15,20 +15,20 @@ class _SmartSpendingTipsState extends State<SmartSpendingTips> {
 
   final List<Map<String, String>> steps = [
     {
-      'title': 'টাকা ম্যানেজ, গ্রো, ইনভেস্ট ও প্রটেক্ট করুন',
+      'title': 'Manage, Grow, Invest & Protect Money',
       'description':
-          'যতটুকুই আয় করেন না কেন, ঠিকভাবে ম্যানেজ করে, ইনকাম বাড়িয়ে, ইনভেস্ট করে এবং সুরক্ষা করলে ভবিষ্যত নিরাপদ হবে।',
-      'videoId': 'Vwb07EXFgfA', // https://www.youtube.com/watch?v=Vwb07EXFgfA
+          'No matter how much you earn, if you manage it well, grow it, invest it, and protect it, your future will be secure.',
+      'videoId': 'Vwb07EXFgfA',
     },
     {
-      'title': 'স্মার্ট ইনভেস্টমেন্ট: জমিতে বিনিয়োগ',
+      'title': 'Smart Investment: Buy Land',
       'description':
-          'জমি হলো নিরাপদ ও লাভজনক ইনভেস্টমেন্ট। নিজের এলাকায় কাগজপত্র দেখে বুঝে ইনভেস্ট করুন। ফ্ল্যাট বা ক্রিপ্টোর চেয়ে বেশি ফ্লেক্সিবল।',
-      'videoId': 'f-FMn43hR34', // https://www.youtube.com/watch?v=f-FMn43hR34
+          'Land is a safe and profitable investment. Check papers and location before you buy. It’s more flexible than flats or crypto.',
+      'videoId': 'f-FMn43hR34',
     },
   ];
 
-  final Color contentColor = Color(0xFFE0E7FA); // Light Lavender Blue
+  final Color contentColor = Color(0xFFE0E7FA);
 
   late List<YoutubePlayerController> _controllers;
   late List<bool> _completed;

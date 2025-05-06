@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:finney/pages/2-chatbot/services/stt_service.dart';
 import 'package:finney/pages/2-chatbot/utils/robot_animation.dart'; 
+import 'package:finney/localization/locales.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 
 class VoiceChatInterface extends StatefulWidget {
   final ChatUser currentUser;
@@ -36,7 +38,7 @@ class _VoiceChatInterfaceState extends State<VoiceChatInterface> {
     bool available = await _sttService.initialize();
     if (!available && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Speech recognition not available on this device')),
+        SnackBar(content: Text(LocaleData.voiceSttNotAvailable.getString(context)),),
       );
     }
   }
@@ -128,9 +130,11 @@ class _VoiceChatInterfaceState extends State<VoiceChatInterface> {
                   ),
                 
                 Text(
-                  _isListening ? 'Listening... Tap again when you finish' : 
-                  _isProcessing ? 'Processing...' : 
-                  'Tap microphone to talk with Finney AI\n',
+                   _isListening
+                      ? LocaleData.voiceListening.getString(context)
+                      : _isProcessing
+                          ? LocaleData.voiceProcessing.getString(context)
+                          : LocaleData.voiceTapMic.getString(context),
                   style: const TextStyle(
                     fontSize: 16,
                     color: Colors.grey,

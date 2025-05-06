@@ -15,20 +15,20 @@ class _SimpleBudgetingState extends State<SimpleBudgeting> {
 
   final List<Map<String, String>> steps = [
     {
-      'title': 'মাসিক আয়ের বুদ্ধিমান বণ্টন',
+      'title': 'Smart Monthly Income Allocation',
       'description':
-          '৫৫% প্রয়োজনীয় খরচে, ১০% দীর্ঘমেয়াদি বিনিয়োগে, ১০% ভবিষ্যতের লক্ষ্যে, ১০% নিজের দক্ষতায় এবং ১৫% আনন্দ-দানে ব্যয় করুন।',
-      'videoId': 'ycPRDF4WOhw', // https://www.youtube.com/watch?v=ycPRDF4WOhw
+          'Spend 55% on needs, 10% on long-term investments, 10% for future goals, 10% to improve your skills, and 15% for fun or charity.',
+      'videoId': 'ycPRDF4WOhw',
     },
     {
-      'title': 'নিজের উপর বিনিয়োগই সবচেয়ে লাভজনক',
+      'title': 'Investing in Yourself Pays Off Most',
       'description':
-          '১০,০০০ টাকা দিয়ে ব্যবসা নয়, স্কিল ডেভেলপ করুন। বই পড়ুন, অনলাইন কোর্স করুন, দক্ষতা দিয়ে আয়ের পথ খুঁজে নিন।',
-      'videoId': 'ngVpfw8K7K8', // https://youtu.be/ngVpfw8K7K8
+          'Instead of starting a business with 10,000 Taka, improve your skills. Read books, take online courses, and find ways to earn using your knowledge.',
+      'videoId': 'ngVpfw8K7K8',
     },
   ];
 
-  final Color contentColor = Color(0xFFD1C4E9); // Soft lavender
+  final Color contentColor = Color(0xFFD1C4E9);
 
   late List<YoutubePlayerController> _controllers;
   late List<bool> _completed;
