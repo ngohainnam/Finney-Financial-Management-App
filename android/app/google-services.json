@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "560045957556",
+    "project_id": "finneyauth",
+    "storage_bucket": "finneyauth.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:560045957556:android:1f6142223ecb63968052e1",
+        "android_client_info": {
+          "package_name": "com.example.finney"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlDrqMlG3kUWXmG3PgWe2eIWcFy__MfJI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
