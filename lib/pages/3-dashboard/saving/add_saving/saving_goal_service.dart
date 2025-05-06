@@ -86,6 +86,16 @@ class SavingGoalService {
         return false; // Not enough balance
       }
 
+      // Get the goal document
+      final goalDoc = await _goalsCollection.doc(goalId).get();
+      final goal = SavingGoal.fromMap(goalDoc.data() as Map<String, dynamic>);
+
+      // Check if amount exceeds remaining target
+      final remainingAmount = goal.targetAmount - goal.savedAmount;
+      if (amount > remainingAmount) {
+        throw Exception('amount_exceeds_target'); // Throw specific exception
+      }
+
       // Create a transaction to deduct from balance
       final transaction = TransactionModel(
         name: 'Savings Transfer',
@@ -99,14 +109,17 @@ class SavingGoalService {
       await _transactionService.addTransaction(transaction);
 
       // Update the savings goal
-    await _goalsCollection.doc(goalId).update({
-      'savedAmount': FieldValue.increment(amount),
-    });
+      await _goalsCollection.doc(goalId).update({
+        'savedAmount': FieldValue.increment(amount),
+      });
 
       return true; // Success
     } catch (e) {
       debugPrint('Error adding to savings: $e');
-      return false; // Failed
+      if (e.toString().contains('amount_exceeds_target')) {
+        throw e; // Re-throw the specific exception
+      }
+      return false; // Failed for other reasons
     }
   }
 }
