@@ -8,7 +8,7 @@ import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
 
 
 class BudgetReminderPage extends StatefulWidget {
-  const BudgetReminderPage({Key? key}) : super(key: key);
+  const BudgetReminderPage({super.key});
 
   @override
   State<BudgetReminderPage> createState() => _BudgetReminderPageState();
@@ -202,7 +202,6 @@ class _BudgetGraphSectionState extends State<BudgetGraphSection> {
     7: 0,
   };
 
-  int _tappedIndex = -1;
   String _selectedFilter = "This Week";
 
   @override
@@ -228,7 +227,6 @@ class _BudgetGraphSectionState extends State<BudgetGraphSection> {
     final day = bengaliDaysFull[index];
     final text = "$day আপনি খরচ করেছেন ${amount.toInt()} টাকা।";
     _flutterTts.speak(text);
-    setState(() => _tappedIndex = index);
   }
 
   @override

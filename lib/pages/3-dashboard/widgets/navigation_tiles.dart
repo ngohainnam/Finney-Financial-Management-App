@@ -1,4 +1,5 @@
 import 'package:finney/pages/2-chatbot/chatbot.dart';
+import 'package:finney/pages/3-dashboard/budget_reminder_page.dart';
 import 'package:finney/pages/3-dashboard/saving/add_saving/saving_goal_page.dart';
 import 'package:finney/pages/7-insights/insights.dart';
 import 'package:flutter/material.dart';
@@ -82,6 +83,18 @@ class NavigationTiles extends StatelessWidget {
                   () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const SavingGoalPage()),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _buildNavigationTile(
+                  context,
+                  'Reminders',
+                  Icons.pie_chart,
+                  () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const BudgetReminderPage()),
                   ),
                 ),
               ),

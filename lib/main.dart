@@ -1,7 +1,6 @@
 import 'package:finney/assets/theme/app_color.dart';
 import 'package:finney/localization/locales.dart';
 import 'package:finney/pages/2-chatbot/models/chat_message_model.dart';
-import 'package:finney/pages/1-auth/auth_page.dart';
 import 'package:finney/assets/path/api.dart';
 import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +11,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'firebase_options.dart';
 import 'pages/1-auth/models/user_model.dart';
 import 'package:finney/pages/5-learn/quiz/quiz_result_model.dart';
+import 'package:finney/pages/1-auth/auth_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

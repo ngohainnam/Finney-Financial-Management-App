@@ -5,7 +5,6 @@ import 'package:finney/pages/3-dashboard/dashboard.dart';
 import 'package:finney/pages/4-report/report.dart';
 import 'package:finney/pages/5-learn/learn.dart';
 import 'package:finney/pages/6-setting/setting.dart';
-import 'package:finney/pages/3-dashboard/widgets/budget_reminder_page.dart';
 
 
 class MainLayout extends StatefulWidget {
