@@ -28,6 +28,12 @@ void main() async {
   Gemini.init(
     apiKey: geminiApiKey,
   );
+
+  // 🔥 Print the current Firebase UID
+  final box = Hive.box<UserModel>('userBox');
+  final user = box.get('user');
+  print("🔥 Current Firebase UID: ${user?.uid}");
+
   runApp(const MyApp());
 }
 

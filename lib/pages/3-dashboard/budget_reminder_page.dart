@@ -2,122 +2,124 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:finney/pages/3-dashboard/transaction/transaction_services.dart';
-import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
-
-
+import 'package:finney/pages/1-auth/models/user_model.dart';
 
 class BudgetReminderPage extends StatefulWidget {
-  const BudgetReminderPage({Key? key}) : super(key: key);
+  const BudgetReminderPage({super.key});
 
   @override
   State<BudgetReminderPage> createState() => _BudgetReminderPageState();
 }
 
 class _BudgetReminderPageState extends State<BudgetReminderPage> {
-  TimeOfDay? _selectedTime;
   final FlutterTts _flutterTts = FlutterTts();
+  final stt.SpeechToText _speech = stt.SpeechToText();
+  final TransactionService _transactionService = TransactionService();
 
-  String _repeatFrequency = "Never (কখনো না)";
+  TimeOfDay? _selectedTime;
+  String _repeat = "Never";
+  bool _isBengali = true;
 
-  final List<String> _repeatOptions = [
-    "Never (কখনো না)",
-    "Daily (প্রতিদিন)",
-    "Weekly (সাপ্তাহিক)",
-    "Monthly (মাসিক)",
-  ];
+  Map<String, double> _weeklySpending = {
+    "Mon": 0,
+    "Tue": 0,
+    "Wed": 0,
+    "Thu": 0,
+    "Fri": 0,
+    "Sat": 0,
+    "Sun": 0,
+  };
+
+  final Map<String, dynamic> _categoryColors = {
+    "Food": {"icon": "🍔", "color": Colors.blue},
+    "Transport": {"icon": "🚗", "color": Colors.blue},
+    "Housing": {"icon": "🏠", "color": Colors.orange},
+    "Shopping": {"icon": "🛍️", "color": Colors.blue},
+  };
+
+  final List<String> _dayOrder = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
   @override
   void initState() {
     super.initState();
-    _loadReminderTime();
     _flutterTts.setLanguage("bn-BD");
+    _flutterTts.setSpeechRate(0.4);
+    _flutterTts.awaitSpeakCompletion(true);
+    _loadReminderSettings();
+    _loadWeeklyExpenses();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Budget Reminder (বাজেট অনুস্মারক)"),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ListView(
-          children: [
-            const BudgetGraphSection(),
-            const SizedBox(height: 20),
-            const CategoryListSection(),
-            const SizedBox(height: 30),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.alarm),
-              label: const Text("Set Reminder (রিমাইন্ডার সেট করুন)"),
-              onPressed: _pickTime,
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                textStyle: const TextStyle(fontSize: 16),
-                backgroundColor: Colors.deepPurple,
-                foregroundColor: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 10),
-            if (_selectedTime != null)
-              Text(
-                "Reminder Time (রিমাইন্ডার সময়): ${_selectedTime!.format(context)}",
-                style: const TextStyle(fontSize: 16),
-              ),
-            const SizedBox(height: 20),
-            Text(
-              "Repeat Frequency (পুনরাবৃত্তি):",
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: _repeatOptions.map((option) {
-                bool isSelected = _repeatFrequency == option;
-                return GestureDetector(
-                  onTap: () async {
-                    setState(() {
-                      _repeatFrequency = option;
-                    });
-                    final prefs = await SharedPreferences.getInstance();
-                    await prefs.setString("reminder_repeat", option);
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: isSelected ? Colors.deepPurple : Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: isSelected ? Colors.deepPurple : Colors.grey.shade300,
-                        width: 2,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.shade200,
-                          blurRadius: 6,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: Text(
-                      option,
-                      style: TextStyle(
-                        color: isSelected ? Colors.white : Colors.black87,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                      ),
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ],
+  Future<void> _loadReminderSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    final int? hour = prefs.getInt("reminder_hour");
+    final int? minute = prefs.getInt("reminder_minute");
+    final String? repeat = prefs.getString("reminder_repeat");
+
+    if (hour != null && minute != null) {
+      setState(() => _selectedTime = TimeOfDay(hour: hour, minute: minute));
+    }
+    if (repeat != null) {
+      setState(() => _repeat = repeat);
+    }
+  }
+
+  Future<void> _loadWeeklyExpenses() async {
+    final expenses = await _transactionService.getWeeklyExpenses();
+    setState(() {
+      _weeklySpending = {for (var e in expenses) e.day: e.amount};
+    });
+  }
+
+  Future<void> _editBudgetLimitFirestore(String categoryName, double currentLimit) async {
+    final controller = TextEditingController(text: currentLimit.toInt().toString());
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Set Budget for $categoryName"),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(hintText: "Enter limit in ৳"),
         ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
+          ElevatedButton(
+            onPressed: () async {
+              final newLimit = double.tryParse(controller.text);
+              if (newLimit != null) {
+                final userId = Hive.box<UserModel>('userBox').get('user')?.uid ?? '';
+                await FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(userId)
+                    .collection('budgets')
+                    .doc(categoryName)
+                    .update({"limit": newLimit});
+                Navigator.pop(context);
+              }
+            },
+            child: const Text("Save"),
+          )
+        ],
       ),
     );
+  }
+
+  String _bn(int value) {
+    const digits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
+    return value.toString().split('').map((d) => digits[int.parse(d)]).join();
+  }
+
+  void _speakSummary() {
+    double totalSpent = 0;
+    double totalLimit = 0;
+    _weeklySpending.forEach((_, value) => totalSpent += value);
+    totalLimit = 5000; // You can pull this from Firestore if needed
+    final percent = (totalSpent / totalLimit * 100).toInt();
+    _flutterTts.speak("আপনি এই সপ্তাহে ${_bn(percent)} শতাশী খরচ করেছেন\।");
   }
 
   Future<void> _pickTime() async {
@@ -125,430 +127,185 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
       context: context,
       initialTime: TimeOfDay.now(),
     );
-
     if (picked != null) {
-      setState(() {
-        _selectedTime = picked;
-      });
-
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt("reminder_hour", picked.hour);
       await prefs.setInt("reminder_minute", picked.minute);
-
-      final hour = picked.hour.toString().padLeft(2, '0');
-      final minute = picked.minute.toString().padLeft(2, '0');
-      final banglaTime = "$hour:$minute";
-      final message = "আপনার রিমাইন্ডার $banglaTime টায় সেট হয়েছে";
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("🔊 Speaking Bengali reminder...")),
-      );
-
-      Future.delayed(const Duration(milliseconds: 300), () async {
-        await _flutterTts.setLanguage("bn-BD");
-        await _flutterTts.speak(message);
-      });
+      final banglaTime = "${_bn(picked.hour)}:${_bn(picked.minute)}";
+      await _flutterTts.speak("আপনার বাজেট রিমাইন্ডার সেট হয়েছে $banglaTime টায়\।");
+      setState(() => _selectedTime = picked);
     }
-  }
-
-  Future<void> _loadReminderTime() async {
-    final prefs = await SharedPreferences.getInstance();
-    final int? hour = prefs.getInt("reminder_hour");
-    final int? minute = prefs.getInt("reminder_minute");
-    final String? repeat = prefs.getString("reminder_repeat");
-
-    if (hour != null && minute != null) {
-      setState(() {
-        _selectedTime = TimeOfDay(hour: hour, minute: minute);
-      });
-    }
-
-    if (repeat != null) {
-      setState(() {
-        _repeatFrequency = repeat;
-      });
-    }
-  }
-}
-
-class BudgetGraphSection extends StatefulWidget {
-  const BudgetGraphSection({super.key});
-
-  @override
-  State<BudgetGraphSection> createState() => _BudgetGraphSectionState();
-}
-
-class _BudgetGraphSectionState extends State<BudgetGraphSection> {
-  final _flutterTts = FlutterTts();
-  final _transactionStream = TransactionService().getTransactions();
-
-  final List<String> bengaliDaysFull = [
-    "সোমবার",
-    "মঙ্গলবার",
-    "বুধবার",
-    "বৃহস্পতিবার",
-    "শুক্রবার",
-    "শনিবার",
-    "রবিবার",
-  ];
-
-  final Map<int, double> _weeklyTotals = {
-    1: 0,
-    2: 0,
-    3: 0,
-    4: 0,
-    5: 0,
-    6: 0,
-    7: 0,
-  };
-
-  int _tappedIndex = -1;
-  String _selectedFilter = "This Week";
-
-  @override
-  void initState() {
-    super.initState();
-    _flutterTts.setLanguage("bn-BD");
-  }
-
-  bool isInFilterRange(DateTime date) {
-    final now = DateTime.now();
-    if (_selectedFilter == "This Week") {
-      final start = now.subtract(Duration(days: now.weekday - 1));
-      final end = start.add(const Duration(days: 6));
-      return date.isAfter(start.subtract(const Duration(days: 1))) &&
-          date.isBefore(end.add(const Duration(days: 1)));
-    } else if (_selectedFilter == "This Month") {
-      return date.month == now.month && date.year == now.year;
-    }
-    return false;
-  }
-
-  void _speakBar(int index, double amount) {
-    final day = bengaliDaysFull[index];
-    final text = "$day আপনি খরচ করেছেন ${amount.toInt()} টাকা।";
-    _flutterTts.speak(text);
-    setState(() => _tappedIndex = index);
   }
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<TransactionModel>>(
-      stream: _transactionStream,
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        _weeklyTotals.updateAll((key, value) => 0);
-
-        for (var tx in snapshot.data!) {
-          if (!tx.isIncome && isInFilterRange(tx.date)) {
-            final weekday = tx.date.weekday;
-            _weeklyTotals.update(weekday, (value) => value + tx.amount.abs());
-          }
-        }
-
-        final List<BarChartGroupData> bars = List.generate(7, (i) {
-          final weekday = i + 1;
-          final amount = _weeklyTotals[weekday]!;
-          final color = amount >= 1000
-              ? Colors.red
-              : amount >= 800
-              ? Colors.orange
-              : Colors.green;
-
-          return BarChartGroupData(
-            x: i,
-            barRods: [
-              BarChartRodData(
-                toY: amount,
-                color: color,
-                width: 18,
-                borderRadius: BorderRadius.circular(4),
-                backDrawRodData: BackgroundBarChartRodData(
-                  show: true,
-                  toY: 1500,
-                  color: Colors.grey.shade300,
-                ),
-              )
-            ],
-          );
-        });
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final userId = Hive.box<UserModel>('userBox').get('user')?.uid ?? '';
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Budget Reminder"),
+        actions: [
+          IconButton(
+            icon: Icon(_isBengali ? Icons.language : Icons.translate),
+            onPressed: () => setState(() => _isBengali = !_isBengali),
+          )
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: ListView(
           children: [
-            // Dropdown aligned to left
-            DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                value: _selectedFilter,
-                icon: const Icon(Icons.arrow_drop_down, color: Colors.black87),
-                dropdownColor: Colors.white,
-                style: const TextStyle(color: Colors.black87, fontSize: 14),
-                borderRadius: BorderRadius.circular(10),
-                items: const [
-                  DropdownMenuItem(value: "This Week", child: Text("This Week")),
-                  DropdownMenuItem(value: "This Month", child: Text("This Month")),
-                ],
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() => _selectedFilter = value);
-                  }
-                },
-              ),
-            ),
-            const SizedBox(height: 6),
-
-            // Dynamic title based on selection
-            Text(
-              _selectedFilter == "This Week"
-                  ? "This Week’s Spending (এই সপ্তাহের খরচ)"
-                  : "This Month’s Spending (এই মাসের খরচ)",
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-            ),
+            const Text("This Week's Spending", style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
-
-            // Bar chart
-            Container(
-              height: 250,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(12),
-              ),
+            SizedBox(
+              height: 180,
               child: BarChart(
                 BarChartData(
-                  maxY: 1500,
-                  gridData: FlGridData(show: true),
-                  borderData: FlBorderData(show: false),
-                  barTouchData: BarTouchData(
-                    enabled: true,
-                    touchCallback: (event, response) {
-                      if (response != null && response.spot != null) {
-                        final index = response.spot!.touchedBarGroupIndex;
-                        final amount = _weeklyTotals[index + 1]!;
-                        _speakBar(index, amount);
-                      }
-                    },
-                    touchTooltipData: BarTouchTooltipData(
-                      tooltipBgColor: Colors.deepPurple,
-                      getTooltipItem: (group, _, rod, __) {
-                        return BarTooltipItem(
-                          '৳${rod.toY.toInt()}',
-                          const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
+                  barGroups: _dayOrder.asMap().entries.map((entry) {
+                    int index = entry.key;
+                    String day = entry.value;
+                    double amount = _weeklySpending[day] ?? 0;
+                    return BarChartGroupData(x: index, barRods: [
+                      BarChartRodData(toY: amount, color: Colors.purple, width: 16)
+                    ]);
+                  }).toList(),
                   titlesData: FlTitlesData(
+                    leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
-                        interval: 1,
-                        getTitlesWidget: (value, _) {
-                          return Text(
-                            bengaliDaysFull[value.toInt()].substring(0, 2),
-                            style: const TextStyle(fontSize: 13),
-                          );
-                        },
-                      ),
-                    ),
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        interval: 500,
-                        getTitlesWidget: (value, _) => Text("৳${value.toInt()}",
-                            style: const TextStyle(fontSize: 10)),
+                        getTitlesWidget: (value, _) => Text(_dayOrder[value.toInt()].substring(0, 1)),
                       ),
                     ),
                   ),
-                  barGroups: bars,
+                  gridData: FlGridData(show: false),
+                  borderData: FlBorderData(show: false),
                 ),
               ),
             ),
             const SizedBox(height: 10),
-            const Text(
-              "✅ On Track (ঠিকঠাক চলছে)",
-              style: TextStyle(color: Colors.green),
+            StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(userId)
+                  .collection('budgets')
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) return const CircularProgressIndicator();
+                final docs = snapshot.data!.docs;
+                return Column(
+                  children: docs.map((doc) {
+                    final data = doc.data() as Map<String, dynamic>;
+                    final name = data['category'] ?? '';
+                    final spent = data['spent']?.toDouble() ?? 0.0;
+                    final limit = data['limit']?.toDouble() ?? 1.0;
+                    final percent = spent / limit;
+                    final icon = _categoryColors[name]?['icon'] ?? "❓";
+                    final color = _categoryColors[name]?['color'] ?? Colors.grey;
+                    final statusIcon = percent >= 1
+                        ? Icons.warning_rounded
+                        : (percent >= 0.8 ? Icons.info_outline : null);
+                    return GestureDetector(
+                      onTap: () => _editBudgetLimitFirestore(name, limit),
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [BoxShadow(color: Colors.grey.shade300, blurRadius: 5)],
+                        ),
+                        child: Row(
+                          children: [
+                            Text(icon, style: const TextStyle(fontSize: 28)),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                                      if (statusIcon != null) ...[
+                                        const SizedBox(width: 6),
+                                        Icon(statusIcon, size: 18, color: Colors.redAccent),
+                                      ]
+                                    ],
+                                  ),
+                                  const SizedBox(height: 6),
+                                  LinearProgressIndicator(
+                                    value: percent.clamp(0.0, 1.0),
+                                    backgroundColor: Colors.grey[300],
+                                    color: color,
+                                    minHeight: 8,
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text("৳${spent.toInt()} / ৳${limit.toInt()}", style: const TextStyle(fontSize: 13)),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
             ),
+            const SizedBox(height: 30),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.alarm),
+              label: const Text("Set Reminder"),
+              onPressed: _pickTime,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.purple,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.volume_up),
+              label: const Text("Summary Voice"),
+              onPressed: _speakSummary,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple,
+                foregroundColor: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 10),
+            if (_selectedTime != null)
+              Text("Reminder Time: ${_selectedTime!.format(context)}",
+                  style: Theme.of(context).textTheme.bodyMedium),
+            const SizedBox(height: 20),
+            const Text("Repeat Frequency:", style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 10,
+              children: ["Never", "Daily", "Weekly", "Monthly"].map((freq) {
+                final selected = _repeat == freq;
+                return ChoiceChip(
+                  label: Text(freq),
+                  selected: selected,
+                  onSelected: (_) async {
+                    final prefs = await SharedPreferences.getInstance();
+                    await prefs.setString("reminder_repeat", freq);
+                    setState(() => _repeat = freq);
+                  },
+                  selectedColor: Colors.purple,
+                );
+              }).toList(),
+            )
           ],
-        );
-      },
-    );
-  }
-}
-
-
-
-
-class CategoryListSection extends StatefulWidget {
-  const CategoryListSection({super.key});
-
-  @override
-  State<CategoryListSection> createState() => _CategoryListSectionState();
-}
-
-class _CategoryListSectionState extends State<CategoryListSection> {
-  final Map<String, double> _spentAmounts = {
-    "Food": 690,
-    "Transport": 300,
-    "Housing": 1200,
-    "Shopping": 200,
-  };
-
-  final Map<String, String> _labelsBn = {
-    "Food": "খাবার ও পানীয়",
-    "Transport": "যাতায়াত",
-    "Housing": "বাসাভাড়া",
-    "Shopping": "কেনাকাটা",
-  };
-
-  final Map<String, double> _budgetGoals = {
-    "Food": 1000,
-    "Transport": 500,
-    "Housing": 2000,
-    "Shopping": 600,
-  };
-
-  @override
-  void initState() {
-    super.initState();
-    _loadGoals();
-  }
-
-  Future<void> _loadGoals() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _budgetGoals.updateAll((key, value) =>
-      prefs.getDouble("goal_$key") ?? _budgetGoals[key]!);
-    });
-  }
-
-  Future<void> _editGoal(String category) async {
-    final prefs = await SharedPreferences.getInstance();
-    final controller = TextEditingController(
-        text: _budgetGoals[category]!.toInt().toString());
-
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text("Set Budget for $category (${_labelsBn[category]})"),
-        content: TextField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          decoration: const InputDecoration(labelText: "Enter amount (৳)"),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final newGoal = double.tryParse(controller.text);
-              if (newGoal != null && newGoal > 0) {
-                setState(() {
-                  _budgetGoals[category] = newGoal;
-                });
-                prefs.setDouble("goal_$category", newGoal);
-              }
-              Navigator.pop(context);
-            },
-            child: const Text("Save"),
-          ),
-        ],
       ),
     );
   }
+}
 
-  @override
-  Widget build(BuildContext context) {
-    final Map<String, String> icons = {
-      "Food": "🍽️",
-      "Transport": "🚗",
-      "Housing": "🏠",
-      "Shopping": "🛍️",
-    };
-
-    return Column(
-      children: _spentAmounts.keys.map((category) {
-        final spent = _spentAmounts[category]!;
-        final goal = _budgetGoals[category]!;
-        final percent = spent / goal;
-        final Color barColor = percent >= 1
-            ? Colors.red
-            : (percent >= 0.8 ? Colors.orange : Colors.blue);
-
-        String? warningText;
-        if (percent >= 1) {
-          warningText = "⚠️ Limit exceeded! (⚠️ বাজেট অতিক্রম করা হয়েছে)";
-        } else if (percent >= 0.8) {
-          warningText = "⚠️ Near limit! (⚠️ আপনি বাজেটের ৮০% ব্যবহার করেছেন)";
-        }
-
-        return GestureDetector(
-          onTap: () => _editGoal(category),
-          child: Container(
-            margin: const EdgeInsets.symmetric(vertical: 8),
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(14),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.shade300,
-                  blurRadius: 6,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(icons[category]!, style: const TextStyle(fontSize: 32)),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "$category (${_labelsBn[category]})",
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16),
-                      ),
-                      const SizedBox(height: 6),
-                      LinearProgressIndicator(
-                        value: percent,
-                        backgroundColor: Colors.grey.shade300,
-                        color: barColor,
-                        minHeight: 8,
-                      ),
-                      const SizedBox(height: 4),
-                      Text("৳${spent.toInt()} / ৳${goal.toInt()}"),
-                      if (warningText != null)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 4),
-                          child: Text(
-                            warningText,
-                            style: const TextStyle(
-                              color: Colors.red,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
+class WeeklyExpense {
+  final String day;
+  final double amount;
+  WeeklyExpense(this.day, this.amount);
 }
