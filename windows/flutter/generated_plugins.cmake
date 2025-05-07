@@ -7,7 +7,11 @@ list(APPEND FLUTTER_PLUGIN_LIST
   file_selector_windows
   firebase_auth
   firebase_core
+<<<<<<< HEAD
   flutter_localization
+=======
+  flutter_inappwebview_windows
+>>>>>>> learn
   flutter_tts
   url_launcher_windows
 )

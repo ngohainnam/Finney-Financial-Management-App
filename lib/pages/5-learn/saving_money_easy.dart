@@ -1,0 +1,144 @@
+import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'learn_progress.dart';
+
+class SavingMoneyEasy extends StatefulWidget {
+  const SavingMoneyEasy({super.key});
+
+  @override
+  State<SavingMoneyEasy> createState() => _SavingMoneyEasyState();
+}
+
+class _SavingMoneyEasyState extends State<SavingMoneyEasy> {
+  final String lessonKey = 'saving_money_easy';
+
+  final List<Map<String, String>> steps = [
+    {
+      'title': 'সঞ্চয়ের অভ্যাস গড়া',
+      'description':
+          'নিয়মিত সঞ্চয় করা বুদ্ধিমানের কাজ এবং অভ্যাসে পরিণত করা উচিত। খরচের আগে সঞ্চয়ের পরিকল্পনা করাই হলো স্মার্ট আর্থিক আচরণ।',
+      'videoId': 'RUz9yjgnGi8', // https://www.youtube.com/watch?v=RUz9yjgnGi8
+    },
+    {
+      'title': 'সঞ্চয়ের গুরুত্ব',
+      'description':
+          'জরুরি সময়ের জন্য সঞ্চয় রাখা অত্যন্ত জরুরি। আয় থেকে শুরুতেই টাকা আলাদা করে রাখার অভ্যাস আমাদের ভবিষ্যতকে নিরাপদ রাখে।',
+      'videoId': 'QNu4u0XsIoM', // https://www.youtube.com/watch?v=QNu4u0XsIoM
+    },
+  ];
+
+  final Color contentColor = Color(0xFFE1D5F0); // Soft lavender tone
+
+  late List<YoutubePlayerController> _controllers;
+  late List<bool> _completed;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _completed = List.generate(
+      steps.length,
+      (index) => LearnProgress.isVideoCompleted(lessonKey, index),
+    );
+
+    _controllers = steps.map((step) {
+      return YoutubePlayerController(
+        initialVideoId: step['videoId']!,
+        flags: const YoutubePlayerFlags(autoPlay: false),
+      );
+    }).toList();
+  }
+
+  @override
+  void dispose() {
+    for (final controller in _controllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  void _markStepCompleted(int index) async {
+    await LearnProgress.markVideoCompleted(lessonKey, index);
+    setState(() {
+      _completed[index] = true;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F7FB),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: const Text(
+          'Saving Money Easy',
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blueAccent),
+        ),
+        iconTheme: const IconThemeData(color: Colors.blueAccent),
+      ),
+      body: ListView.separated(
+        padding: const EdgeInsets.all(16),
+        separatorBuilder: (_, __) => const SizedBox(height: 24),
+        itemCount: steps.length,
+        itemBuilder: (context, index) {
+          final step = steps[index];
+          return Container(
+            decoration: BoxDecoration(
+              color: contentColor,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 5,
+                  offset: Offset(0, 3),
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                YoutubePlayer(controller: _controllers[index]),
+                const SizedBox(height: 12),
+                Text(
+                  step['title']!,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  step['description']!,
+                  style: const TextStyle(
+                    color: Colors.black54,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: ElevatedButton.icon(
+                    onPressed: _completed[index]
+                        ? null
+                        : () => _markStepCompleted(index),
+                    icon: const Icon(LucideIcons.check),
+                    label: Text(_completed[index] ? 'Completed' : 'Mark as Done'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _completed[index]
+                          ? Colors.green[300]
+                          : Colors.blueAccent,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
