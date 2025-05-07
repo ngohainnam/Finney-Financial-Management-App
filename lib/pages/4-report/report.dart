@@ -1,4 +1,3 @@
-import 'package:finney/assets/theme/app_color.dart';
 import 'package:flutter/material.dart';
 
 class Report extends StatelessWidget {
@@ -7,8 +6,12 @@ class Report extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
-      body: const Center(child: Text("Report page")),
+      appBar: AppBar(
+        title: const Text('Reports'),
+      ),
+      body: const Center(
+        child: Text('This is the Reports page!'),
+      ),
     );
   }
 }

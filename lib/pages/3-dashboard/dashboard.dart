@@ -13,6 +13,7 @@ import 'package:finney/pages/3-dashboard/transaction/transaction_services.dart';
 import 'package:finney/pages/3-dashboard/models/transaction_model.dart' hide CategoryExpense;
 import 'package:flutter_localization/flutter_localization.dart';
 
+
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
 
@@ -211,6 +212,13 @@ class DashboardState extends State<Dashboard> {
       onDeleteTransaction: _handleDeleteTransaction,
       timeRange: currentTimeRange,
       onTimeRangeChanged: _onTimeRangeChanged,
+//import 'package:finney/pages/3-dashboard/widgets/charts/spending_bar_chart.dart';
+//import 'package:finney/pages/3-dashboard/widgets/charts/category_pie_chart.dart';
+//import 'package:finney/pages/3-dashboard/services/transaction_services.dart';
+//import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
+//import 'package:finney/pages/3-dashboard/budget_reminder_page.dart';
+//import 'package:finney/pages/3-dashboard/transaction/transaction_services.dart';
+//import 'package:finney/pages/3-dashboard/models/transaction_model.dart' hide CategoryExpense;
     );
   }
 

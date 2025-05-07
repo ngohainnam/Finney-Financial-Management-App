@@ -4,6 +4,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'models/user_model.dart';
+import 'package:finney/pages/1-auth/login_or_register_page.dart';
+import 'home_page.dart';
+
+
 
 class AuthPage extends StatelessWidget {
   const AuthPage({super.key});
@@ -29,7 +33,7 @@ class AuthPage extends StatelessWidget {
               User? user = snapshot.data;
               box.put('user', UserModel(uid: user?.uid ?? '', email: user?.email ?? '', name: ''));
             }
-            return MainLayout();
+            return const MainLayout();
           }
           
           // If not logged in, show login or register page
