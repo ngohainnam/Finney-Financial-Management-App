@@ -82,37 +82,39 @@ class ReportScreenState extends State<ReportScreen> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: AppColors.lightBackground,
+    appBar: AppBar(
+      title: const Text('Report'),
       backgroundColor: AppColors.lightBackground,
-      appBar: AppBar(
-        title: const Text('Report'),
-        backgroundColor: AppColors.lightBackground,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SpendingBarChart(
-              weeklyExpenses: _weeklyExpenses.map((e) =>
-                services.WeeklyExpenseData(e.day, e.amount)
-              ).toList(),
+    ),
+    body: transactions.isEmpty
+        ? const Center(child: CircularProgressIndicator())
+        : SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SpendingBarChart(
+                  weeklyExpenses: _weeklyExpenses
+                      .map((e) => services.WeeklyExpenseData(e.day, e.amount))
+                      .toList(),
+                ),
+                const SizedBox(height: 20),
+                SavingPredCard(transactions: transactions),
+                const SizedBox(height: 20),
+                BudgetPredCard(transactions: transactions),
+                const SizedBox(height: 20),
+                CategoryPieChart(categoryExpenses: categoryExpenses),
+                const SizedBox(height: 20),
+              ],
             ),
-            const SizedBox(height: 20),
-            SavingPredCard(transactions: transactions),
-    const SizedBox(height: 20),
-    BudgetPredCard(transactions: transactions),
-    const SizedBox(height: 20),
-            CategoryPieChart(categoryExpenses: categoryExpenses),
-            const SizedBox(height: 20),
-             
-          ],
-        ),
-      ),
-    );
-  }
+          ),
+  );
+}
+
 
   IconData getIconForCategory(String category) {
     switch (category) {
