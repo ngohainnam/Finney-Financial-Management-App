@@ -1,4 +1,4 @@
-import 'package:finney/components/lanaguage_button.dart';
+import 'package:finney/components/language_button.dart';
 import 'package:finney/components/charts/chart_service.dart' as chart_service;
 import 'package:finney/components/time_selector.dart';
 import 'package:finney/localization/locales.dart';

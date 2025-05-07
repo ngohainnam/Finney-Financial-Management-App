@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:finney/assets/theme/app_color.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:finney/localization/locales.dart';
 
 class LanguageButton extends StatefulWidget {
-  // Size options for the button
   final double size;
   final bool showText;
+  final String? initialLanguage;
+  final Function(String)? onLanguageChanged;
 
   const LanguageButton({
     super.key,
     this.size = 40,
     this.showText = false,
+    this.initialLanguage,
+    this.onLanguageChanged,
   });
 
   @override
@@ -19,11 +24,23 @@ class LanguageButton extends StatefulWidget {
 class _LanguageButtonState extends State<LanguageButton> {
   String _currentLanguage = 'English';
   
-  //map of languages with flags
   final Map<String, String> _languageFlags = {
     'English': '🇺🇸',
     'Bengali': '🇧🇩',
   };
+  
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialLanguage != null) {
+      _currentLanguage = widget.initialLanguage!;
+    } else {
+      // If no initial language provided, detect from the current locale
+      _currentLanguage = FlutterLocalization.instance.currentLocale!.languageCode == 'en'
+          ? 'English'
+          : 'Bengali';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,8 +80,18 @@ class _LanguageButtonState extends State<LanguageButton> {
 
   void _showLanguageSelector(BuildContext context) {
     final availableLanguages = [
-      {'code': 'en', 'name': 'English', 'flag': '🇺🇸'},
-      {'code': 'bn', 'name': 'Bengali', 'flag': '🇧🇩'},
+      {
+        'code': 'en', 
+        'name': 'English', 
+        'localName': LocaleData.languageEnglish.getString(context),
+        'flag': '🇺🇸'
+      },
+      {
+        'code': 'bn', 
+        'name': 'Bengali', 
+        'localName': LocaleData.languageBengali.getString(context),
+        'flag': '🇧🇩'
+      },
     ];
     
     showModalBottomSheet(
@@ -92,7 +119,7 @@ class _LanguageButtonState extends State<LanguageButton> {
             Padding(
               padding: const EdgeInsets.all(16),
               child: Text(
-                'Select Language',
+                LocaleData.language.getString(context),
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -128,7 +155,7 @@ class _LanguageButtonState extends State<LanguageButton> {
                     ),
                   ),
                   title: Text(
-                    language['name']!,
+                    language['localName']!,
                     style: TextStyle(
                       fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                     ),
@@ -142,22 +169,23 @@ class _LanguageButtonState extends State<LanguageButton> {
                       _currentLanguage = language['name']!;
                     });
                     
+                    // Update the app's locale
+                    FlutterLocalization.instance.translate(
+                      language['code']!,
+                    );
+                    
+                    // Call the callback if provided
+                    if (widget.onLanguageChanged != null) {
+                      widget.onLanguageChanged!(_currentLanguage);
+                    }
+                    
                     // Close the bottom sheet
                     Navigator.pop(context);
-                    
-                    // Show a message that full functionality will be implemented later
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Language selection functionality will be implemented later'),
-                        duration: Duration(seconds: 2),
-                      ),
-                    );
                   },
                 );
               },
             ),
             const SizedBox(height: 16),
-            // Padding to account for bottom insets on notched devices
             SizedBox(height: MediaQuery.of(context).padding.bottom),
           ],
         ),

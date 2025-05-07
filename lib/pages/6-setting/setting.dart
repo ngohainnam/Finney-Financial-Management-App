@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:finney/components/language_button.dart';
 import 'package:finney/localization/locales.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -398,29 +398,10 @@ class _SettingState extends State<Setting> {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        _buildDropdownOption(
+                        _buildLanguageOption(
                           icon: Icons.language,
                           title: LocaleData.language.getString(context),
                           value: selectedLanguage,
-                          items: [
-                            DropdownMenuItem(
-                              value: 'English',
-                              child: Text(LocaleData.languageEnglish.getString(context)),
-                            ),
-                            DropdownMenuItem(
-                              value: 'Bengali',
-                              child: Text(LocaleData.languageBengali.getString(context)),
-                            ),
-                          ],
-                          onChanged: (val) {
-                            setState(() {
-                              selectedLanguage = val!;
-                              FlutterLocalization.instance.translate(
-                                val == 'English' ? 'en' : 'bn',
-                              );
-                              _saveUserData();
-                            });
-                          },
                         ),
                         const SizedBox(height: 10),
                         _buildDropdownOption(
@@ -635,6 +616,47 @@ class _SettingState extends State<Setting> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildLanguageOption({
+    required IconData icon,
+    required String title,
+    required String value,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: AppColors.primary),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: AppColors.primary),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          LanguageButton(
+            size: 36,
+            showText: true,
+            initialLanguage: selectedLanguage,
+            onLanguageChanged: (language) {
+              setState(() {
+                selectedLanguage = language;
+                _saveUserData();
+              });
+            },
+          ),
+        ],
       ),
     );
   }
