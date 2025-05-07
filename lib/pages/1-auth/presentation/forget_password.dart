@@ -5,6 +5,9 @@ import 'package:finney/assets/theme/app_color.dart';
 import 'package:finney/assets/widgets/common/error_message.dart';
 import 'package:finney/assets/widgets/common/my_button.dart';
 import 'package:finney/assets/widgets/common/my_textfield.dart';
+import 'package:finney/localization/locales.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -17,7 +20,6 @@ class ForgotPasswordPageState extends State<ForgotPasswordPage> {
   final emailController = TextEditingController();
 
   void sendPasswordResetEmail() async {
-    // Show a loading indicator
     showDialog(
       context: context,
       builder: (context) {
@@ -30,36 +32,37 @@ class ForgotPasswordPageState extends State<ForgotPasswordPage> {
     );
 
     try {
-      // Trigger Firebase's password reset email
-      await FirebaseAuth.instance.sendPasswordResetEmail(email: emailController.text);
-
-      // Close the loading indicator
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: emailController.text.trim());
       Navigator.pop(context);
-
-      // Show a success message
       showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text('Password Reset'),
-            content: Text('A password reset link has been sent to your email.'),
+            title: Text(
+              LocaleData.forgotPasswordTitle.getString(context),
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            content: Text(
+              LocaleData.passwordResetSuccess.getString(context),
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.pop(context); // Close the dialog
+                  Navigator.pop(context);
                 },
-                child: Text('OK'),
+                child: Text(
+                  LocaleData.dialogOk.getString(context),
+                  style: Theme.of(context).textTheme.labelLarge,
+                ),
               ),
             ],
           );
         },
       );
     } catch (e) {
-      // Close the loading indicator
       Navigator.pop(context);
-
-      // Show error message if the email fails to send
-      showErrorMessage(context, 'Error: ${e.toString()}');
+      showErrorMessage(context, LocaleData.passwordResetError.getString(context));
     }
   }
 
@@ -94,7 +97,7 @@ class ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      'Forgot Password',
+                      LocaleData.forgotPasswordTitle.getString(context),
                       style: TextStyle(
                         color: AppColors.darkBlue,
                         fontSize: 20,
@@ -106,12 +109,12 @@ class ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 const SizedBox(height: 25),
                 MyTextField(
                   controller: emailController,
-                  hintText: 'Enter your email',
+                  hintText: LocaleData.emailHint.getString(context),
                   obscureText: false,
                 ),
                 const SizedBox(height: 25),
                 MyButton(
-                  text: 'Send Reset Link',
+                  text: LocaleData.sendResetLink.getString(context),
                   onTap: sendPasswordResetEmail,
                 ),
                 const SizedBox(height: 50),
@@ -120,7 +123,7 @@ class ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     Navigator.pop(context); // Navigate back to login page
                   },
                   child: Text(
-                    'Back to login',
+                    LocaleData.backToLogin.getString(context),
                     style: TextStyle(
                       color: AppColors.primary,
                       fontWeight: FontWeight.w500,
@@ -134,4 +137,10 @@ class ForgotPasswordPageState extends State<ForgotPasswordPage> {
       ),
     );
   }
+  @override
+  void dispose() {
+    emailController.dispose();
+    super.dispose();
+  }
 }
+

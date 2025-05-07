@@ -1,52 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:finney/assets/theme/app_color.dart';
-import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/localization/locales.dart';
+import 'package:finney/utils/currency_formatter.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 
-class LanguageButton extends StatefulWidget {
+class CurrencyButton extends StatefulWidget {
   final double size;
   final bool showText;
-  final String? initialLanguage;
-  final Function(String)? onLanguageChanged;
-  final bool showFlag;
+  final String? initialCurrency;
+  final Function(String)? onCurrencyChanged;
 
-  const LanguageButton({
+  const CurrencyButton({
     super.key,
     this.size = 40,
     this.showText = false,
-    this.initialLanguage,
-    this.onLanguageChanged,
-    this.showFlag = true,
+    this.initialCurrency,
+    this.onCurrencyChanged,
   });
 
   @override
-  State<LanguageButton> createState() => _LanguageButtonState();
+  State<CurrencyButton> createState() => _CurrencyButtonState();
 }
 
-class _LanguageButtonState extends State<LanguageButton> {
-  String _currentLanguage = 'English';
+class _CurrencyButtonState extends State<CurrencyButton> {
+  late String _currentCurrency;
   
-  final Map<String, String> _languageFlags = {
-    'English': '🇺🇸',
-    'Bengali': '🇧🇩',
+  final Map<String, String> _currencySymbols = {
+    'BDT': '৳',
+    'AUD': '\$',
   };
   
   @override
   void initState() {
     super.initState();
-    if (widget.initialLanguage != null) {
-      _currentLanguage = widget.initialLanguage!;
-    } else {
-      _currentLanguage = FlutterLocalization.instance.currentLocale!.languageCode == 'en'
-          ? 'English'
-          : 'Bengali';
-    }
+    _currentCurrency = widget.initialCurrency ?? 'BDT';
   }
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => _showLanguageSelector(context),
+      onTap: () => _showCurrencySelector(context),
       borderRadius: BorderRadius.circular(20),
       child: Container(
         height: widget.size,
@@ -59,38 +52,37 @@ class _LanguageButtonState extends State<LanguageButton> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (widget.showFlag)
-              Text(
-                _languageFlags[_currentLanguage] ?? '🇺🇸',
-                style: TextStyle(fontSize: widget.size * 0.5),
-              ),
-            if (widget.showFlag && widget.showText)
+            Text(
+              _currencySymbols[_currentCurrency] ?? '৳',
+              style: TextStyle(fontSize: widget.size * 0.5),
+            ),
+            if (widget.showText) ...[
               const SizedBox(width: 8),
-            if (widget.showText)
               Text(
-                _currentLanguage,
+                _currentCurrency,
                 style: TextStyle(
                   fontSize: widget.size * 0.35,
                   fontWeight: FontWeight.w500,
                 ),
               ),
+            ],
           ],
         ),
       ),
     );
   }
 
-  void _showLanguageSelector(BuildContext context) {
-    final availableLanguages = [
+  void _showCurrencySelector(BuildContext context) {
+    final availableCurrencies = [
       {
-        'code': 'en',
-        'name': 'English',
-        'localName': LocaleData.languageEnglish.getString(context),
+        'code': 'BDT', 
+        'symbol': '৳',
+        'name': LocaleData.currencyBDT.getString(context),
       },
       {
-        'code': 'bn',
-        'name': 'Bengali',
-        'localName': LocaleData.languageBengali.getString(context),
+        'code': 'AUD', 
+        'symbol': '\$',
+        'name': LocaleData.currencyAUD.getString(context),
       },
     ];
     
@@ -105,6 +97,7 @@ class _LanguageButtonState extends State<LanguageButton> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Handle bar
             Container(
               margin: const EdgeInsets.only(top: 8),
               height: 4,
@@ -114,10 +107,11 @@ class _LanguageButtonState extends State<LanguageButton> {
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
+            // Title
             Padding(
               padding: const EdgeInsets.all(16),
               child: Text(
-                LocaleData.language.getString(context),
+                LocaleData.currency.getString(context),
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -126,35 +120,56 @@ class _LanguageButtonState extends State<LanguageButton> {
               ),
             ),
             const Divider(),
+            // Currency list
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: availableLanguages.length,
+              itemCount: availableCurrencies.length,
               itemBuilder: (context, index) {
-                final language = availableLanguages[index];
-                final isSelected = language['name'] == _currentLanguage;
+                final currency = availableCurrencies[index];
+                final isSelected = currency['code'] == _currentCurrency;
                 
                 return ListTile(
-                  leading: isSelected
-                      ? Icon(Icons.check_circle, color: AppColors.primary, size: 24)
-                      : const SizedBox(width: 24),
+                  leading: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? AppColors.primary.withValues(alpha: 0.1)
+                          : Colors.grey.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Text(
+                        currency['symbol']!,
+                        style: const TextStyle(fontSize: 20),
+                      ),
+                    ),
+                  ),
                   title: Text(
-                    language['localName']!,
+                    currency['name']!,
                     style: TextStyle(
                       fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                     ),
                   ),
-                  trailing: null,
+                  trailing: isSelected
+                      ? Icon(Icons.check_circle, color: AppColors.primary)
+                      : null,
                   onTap: () {
+                    // Update the current currency in the widget state
                     setState(() {
-                      _currentLanguage = language['name']!;
+                      _currentCurrency = currency['code']!;
                     });
                     
-                    // Remove translate call to avoid navigation reset
-                    if (widget.onLanguageChanged != null) {
-                      widget.onLanguageChanged!(_currentLanguage);
+                    // Update the currency formatter
+                    CurrencyFormatter.updateCurrency(_currentCurrency);
+                    
+                    // Call the callback if provided
+                    if (widget.onCurrencyChanged != null) {
+                      widget.onCurrencyChanged!(_currentCurrency);
                     }
                     
+                    // Close the bottom sheet
                     Navigator.pop(context);
                   },
                 );

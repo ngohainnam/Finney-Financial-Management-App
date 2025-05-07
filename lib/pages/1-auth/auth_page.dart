@@ -29,7 +29,7 @@ class AuthPage extends StatelessWidget {
               User? user = snapshot.data;
               box.put('user', UserModel(uid: user?.uid ?? '', email: user?.email ?? '', name: ''));
             }
-            return MainLayout();
+            return const MainLayout();
           }
           
           // If not logged in, show login or register page

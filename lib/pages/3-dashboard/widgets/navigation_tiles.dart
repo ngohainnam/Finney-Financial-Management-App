@@ -1,4 +1,5 @@
 import 'package:finney/pages/2-chatbot/chatbot.dart';
+import 'package:finney/pages/3-dashboard/budget_reminder_page.dart';
 import 'package:finney/pages/3-dashboard/saving/add_saving/saving_goal_page.dart';
 import 'package:finney/pages/7-insights/insights.dart';
 import 'package:flutter/material.dart';
@@ -26,7 +27,6 @@ class NavigationTiles extends StatelessWidget {
             ),
           ),
         ),
-        
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
@@ -36,7 +36,7 @@ class NavigationTiles extends StatelessWidget {
                   context,
                   'Insights',
                   Icons.bar_chart,
-                  () => Navigator.push(
+                      () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const Insights()),
                   ),
@@ -48,7 +48,7 @@ class NavigationTiles extends StatelessWidget {
                   context,
                   'AI Assistant',
                   Icons.support_agent_rounded,
-                  () => Navigator.push(
+                      () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const Chatbot()),
                   ),
@@ -57,7 +57,6 @@ class NavigationTiles extends StatelessWidget {
             ],
           ),
         ),
-        
         Padding(
           padding: const EdgeInsets.only(left: 16, top: 24, bottom: 12),
           child: Text(
@@ -69,7 +68,6 @@ class NavigationTiles extends StatelessWidget {
             ),
           ),
         ),
-        
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
@@ -79,9 +77,21 @@ class NavigationTiles extends StatelessWidget {
                   context,
                   'Goals',
                   Icons.flag,
-                  () => Navigator.push(
+                      () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const SavingGoalPage()),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _buildNavigationTile(
+                  context,
+                  'Reminder',
+                  Icons.alarm,
+                      () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const BudgetReminderPage()),
                   ),
                 ),
               ),
@@ -106,11 +116,11 @@ class NavigationTiles extends StatelessWidget {
   }
 
   Widget _buildNavigationTile(
-    BuildContext context,
-    String title,
-    IconData icon,
-    VoidCallback onTap,
-  ) {
+      BuildContext context,
+      String title,
+      IconData icon,
+      VoidCallback onTap,
+      ) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),

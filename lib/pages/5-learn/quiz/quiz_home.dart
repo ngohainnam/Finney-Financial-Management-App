@@ -1,91 +1,121 @@
 import 'package:flutter/material.dart';
-import 'package:finney/pages/5-learn/beginner/beginner_quiz.dart';
-import 'package:finney/pages/5-learn/intermediate/intermediate_quiz.dart';
-import 'package:finney/pages/5-learn/advanced/advanced_quiz.dart';
-import 'package:finney/localization/locales.dart';
-import 'package:flutter_localization/flutter_localization.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'quiz.dart';
+import 'quiz_results_page.dart';
+import 'quiz_result_model.dart';
+import 'package:intl/intl.dart';
 
-class QuizHomeScreen extends StatelessWidget {
-  const QuizHomeScreen({super.key});
+class QuizHomePage extends StatelessWidget {
+  const QuizHomePage({super.key});
+
+  Future<Map<String, dynamic>> _getSummary() async {
+    final box = Hive.box<QuizResult>('quiz_results');
+    if (box.isEmpty) return {'total': 0, 'average': 0.0, 'last': null};
+
+    int totalAttempts = box.length;
+    double avgScore = 0;
+    DateTime? last;
+
+    for (int i = 0; i < box.length; i++) {
+      final result = box.getAt(i);
+      if (result != null) {
+        avgScore += result.score / result.totalQuestions;
+        if (last == null || result.timestamp.isAfter(last)) {
+          last = result.timestamp;
+        }
+      }
+    }
+
+    return {
+      'total': totalAttempts,
+      'average': (avgScore / totalAttempts) * 100,
+      'last': last
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar( title: Text(LocaleData.quizHomeTitle.getString(context)),),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildQuizOption(
-              context,
-              level: LocaleData.beginnerLevelQuiz,
-              color: Colors.green,
-              onTap:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const BeginnerQuiz(),
-                    ),
-                  ), // Navigate to beginner quiz
-            ),
-            _buildQuizOption(
-              context,
-              level: LocaleData.intermediateLevelQuiz,
-              color: Colors.blue,
-              onTap:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const IntermediateQuiz(),
-                    ),
-                  ), // Navigate to intermediate quiz
-            ),
-            _buildQuizOption(
-              context,
-              level: LocaleData.advancedLevelQuiz,
-              color: Colors.purple,
-              onTap:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const AdvancedQuiz(),
-                    ),
-                  ), // Navigate to advanced quiz
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+    return FutureBuilder<Map<String, dynamic>>(
+      future: _getSummary(),
+      builder: (context, snapshot) {
+        final summary = snapshot.data;
 
-  Widget _buildQuizOption(
-    BuildContext context, {
-    required String level,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.8,
-        margin: const EdgeInsets.symmetric(vertical: 8),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color, width: 2),
-        ),
-        child: Center(
-          child: Text(
-            '$level Level Quiz',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: color,
+        return DefaultTabController(
+          length: 2,
+          child: Scaffold(
+            backgroundColor: const Color(0xFFF5F7FB),
+            appBar: AppBar(
+              title: const Text("Quiz"),
+              elevation: 0,
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black,
+              bottom: const TabBar(
+                labelColor: Colors.blueAccent,
+                unselectedLabelColor: Colors.grey,
+                indicatorColor: Colors.blueAccent,
+                tabs: [
+                  Tab(text: 'Take the Quiz'),
+                  Tab(text: 'Results'),
+                ],
+              ),
+            ),
+            body: Column(
+              children: [
+                if (summary != null) ...[
+                  Container(
+                    color: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text("Attempts",
+                                style: TextStyle(fontWeight: FontWeight.w500)),
+                            Text("${summary['total']}",
+                                style: const TextStyle(fontSize: 16)),
+                          ],
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text("Average Score",
+                                style: TextStyle(fontWeight: FontWeight.w500)),
+                            Text("${summary['average'].toStringAsFixed(1)}%",
+                                style: const TextStyle(fontSize: 16)),
+                          ],
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text("Last Attempt",
+                                style: TextStyle(fontWeight: FontWeight.w500)),
+                            Text(
+                              summary['last'] != null
+                                  ? DateFormat('MMM d, h:mm a').format(summary['last'])
+                                  : "-",
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+                const Expanded(
+                  child: TabBarView(
+                    children: [
+                      QuizPage(),
+                      QuizResultsPage(),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
