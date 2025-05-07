@@ -32,6 +32,7 @@ class AppNavbar extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Search Text Field (keep)
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
               child: TextField(
@@ -40,10 +41,10 @@ class AppNavbar extends StatelessWidget {
                   hintText: 'Ask me financial question...',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none, 
+                    borderSide: BorderSide.none,
                   ),
                   filled: true,
-                  fillColor: AppColors.blurGray.withValues(alpha: 0.2), 
+                  fillColor: AppColors.blurGray.withAlpha(50),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   suffixIcon: IconButton(
                     icon: const Icon(Icons.send_rounded, color: AppColors.darkBlue),
@@ -64,8 +65,8 @@ class AppNavbar extends StatelessWidget {
                 },
               ),
             ),
-            
-            // Navigation bar
+
+            // Navigation Bar (your correct tabs)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
               child: GNav(
@@ -74,14 +75,27 @@ class AppNavbar extends StatelessWidget {
                 activeColor: Colors.white,
                 tabBackgroundGradient: AppColors.ombreBlue,
                 iconSize: 25,
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(16),
                 gap: 8,
                 onTabChange: onTabChange,
                 selectedIndex: selectedIndex,
                 tabs: const [
-                  GButton(icon: Icons.dashboard, text: 'Dashboard'),
-                  GButton(icon: Icons.school, text: 'Learning'),
-                  GButton(icon: Icons.settings, text: 'Settings'),
+                  GButton(
+                    icon: Icons.dashboard,
+                    text: 'Dashboard',
+                  ),
+                  GButton(
+                    icon: Icons.bar_chart,
+                    text: 'Reports',
+                  ),
+                  GButton(
+                    icon: Icons.menu_book,
+                    text: 'Learn',
+                  ),
+                  GButton(
+                    icon: Icons.settings,
+                    text: 'Settings',
+                  ),
                 ],
               ),
             ),

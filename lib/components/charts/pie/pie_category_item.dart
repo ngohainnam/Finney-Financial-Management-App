@@ -52,7 +52,7 @@ class CategoryExpenseItem extends StatelessWidget {
               
               // Amount
               Text(
-                formatter.format(amount),
+                amount.toStringAsFixed(2),
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 15,

@@ -1,4 +1,3 @@
-import 'package:finney/components/language_button.dart';
 import 'package:finney/components/charts/chart_service.dart' as chart_service;
 import 'package:finney/components/time_selector.dart';
 import 'package:finney/localization/locales.dart';
@@ -25,16 +24,14 @@ class DashboardState extends State<Dashboard> {
   final TransactionService _transactionService = TransactionService();
   final chart_service.ChartService _chartService = chart_service.ChartService();
 
-  // Current time range for filtering data - make this accessible to other widgets
   static TimeRangeData currentTimeRange = TimeRangeData.month();
-  
+
   double _currentBalance = 0.0;
   double _monthlyIncome = 0.0;
   double _monthlyExpenseTotal = 0.0;
 
-  // Raw transaction data - always store all transactions
   List<TransactionModel> _transactions = [];
-  
+
   bool _isLoading = true;
   bool _isRefreshing = false;
 
@@ -52,22 +49,20 @@ class DashboardState extends State<Dashboard> {
   }
 
   void _updateChartsForTimeRange() {
-    // No data to update
     if (_transactions.isEmpty) return;
 
-    // Update balance data
     _updateBalanceData();
   }
-  
+
   void _updateBalanceData() {
     final filteredTransactions = _chartService.filterTransactionsByTimeRange(
       _transactions,
       currentTimeRange,
     );
-    
+
     double income = 0.0;
     double expenses = 0.0;
-    
+
     for (var transaction in filteredTransactions) {
       if (transaction.amount > 0) {
         income += transaction.amount;
@@ -75,7 +70,7 @@ class DashboardState extends State<Dashboard> {
         expenses += transaction.amount.abs();
       }
     }
-    
+
     setState(() {
       _monthlyIncome = income;
       _monthlyExpenseTotal = expenses;
@@ -92,7 +87,6 @@ class DashboardState extends State<Dashboard> {
         _isRefreshing = true;
       });
 
-      // Start listening for all transactions
       _transactionService.getTransactions().listen((transactions) {
         if (mounted) {
           setState(() {
@@ -158,14 +152,10 @@ class DashboardState extends State<Dashboard> {
         ),
         automaticallyImplyLeading: true,
         actions: [
-          const Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: LanguageButton(showText: false),
-          ),
           IconButton(
             icon: const Icon(Icons.help_outline),
             onPressed: () => DashboardHelp.show(context),
-          ),          
+          ),
         ],
       ),
       body: _isLoading
@@ -187,7 +177,7 @@ class DashboardState extends State<Dashboard> {
               TimeRangeSelector(
                 initialTimeRange: currentTimeRange,
                 onTimeRangeChanged: _onTimeRangeChanged,
-              ),              
+              ),
               RobotAnimationHeader(),
               const NavigationTiles(),
               _buildRecentTransactions(),
@@ -209,8 +199,7 @@ class DashboardState extends State<Dashboard> {
       _transactions,
       currentTimeRange,
     );
-    
-    // Pass time range data and callback
+
     return RecentTransactions(
       transactions: filteredTransactions,
       onDeleteTransaction: _handleDeleteTransaction,

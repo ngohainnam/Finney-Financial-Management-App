@@ -1,11 +1,11 @@
-import 'package:finney/assets/theme/app_color.dart';
 import 'package:finney/components/charts/chart_service.dart';
 import 'package:finney/components/time_selector.dart';
 import 'package:finney/pages/7-insights/chart_query.dart';
-import 'package:finney/pages/7-insights/insights.dart'; 
+import 'package:finney/pages/7-insights/insights.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
+import 'package:sprintf/sprintf.dart';
 import 'package:finney/localization/locales.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 
@@ -14,7 +14,7 @@ class UnifiedBarChart extends StatefulWidget {
   final List<PeriodExpense> periodExpenses;
   final ChartInterval interval;
   final TimeRangeData timeRange;
-  final ChartViewType viewType; // Add view type parameter
+  final ChartViewType viewType;
 
   const UnifiedBarChart({
     super.key,
@@ -22,7 +22,7 @@ class UnifiedBarChart extends StatefulWidget {
     required this.periodExpenses,
     required this.interval,
     required this.timeRange,
-    required this.viewType, // Make this required
+    required this.viewType,
   });
 
   @override
@@ -32,14 +32,14 @@ class UnifiedBarChart extends StatefulWidget {
 class _UnifiedBarChartState extends State<UnifiedBarChart> {
   final int _itemsPerPage = 12;
   int _currentPage = 0;
-  
+
   // Get bar color based on view type
   Color get _barColor {
     return widget.viewType == ChartViewType.income
-        ? Colors.green  
-        : Colors.redAccent;  
+        ? Colors.green
+        : Colors.redAccent;
   }
-  
+
   @override
   void didUpdateWidget(UnifiedBarChart oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -54,10 +54,10 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> {
 
   List<PeriodExpense> get _currentPageData {
     if (widget.periodExpenses.isEmpty) return [];
-    
+
     final startIndex = _currentPage * _itemsPerPage;
     final endIndex = min(startIndex + _itemsPerPage, widget.periodExpenses.length);
-    
+
     return widget.periodExpenses.sublist(startIndex, endIndex);
   }
 
@@ -75,7 +75,7 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> {
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormat = NumberFormat.currency(symbol: '\$');
+    final currencyFormat = NumberFormat.currency(symbol: '৳');
     final totalAmount = widget.periodExpenses.isEmpty
         ? 0.0
         : widget.periodExpenses.fold(0.0, (sum, expense) => sum + expense.amount);
@@ -98,7 +98,7 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> {
         children: [
           _buildHeader(currencyFormat, totalAmount),
           const SizedBox(height: 8),
-          
+
           if (widget.periodExpenses.isEmpty)
             _buildEmptyState()
           else
@@ -127,7 +127,7 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> {
         Text(
           '${LocaleData.total.getString(context)}: ${currencyFormat.format(totalAmount)}',
           style: TextStyle(
-            color: _barColor, // Use dynamic color based on type
+            color: _barColor,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -158,23 +158,83 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> {
             BarChartData(
               alignment: BarChartAlignment.spaceAround,
               maxY: _calculateMaxY(_currentPageData),
-              titlesData: _buildTitlesData(),
+              titlesData: _buildTitlesData(currencyFormat),
               gridData: _buildGridData(),
               borderData: FlBorderData(show: false),
               barGroups: _buildBarGroups(),
               barTouchData: _buildBarTouchData(currencyFormat),
             ),
+            swapAnimationDuration: const Duration(milliseconds: 150),
+            swapAnimationCurve: Curves.linear,
           ),
         ),
-        
+
         if (_totalPages > 1)
           _buildPagination(),
+
+        const SizedBox(height: 16),
+        _buildSummaryText(currencyFormat),
       ],
     );
   }
 
-  FlTitlesData _buildTitlesData() {
-    
+  Widget _buildSummaryText(NumberFormat currencyFormat) {
+    if (widget.periodExpenses.isEmpty) return const SizedBox.shrink();
+
+    final total = widget.periodExpenses.fold(0.0, (sum, expense) => sum + expense.amount);
+    final average = total / widget.periodExpenses.length;
+    final maxExpense = widget.periodExpenses.reduce((a, b) => a.amount > b.amount ? a : b);
+    final minExpense = widget.periodExpenses.reduce((a, b) => a.amount < b.amount ? a : b);
+
+    String summary = '';
+    if (widget.viewType == ChartViewType.expenses) {
+      summary = sprintf(
+        FlutterLocalization.instance.currentLocale!.languageCode == 'en' 
+            ? LocaleData.en['expenseSummary']! 
+            : LocaleData.bd['expenseSummary']!,
+        [
+          currencyFormat.format(total),
+          currencyFormat.format(average),
+          currencyFormat.format(maxExpense.amount),
+          maxExpense.period,
+          currencyFormat.format(minExpense.amount),
+          minExpense.period,
+        ],
+      );
+    } else {
+      summary = sprintf(
+        FlutterLocalization.instance.currentLocale!.languageCode == 'en' 
+            ? LocaleData.en['incomeSummary']! 
+            : LocaleData.bd['incomeSummary']!,
+        [
+          currencyFormat.format(total),
+          currencyFormat.format(average),
+          currencyFormat.format(maxExpense.amount),
+          maxExpense.period,
+          currencyFormat.format(minExpense.amount),
+          minExpense.period,
+        ],
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        summary,
+        style: const TextStyle(
+          fontSize: 14,
+          height: 1.5,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  FlTitlesData _buildTitlesData(NumberFormat currencyFormat) {
     return FlTitlesData(
       show: true,
       bottomTitles: AxisTitles(
@@ -185,7 +245,7 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> {
             if (index >= 0 && index < _currentPageData.length) {
               final label = _currentPageData[index].period;
               final displayLabel = label.length > 5 ? label.substring(0, 5) : label;
-              
+
               return SideTitleWidget(
                 axisSide: meta.axisSide,
                 space: 8,
@@ -203,7 +263,6 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> {
           reservedSize: 30,
         ),
       ),
-      // Left axis titles (currency values)
       leftTitles: AxisTitles(
         sideTitles: SideTitles(
           showTitles: true,
@@ -213,7 +272,7 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> {
               axisSide: meta.axisSide,
               space: 8,
               child: Text(
-                '\$${value.toInt()}',
+                currencyFormat.format(value),
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 10,
@@ -222,7 +281,7 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> {
             );
           },
           interval: _calculateYAxisInterval(_currentPageData),
-          reservedSize: 40,
+          reservedSize: 60, // Increased reserved size to prevent overlapping
         ),
       ),
       topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -266,23 +325,23 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> {
 
   BarTouchData _buildBarTouchData(NumberFormat currencyFormat) {
     return BarTouchData(
-      enabled: true,
+      touchCallback: (FlTouchEvent event, response) {
+        if (response == null || response.spot == null) {
+          return;
+        }
+      },
       touchTooltipData: BarTouchTooltipData(
-        tooltipBgColor: AppColors.blurGray,
+        tooltipBgColor: Colors.transparent,
+        tooltipRoundedRadius: 0,
+        tooltipPadding: EdgeInsets.zero,
+        tooltipMargin: 0,
         getTooltipItem: (group, groupIndex, rod, rodIndex) {
-          final period = _currentPageData[groupIndex].period;
-          return BarTooltipItem(
-            '${currencyFormat.format(rod.toY)}\n$period',
-            const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          );
+          return null;
         },
       ),
     );
   }
-  
+
   Widget _buildPagination() {
     return Padding(
       padding: const EdgeInsets.only(top: 16.0),
@@ -329,7 +388,7 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> {
         .reduce((a, b) => a > b ? a : b);
 
     if (maxAmount == 0) return 100;
-    
+
     final interval = _calculateYAxisInterval(data);
     return ((maxAmount / interval).ceil() * interval).toDouble();
   }
@@ -342,34 +401,34 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> {
         .reduce((a, b) => a > b ? a : b);
 
     if (maxAmount == 0) return 100;
-    
+
     if (maxAmount > 1000) return 250;
     if (maxAmount > 500) return 100;
     return 50;
   }
-  
+
   int min(int a, int b) => a < b ? a : b;
   int max(int a, int b) => a > b ? a : b;
 
 
   Map<String, dynamic> _getChartDataForLLM() {
-  final Map<String, dynamic> data = {};
-  
-  if (widget.periodExpenses.isEmpty) {
-    return {'empty': true};
+    final Map<String, dynamic> data = {};
+
+    if (widget.periodExpenses.isEmpty) {
+      return {'empty': true};
+    }
+
+    data['periods'] = widget.periodExpenses.map((expense) => {
+      'period': expense.period,
+      'amount': expense.amount,
+    }).toList();
+
+    data['total'] = widget.periodExpenses.fold(
+        0.0, (sum, expense) => sum + expense.amount);
+
+    data['interval'] = widget.interval.toString().split('.').last;
+    data['timeRange'] = widget.timeRange.range.toString().split('.').last;
+
+    return data;
   }
-  
-  data['periods'] = widget.periodExpenses.map((expense) => {
-    'period': expense.period,
-    'amount': expense.amount,
-  }).toList();
-  
-  data['total'] = widget.periodExpenses.fold(
-    0.0, (sum, expense) => sum + expense.amount);
-    
-  data['interval'] = widget.interval.toString().split('.').last;
-  data['timeRange'] = widget.timeRange.range.toString().split('.').last;
-  
-  return data;
-}
 }

@@ -3,6 +3,7 @@ import 'package:finney/pages/3-dashboard/models/saving_goal_model.dart';
 import 'package:finney/pages/3-dashboard/saving/add_saving/saving_goal_service.dart';
 import 'package:finney/pages/3-dashboard/saving/add_saving/add_edit_goal_page.dart';
 import 'package:finney/pages/3-dashboard/widgets/goal_card.dart';
+import 'package:finney/pages/3-dashboard/saving/services/saving_notification_service.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/localization/locales.dart';
 
@@ -21,39 +22,6 @@ class SavingGoalPage extends StatefulWidget {
 
 class SavingGoalPageState extends State<SavingGoalPage> {
   final SavingGoalService _goalService = SavingGoalService();
-
-  void _showSuccessMessage(String message) {
-    _showSnackbar(message, _successColor, Icons.check_circle);
-  }
-
-  void _showErrorMessage(String message) {
-    _showSnackbar(message, _errorColor, Icons.error);
-  }
-
-  void _showInfoMessage(String message) {
-    _showSnackbar(message, _infoColor, Icons.info);
-  }
-
-  void _showSnackbar(String message, Color color, IconData icon) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(icon, color: Colors.white),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(message, style: const TextStyle(fontSize: 16)),
-            ),
-          ],
-        ),
-        backgroundColor: color,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        duration: const Duration(seconds: 3),
-        elevation: 6,
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -251,10 +219,10 @@ class SavingGoalPageState extends State<SavingGoalPage> {
             Text(
               LocaleData.savingsOfTarget.getString(context).replaceFirst(
                 '%s',
-                totalSaved.toStringAsFixed(2),
+                '৳${totalSaved.toStringAsFixed(2)}',
               ).replaceFirst(
                 '%s',
-                totalTarget.toStringAsFixed(2),
+                '৳${totalTarget.toStringAsFixed(2)}',
               ),
               style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
             ),
@@ -265,7 +233,10 @@ class SavingGoalPageState extends State<SavingGoalPage> {
   }
 
   Future<void> _refreshGoals() async {
-    _showInfoMessage(LocaleData.goalsRefreshed.getString(context));
+    SavingNotificationService.showInfo(
+      context: context,
+      message: LocaleData.goalsRefreshed.getString(context),
+    );
     setState(() {});
   }
 
@@ -273,12 +244,14 @@ class SavingGoalPageState extends State<SavingGoalPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder:
-            (_) => AddEditGoalPage(
-              onGoalSaved: (SavingGoal goal) {
-                _showSuccessMessage(LocaleData.goalCreated.getString(context).replaceFirst('%s', goal.title),);
-              },
-            ),
+        builder: (_) => AddEditGoalPage(
+          onGoalSaved: (SavingGoal goal) {
+            SavingNotificationService.showSuccess(
+              context: context,
+              message: LocaleData.goalCreated.getString(context).replaceFirst('%s', goal.title),
+            );
+          },
+        ),
       ),
     );
   }
@@ -287,79 +260,106 @@ class SavingGoalPageState extends State<SavingGoalPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder:
-            (_) => AddEditGoalPage(
-              existingGoal: goal,
-              onGoalSaved: (SavingGoal updatedGoal) {
-                _showSuccessMessage(LocaleData.goalUpdated.getString(context).replaceFirst('%s', updatedGoal.title),);
-              },
-              onGoalDeleted: () {
-                _showErrorMessage(LocaleData.goalWasDeleted.getString(context));
-              },
-            ),
+        builder: (_) => AddEditGoalPage(
+          existingGoal: goal,
+          onGoalSaved: (SavingGoal updatedGoal) {
+            SavingNotificationService.showSuccess(
+              context: context,
+              message: LocaleData.goalUpdated.getString(context).replaceFirst('%s', updatedGoal.title),
+            );
+          },
+          onGoalDeleted: () {
+            SavingNotificationService.showError(
+              context: context,
+              message: LocaleData.goalWasDeleted.getString(context),
+            );
+          },
+        ),
       ),
     );
   }
 
   Future<void> _addToSavings(SavingGoal goal, double amount) async {
-    if (amount <= 0) {
-      _showErrorMessage(LocaleData.amountGreaterThanZero.getString(context));
-      return;
-    }
     try {
-      await _goalService.addToSavings(goal.id, amount);
-      _showSuccessMessage(
-        LocaleData.addedToSavings.getString(context)
-        .replaceFirst('%s', amount.toStringAsFixed(2))
-        .replaceFirst('%s', goal.title),
-      );
+      final success = await _goalService.addToSavings(goal.id, amount);
+      
+      if (success) {
+        SavingNotificationService.showSuccess(
+          context: context,
+          message: LocaleData.addedToSavings.getString(context)
+              .replaceFirst('%s', amount.toString())
+              .replaceFirst('%s', goal.title),
+        );
+      } else {
+        SavingNotificationService.showError(
+          context: context,
+          message: LocaleData.insufficientBalance.getString(context),
+        );
+      }
     } catch (e) {
-      _showErrorMessage(LocaleData.couldNotAddSavings.getString(context));
+      if (e.toString().contains('amount_exceeds_target')) {
+        final remainingAmount = goal.targetAmount - goal.savedAmount;
+        SavingNotificationService.showError(
+          context: context,
+          message: LocaleData.amountExceedsTarget.getString(context)
+              .replaceFirst('%s', '৳${remainingAmount.toStringAsFixed(2)}'),
+        );
+      } else {
+        SavingNotificationService.showError(
+          context: context,
+          message: LocaleData.errorAddingSavings.getString(context),
+        );
+      }
     }
   }
 
   Future<void> _deleteGoal(SavingGoal goal) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            title: Row(
-              children: [
-                Icon(Icons.warning_amber_rounded, color: _errorColor),
-                const SizedBox(width: 12),
-                Text(LocaleData.deleteGoalQuestion.getString(context)),
-              ],
-            ),
-            content: Text(LocaleData.confirmDeleteGoalPermanent.getString(context).replaceFirst(
-              '%s',
-              goal.title,
-            ),),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: Text(LocaleData.cancel.getString(context)),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: _errorColor),
-                onPressed: () => Navigator.pop(context, true),
-                child: Text(
-                  LocaleData.delete.getString(context),
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            ],
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: _errorColor),
+            const SizedBox(width: 12),
+            Text(LocaleData.deleteGoalQuestion.getString(context)),
+          ],
+        ),
+        content: Text(LocaleData.confirmDeleteGoalPermanent.getString(context).replaceFirst(
+          '%s',
+          goal.title,
+        )),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(LocaleData.cancel.getString(context)),
           ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: _errorColor),
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(
+              LocaleData.delete.getString(context),
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
     );
 
     if (confirmed == true) {
       try {
         await _goalService.deleteGoal(goal.id);
-        _showSuccessMessage(LocaleData.goalDeleted.getString(context).replaceFirst('%s', goal.title),);
+        SavingNotificationService.showSuccess(
+          context: context,
+          message: LocaleData.goalDeleted.getString(context).replaceFirst('%s', goal.title),
+        );
       } catch (e) {
-        _showErrorMessage(LocaleData.couldNotDeleteGoal.getString(context));
+        SavingNotificationService.showError(
+          context: context,
+          message: LocaleData.couldNotDeleteGoal.getString(context),
+        );
       }
     }
   }
