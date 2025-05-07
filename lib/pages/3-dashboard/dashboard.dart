@@ -1,4 +1,3 @@
-import 'package:finney/components/language_button.dart';
 import 'package:finney/components/charts/chart_service.dart' as chart_service;
 import 'package:finney/components/time_selector.dart';
 import 'package:finney/localization/locales.dart';
@@ -158,10 +157,6 @@ class DashboardState extends State<Dashboard> {
         ),
         automaticallyImplyLeading: true,
         actions: [
-          const Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: LanguageButton(showText: false),
-          ),
           IconButton(
             icon: const Icon(Icons.help_outline),
             onPressed: () => DashboardHelp.show(context),
