@@ -1,7 +1,9 @@
+import 'package:finney/localization/locales.dart';
 import 'package:finney/pages/2-chatbot/utils/robot_animation.dart';
 import 'package:flutter/material.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:finney/assets/theme/app_color.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 
 class WelcomeScreen extends StatelessWidget {
   final List<String> suggestedQuestions;
@@ -33,11 +35,11 @@ Widget build(BuildContext context) {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _buildTryAskingText(),
+                  _buildTryAskingText(context),
                   const SizedBox(height: 20),
                   _buildSuggestedQuestions(),
                   const SizedBox(height: 20),
-                  _buildSkipButton(),
+                  _buildSkipButton(context),
                   const SizedBox(height: 20),
                 ],
               ),
@@ -49,9 +51,9 @@ Widget build(BuildContext context) {
   );
 }
 
-  Widget _buildTryAskingText() {
+  Widget _buildTryAskingText(BuildContext context) {
     return Text(
-      'Try asking',
+      LocaleData.welcomeTryAsking.getString(context),
       style: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.bold,
@@ -121,7 +123,7 @@ Widget build(BuildContext context) {
     );
   }
 
-  Widget _buildSkipButton() {
+  Widget _buildSkipButton(BuildContext context) {
     return TextButton(
       onPressed: onQuestionSelected,
       style: TextButton.styleFrom(
@@ -134,7 +136,7 @@ Widget build(BuildContext context) {
         ),
       ),
       child: Text(
-        'Write your own question',
+        LocaleData.welcomeWriteQuestion.getString(context),
         style: TextStyle(
           color: AppColors.primary,
           fontWeight: FontWeight.w500,

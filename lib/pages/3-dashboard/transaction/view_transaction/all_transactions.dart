@@ -5,6 +5,8 @@ import 'package:finney/pages/3-dashboard/transaction/transaction_services.dart';
 import 'package:finney/pages/3-dashboard/transaction/widgets/transaction_list.dart';
 import 'package:finney/pages/3-dashboard/widgets/delete_transaction_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:finney/localization/locales.dart';
 
 class AllTransactionsScreen extends StatefulWidget {
   final List<TransactionModel> transactions;
@@ -78,8 +80,10 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
 
     final confirmed = await DeleteTransactionDialog.show(
       context,
-      message: 'This action cannot be undone. Are you sure you want to delete ${selectedTransactions.length} transaction(s)?',
-      title: 'Delete Transactions',
+      message: LocaleData.confirmDeleteAction
+        .getString(context)
+        .replaceFirst('%d', selectedTransactions.length.toString()),
+      title: LocaleData.deleteTransactions.getString(context),
     );
 
     if (confirmed) {
@@ -106,7 +110,9 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          _isDeleteMode ? 'Select Items to Delete' : 'Transactions',
+          _isDeleteMode
+            ? LocaleData.selectItemsToDelete.getString(context)
+            : LocaleData.transactions.getString(context),
           style: const TextStyle(
             color: AppColors.primary,
             fontWeight: FontWeight.bold,
@@ -174,7 +180,9 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
               stream: _transactionService.getTransactions(),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
+                  return Center(
+                    child: Text(LocaleData.errorLoadingTransactions.getString(context)),
+                  );
                 }
       
                 if (!snapshot.hasData) {

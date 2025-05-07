@@ -56,9 +56,11 @@ dependencies:
   url_launcher: ^6.2.5
   speech_to_text: ^7.0.0
   lottie: ^3.3.1
+  flutter_localization: ^0.3.2
   lucide_icons: ^0.257.0
   youtube_player_flutter: ^9.1.1
-  flutter_inappwebview: ^6.0.0-beta.24
+  flutter_inappwebview: ^6.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -87,8 +89,8 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-  - lib/images/
-  - lib/animations/
+    - lib/images/
+    - lib/animations/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

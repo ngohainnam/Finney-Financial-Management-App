@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:finney/assets/theme/app_color.dart';
 import 'package:finney/pages/3-dashboard/transaction/widgets/transaction_item.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:finney/localization/locales.dart';
 
 class TransactionList extends StatelessWidget {
   final List<TransactionModel> transactions;
@@ -45,16 +47,16 @@ class TransactionList extends StatelessWidget {
     );
   }
 
-  String _formatDate(String date) {
+  String _formatDate(String date, BuildContext context) {
     final today = DateTime.now();
     final yesterday = today.subtract(const Duration(days: 1));
 
     final transactionDate = DateTime.parse(date);
 
     if (DateFormat('yyyy-MM-dd').format(today) == date) {
-      return 'Today';
+      return LocaleData.today.getString(context);
     } else if (DateFormat('yyyy-MM-dd').format(yesterday) == date) {
-      return 'Yesterday';
+      return LocaleData.yesterday.getString(context);
     }
     return DateFormat('EEEE, MMMM d').format(transactionDate);
   }
@@ -64,11 +66,11 @@ class TransactionList extends StatelessWidget {
     final groupedTransactions = _groupTransactionsByDate();
 
     if (transactions.isEmpty) {
-      return const Center(
+      return Center(
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 20.0),
           child: Text(
-            'No transactions yet',
+            LocaleData.noTransactionsYet.getString(context),
             style: TextStyle(color: Colors.grey),
           ),
         ),
@@ -83,7 +85,7 @@ class TransactionList extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Text(
-                _formatDate(entry.key),
+                _formatDate(entry.key, context),
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,

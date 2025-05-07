@@ -166,7 +166,7 @@ class _QuizPageState extends State<QuizPage> {
                       ),
                       const SizedBox(height: 24),
 
-                      // ✅ Answer Options with color feedback
+
                       ...List.generate(question.options.length, (index) {
                         final isCorrect = index == question.correctAnswerIndex;
                         final isSelected = index == _selectedIndex;

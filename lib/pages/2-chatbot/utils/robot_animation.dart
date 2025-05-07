@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:finney/assets/theme/app_color.dart';
 import 'package:lottie/lottie.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:finney/localization/locales.dart';
 
 class RobotAnimationHeader extends StatelessWidget {
   final bool isTyping;
@@ -35,7 +37,7 @@ class RobotAnimationHeader extends StatelessWidget {
             ),
 
             Text(
-              isTyping ? "Thinking..." : "",
+              isTyping ? LocaleData.thinking.getString(context) : "",
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,

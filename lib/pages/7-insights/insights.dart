@@ -7,6 +7,8 @@ import 'package:finney/pages/3-dashboard/dashboard.dart';
 import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
 import 'package:finney/pages/3-dashboard/transaction/transaction_services.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:finney/localization/locales.dart';
 
 enum ChartViewType { expenses, income }
 
@@ -85,6 +87,7 @@ class _InsightsState extends State<Insights> with SingleTickerProviderStateMixin
         _transactions,
         _currentTimeRange,
         interval,
+        context,
         transactionType: chart_service.TransactionType.expense,
       );
       
@@ -92,6 +95,7 @@ class _InsightsState extends State<Insights> with SingleTickerProviderStateMixin
         _transactions,
         _currentTimeRange,
         interval,
+        context,
         transactionType: chart_service.TransactionType.income,
       );
       
@@ -133,7 +137,7 @@ class _InsightsState extends State<Insights> with SingleTickerProviderStateMixin
                 ),
                 alignment: Alignment.center,
                 child: Text(
-                  'Expenses',
+                  LocaleData.expenses.getString(context),
                   style: TextStyle(
                     color: _currentViewType == ChartViewType.expenses
                         ? Colors.white
@@ -158,7 +162,7 @@ class _InsightsState extends State<Insights> with SingleTickerProviderStateMixin
                 ),
                 alignment: Alignment.center,
                 child: Text(
-                  'Income',
+                  LocaleData.income.getString(context),
                   style: TextStyle(
                     color: _currentViewType == ChartViewType.income
                         ? Colors.white
@@ -190,7 +194,7 @@ class _InsightsState extends State<Insights> with SingleTickerProviderStateMixin
       appBar: AppBar(
         backgroundColor: AppColors.lightBackground,
         title: Text(
-          'Insights',
+          LocaleData.insights.getString(context),
           style: TextStyle(
             color: AppColors.primary,
             fontWeight: FontWeight.bold,
@@ -201,14 +205,14 @@ class _InsightsState extends State<Insights> with SingleTickerProviderStateMixin
           labelColor: AppColors.primary,
           unselectedLabelColor: Colors.grey,
           indicatorColor: AppColors.primary,
-          tabs: const [
+          tabs:  [
             Tab(
               icon: Icon(Icons.bar_chart),
-              text: 'Spending Analysis',
+              text: LocaleData.spendingAnalysis.getString(context),
             ),
             Tab(
               icon: Icon(Icons.pie_chart),
-              text: 'Category Breakdown',
+              text: LocaleData.categoryBreakdown.getString(context),
             ),
           ],
         ),
@@ -242,8 +246,8 @@ class _InsightsState extends State<Insights> with SingleTickerProviderStateMixin
                         padding: const EdgeInsets.all(16.0),
                         child: UnifiedBarChart(
                           title: _currentViewType == ChartViewType.expenses 
-                              ? 'Expense Analysis' 
-                              : 'Income Analysis',
+                              ? LocaleData.expenseAnalysis.getString(context)
+                              : LocaleData.incomeAnalysis.getString(context),
                           periodExpenses: currentPeriodData,
                           interval: _chartService.getIntervalForTimeRange(_currentTimeRange),
                           timeRange: _currentTimeRange,

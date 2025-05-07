@@ -2,6 +2,8 @@ import 'package:finney/components/time_selector.dart';
 import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
 import 'package:finney/pages/3-dashboard/utils/category.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:finney/localization/locales.dart';
 
 // Add TransactionType enum
 enum TransactionType {
@@ -34,15 +36,13 @@ class CategoryExpense {
   });
 }
 
-// Enum for chart interval (used for bar charts)
 enum ChartInterval {
-  week,  // Show days in a week
-  month, // Show days in a month
-  year,  // Show months in a year
+  week, 
+  month,
+  year,
 }
 
 class ChartService {
-  // Filter transactions by time range
   List<TransactionModel> filterTransactionsByTimeRange(
     List<TransactionModel> transactions,
     TimeRangeData timeRange,
@@ -53,7 +53,6 @@ class ChartService {
     }).toList();
   }
   
-  // Helper method to filter by transaction type
   List<TransactionModel> filterByTransactionType(
     List<TransactionModel> transactions,
     TransactionType type, 
@@ -69,71 +68,60 @@ class ChartService {
     }).toList();
   }
 
-  // Get data for bar chart
   List<PeriodExpense> getPeriodExpenses(
-    List<TransactionModel> transactions,
-    TimeRangeData timeRange,
-    ChartInterval interval, {
-    TransactionType transactionType = TransactionType.expense,
-  }) {
-    if (transactions.isEmpty) return [];
+  List<TransactionModel> transactions,
+  TimeRangeData timeRange,
+  ChartInterval interval,
+  BuildContext context, {
+  TransactionType transactionType = TransactionType.expense,
+}) {
+  if (transactions.isEmpty) return [];
 
-    // Filter transactions by the time range
-    final filteredTransactions = filterTransactionsByTimeRange(
-      transactions,
-      timeRange,
-    );
-    
-    // Filter by transaction type
-    final typeFilteredTransactions = filterByTransactionType(
-      filteredTransactions,
-      transactionType,
-    );
+  final filteredTransactions = filterTransactionsByTimeRange(
+    transactions,
+    timeRange,
+  );
+  final typeFilteredTransactions = filterByTransactionType(
+    filteredTransactions,
+    transactionType,
+  );
 
-    if (typeFilteredTransactions.isEmpty) return [];
+  if (typeFilteredTransactions.isEmpty) return [];
 
-    // Group transactions based on the selected interval
-    final Map<String, double> periodMap = {};
-    
-    for (var transaction in typeFilteredTransactions) {
-      final periodKey = _getPeriodKey(transaction.date, interval);
-      
-      final amount = transactionType == TransactionType.expense
-          ? transaction.amount.abs() 
-          : transaction.amount;
-          
-      periodMap[periodKey] = (periodMap[periodKey] ?? 0) + amount;
-    }
-
-    // Generate the list of all periods in the time range
-    final allPeriods = _generateAllPeriods(
-      timeRange.startDate,
-      timeRange.endDate,
-      interval,
-    );
-
-    // Map the data to PeriodExpense objects, ensuring all periods are included
-    return allPeriods.map((period) {
-      return PeriodExpense(
-        period: period,
-        amount: periodMap[period] ?? 0.0,
-      );
-    }).toList();
+  final Map<String, double> periodMap = {};
+  for (var transaction in typeFilteredTransactions) {
+    final periodKey = _getPeriodKey(transaction.date, interval, context);
+    final amount = transactionType == TransactionType.expense
+        ? transaction.amount.abs()
+        : transaction.amount;
+    periodMap[periodKey] = (periodMap[periodKey] ?? 0) + amount;
   }
 
-  // Get category expenses for pie chart - updated to support income
+  final allPeriods = _generateAllPeriods(
+    timeRange.startDate,
+    timeRange.endDate,
+    interval,
+    context,
+  );
+
+  return allPeriods.map((period) {
+    return PeriodExpense(
+      period: period,
+      amount: periodMap[period] ?? 0.0,
+    );
+  }).toList();
+  }
   List<CategoryExpense> getCategoryExpenses(
     List<TransactionModel> transactions,
     TimeRangeData timeRange, {
     TransactionType transactionType = TransactionType.expense,
   }) {
-    // Filter transactions by the time range
+
     final filteredTransactions = filterTransactionsByTimeRange(
       transactions,
       timeRange,
     );
     
-    // Filter by transaction type
     final typeFilteredTransactions = filterByTransactionType(
       filteredTransactions,
       transactionType,
@@ -141,21 +129,19 @@ class ChartService {
 
     if (typeFilteredTransactions.isEmpty) return [];
 
-    // Group expenses by category
     final Map<String, double> categoryMap = {};
     final Map<String, Color> categoryColorMap = {};
     
     for (var transaction in typeFilteredTransactions) {
       final category = transaction.category;
       final amount = transactionType == TransactionType.expense
-          ? transaction.amount.abs() // For expenses, use absolute value
-          : transaction.amount;      // For income, use positive value
+          ? transaction.amount.abs() 
+          : transaction.amount;
       
       categoryMap[category] = (categoryMap[category] ?? 0) + amount;
       categoryColorMap[category] = CategoryUtils.getColorForCategory(category);
     }
 
-    // Convert to list of CategoryExpense objects
     return categoryMap.entries.map((entry) {
       return CategoryExpense(
         name: entry.key,
@@ -163,11 +149,9 @@ class ChartService {
         color: categoryColorMap[entry.key] ?? Colors.grey,
       );
     }).toList()
-      // Sort by amount (descending)
       ..sort((a, b) => b.amount.compareTo(a.amount));
   }
   
-  // Helper method to map time range to chart interval
   ChartInterval getIntervalForTimeRange(TimeRangeData timeRange) {
     switch (timeRange.range) {
       case TimeRange.week:
@@ -180,7 +164,6 @@ class ChartService {
     }
   }
   
-  // Helper to convert CategoryExpense to map for the pie chart
   List<Map<String, dynamic>> convertCategoryExpensesToMap(List<CategoryExpense> expenses) {
     return expenses.map((item) => {
       'name': item.name,
@@ -189,48 +172,63 @@ class ChartService {
     }).toList();
   }
 
-  String _getPeriodKey(DateTime date, ChartInterval interval) {
-    switch (interval) {
-      case ChartInterval.week:
-        return _getWeekdayName(date.weekday);
-        
-      case ChartInterval.month:
-        return date.day.toString();
-        
-      case ChartInterval.year:
-        return _getMonthName(date.month);
-    }
+  String _getPeriodKey(DateTime date, ChartInterval interval, BuildContext context) {
+  switch (interval) {
+    case ChartInterval.week:
+      return _getWeekdayName(date.weekday, context);
+    case ChartInterval.month:
+      return date.day.toString();
+    case ChartInterval.year:
+      return _getMonthName(date.month, context);
+  }
   }
 
   List<String> _generateAllPeriods(
-    DateTime startDate,
-    DateTime endDate,
-    ChartInterval interval,
-  ) {
-    switch (interval) {
-      case ChartInterval.week:
-        // For a week, show weekdays
-        return List.generate(7, (i) => _getWeekdayName(i + 1));
-      
-      case ChartInterval.month:
-        // For a month, show days (1-31)
-        final daysInMonth = DateTime(startDate.year, startDate.month + 1, 0).day;
-        return List.generate(daysInMonth, (i) => (i + 1).toString());
-      
-      case ChartInterval.year:
-        // For a year, show months (Jan-Dec)
-        return List.generate(12, (i) => _getMonthName(i + 1));
-    }
+  DateTime startDate,
+  DateTime endDate,
+  ChartInterval interval,
+  BuildContext context,
+) {
+  switch (interval) {
+    case ChartInterval.week:
+      return List.generate(7, (i) => _getWeekdayName(i + 1, context));
+    case ChartInterval.month:
+      final daysInMonth = DateTime(startDate.year, startDate.month + 1, 0).day;
+      return List.generate(daysInMonth, (i) => (i + 1).toString());
+    case ChartInterval.year:
+      return List.generate(12, (i) => _getMonthName(i + 1, context));
+  }
   }
 
-  String _getWeekdayName(int weekday) {
-    const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    return weekdays[weekday - 1];
+  String _getWeekdayName(int weekday, BuildContext context) {
+  const weekdayKeys = [
+    LocaleData.mon,
+    LocaleData.tue,
+    LocaleData.wed,
+    LocaleData.thu,
+    LocaleData.fri,
+    LocaleData.sat,
+    LocaleData.sun,
+  ];
+  return weekdayKeys[weekday - 1].getString(context);
   }
 
-  String _getMonthName(int month) {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return months[month - 1];
+  String _getMonthName(int month, BuildContext context) {
+  const monthKeys = [
+    LocaleData.jan,
+    LocaleData.feb,
+    LocaleData.mar,
+    LocaleData.apr,
+    LocaleData.may,
+    LocaleData.jun,
+    LocaleData.jul,
+    LocaleData.aug,
+    LocaleData.sep,
+    LocaleData.oct,
+    LocaleData.nov,
+    LocaleData.dec,
+  ];
+  return monthKeys[month - 1].getString(context);
   }
 
   double calculateTotalIncome(List<TransactionModel> transactions) {

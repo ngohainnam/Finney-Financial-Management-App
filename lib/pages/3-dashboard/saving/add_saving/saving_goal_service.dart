@@ -1,9 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finney/pages/3-dashboard/models/saving_goal_model.dart';
+import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
+import 'package:finney/pages/3-dashboard/transaction/transaction_services.dart';
+import 'package:flutter/foundation.dart';
 
 class SavingGoalService {
   final CollectionReference _goalsCollection = FirebaseFirestore.instance
       .collection('goals');
+  final TransactionService _transactionService = TransactionService();
 
   // Add or update a goal (uses set with merge for both operations)
   Future<void> saveGoal(SavingGoal goal) async {
@@ -65,10 +69,44 @@ class SavingGoalService {
         );
   }
 
-  // Add amount to savedAmount field
-  Future<void> addToSavings(String goalId, double amount) async {
+  // Get current balance from transactions
+  Future<double> getCurrentBalance() async {
+    final transactions = await _transactionService.getTransactions().first;
+    return transactions.fold<double>(0.0, (total, transaction) => total + transaction.amount);
+  }
+
+  // Add amount to savedAmount field with balance check
+  Future<bool> addToSavings(String goalId, double amount) async {
+    try {
+      // Get current balance
+      final currentBalance = await getCurrentBalance();
+
+      // Check if there's enough balance
+      if (currentBalance < amount) {
+        return false; // Not enough balance
+      }
+
+      // Create a transaction to deduct from balance
+      final transaction = TransactionModel(
+        name: 'Savings Transfer',
+        category: 'Savings',
+        amount: -amount, // Negative amount for expense
+        date: DateTime.now(),
+        description: 'Transfer to savings goal',
+      );
+
+      // Add the transaction first
+      await _transactionService.addTransaction(transaction);
+
+      // Update the savings goal
     await _goalsCollection.doc(goalId).update({
       'savedAmount': FieldValue.increment(amount),
     });
+
+      return true; // Success
+    } catch (e) {
+      debugPrint('Error adding to savings: $e');
+      return false; // Failed
+    }
   }
 }

@@ -15,6 +15,8 @@ import 'services/chat_service.dart';
 import 'presentation/welcome_screen.dart';
 import 'utils/chatbot_help.dart';
 import 'dart:async'; 
+import 'package:finney/localization/locales.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 
 class Chatbot extends StatefulWidget {
   final String? initialQuestion;
@@ -192,8 +194,8 @@ class _ChatbotState extends State<Chatbot> {
               if (mounted) {
                 // Show success message
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Transaction added successfully'),
+                  SnackBar(
+                    content: Text(LocaleData.transactionAddedSuccess.getString(context)),
                     backgroundColor: Colors.green,
                   ),
                 );
@@ -202,7 +204,7 @@ class _ChatbotState extends State<Chatbot> {
                 final confirmMessage = ChatMessage(
                   user: ChatConstants.geminiUser,
                   createdAt: DateTime.now(),
-                  text: "Transaction added successfully!",
+                  text: LocaleData.transactionAddedSuccess.getString(context),
                 );
                 
                 setState(() {
@@ -222,7 +224,7 @@ class _ChatbotState extends State<Chatbot> {
               final cancelMessage = ChatMessage(
                 user: ChatConstants.geminiUser,
                 createdAt: DateTime.now(),
-                text: "No problem, I won't add that transaction.",
+                text: LocaleData.transactionCanceled.getString(context),
               );
               
               setState(() {
@@ -275,8 +277,8 @@ class _ChatbotState extends State<Chatbot> {
 
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Transaction added successfully'),
+              SnackBar(
+                content: Text(LocaleData.transactionAddedSuccess.getString(context)),
                 backgroundColor: Colors.green,
               ),
             );
@@ -285,7 +287,7 @@ class _ChatbotState extends State<Chatbot> {
           final message = ChatMessage(
             user: ChatConstants.geminiUser,
             createdAt: DateTime.now(),
-            text: "Transaction added successfully!",
+            text: LocaleData.transactionAddedSuccess.getString(context),
           );
           
           setState(() {
@@ -300,7 +302,7 @@ class _ChatbotState extends State<Chatbot> {
           final message = ChatMessage(
             user: ChatConstants.geminiUser,
             createdAt: DateTime.now(),
-            text: "Sorry, I couldn't add the transaction. Please try again later.",
+            text: LocaleData.transactionAddError.getString(context),
           );
           
           setState(() {
@@ -315,7 +317,7 @@ class _ChatbotState extends State<Chatbot> {
         final message = ChatMessage(
           user: ChatConstants.geminiUser,
           createdAt: DateTime.now(),
-          text: "No problem, I won't add that transaction.",
+          text: LocaleData.transactionCanceled.getString(context),
         );
         
         setState(() {
@@ -330,7 +332,7 @@ class _ChatbotState extends State<Chatbot> {
         final message = ChatMessage(
           user: ChatConstants.geminiUser,
           createdAt: DateTime.now(),
-          text: "I'm not sure what you want to do with this transaction. Let me show you the options.",
+          text: LocaleData.transactionConfirmPrompt.getString(context),
         );
         
         setState(() {
@@ -353,7 +355,7 @@ class _ChatbotState extends State<Chatbot> {
                 final confirmMessage = ChatMessage(
                   user: ChatConstants.geminiUser,
                   createdAt: DateTime.now(),
-                  text: "Transaction added successfully!",
+                  text: LocaleData.transactionAddedSuccess.getString(context),
                 );
                 
                 setState(() {
@@ -372,7 +374,7 @@ class _ChatbotState extends State<Chatbot> {
       final message = ChatMessage(
         user: ChatConstants.geminiUser,
         createdAt: DateTime.now(),
-        text: "I don't have any transaction to confirm at the moment.",
+        text: LocaleData.transactionNoPending.getString(context),
       );
       
       setState(() {
@@ -443,13 +445,15 @@ class _ChatbotState extends State<Chatbot> {
 
   @override
   Widget build(BuildContext context) {
+    final suggestedQuestions = ChatConstants.getSuggestedQuestions(context);
+
     return Scaffold(
       backgroundColor: AppColors.lightBackground,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text(
-          'Finney AI',
+          LocaleData.chatbotTitle.getString(context),
           style: TextStyle(
             color: AppColors.primary,
             fontWeight: FontWeight.bold,
@@ -475,22 +479,22 @@ class _ChatbotState extends State<Chatbot> {
                   ? const Center(child: CircularProgressIndicator())
                   : showWelcomeScreen 
                     ? WelcomeScreen(
-                        suggestedQuestions: ChatConstants.suggestedQuestions,
-                        onSendMessage: _sendMessage,
-                        currentUser: ChatConstants.currentUser,
-                        onQuestionSelected: () {
-                          setState(() {
-                            showWelcomeScreen = false;
-                          });
-                        },
-                      )
-                    : ChatInterface(
-                        currentUser: ChatConstants.currentUser,
-                        onSend: _sendMessage,
-                        messages: messages,
-                        onMediaSend: _sendMediaMessage,
-                        isAiTyping: _isAiTyping, 
-                      ),
+                            suggestedQuestions: suggestedQuestions,
+                            onSendMessage: _sendMessage,
+                            currentUser: ChatConstants.currentUser,
+                            onQuestionSelected: () {
+                              setState(() {
+                                showWelcomeScreen = false;
+                              });
+                            },
+                          )
+                        : ChatInterface(
+                            currentUser: ChatConstants.currentUser,
+                            onSend: _sendMessage,
+                            messages: messages,
+                            onMediaSend: _sendMediaMessage,
+                            isAiTyping: _isAiTyping,
+                          ),
               ),
             ],
           ),

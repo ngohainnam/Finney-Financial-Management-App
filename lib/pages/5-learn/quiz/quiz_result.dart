@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'quiz.dart';
 import 'quiz_questions.dart';
-import 'quiz_review_page.dart'; //
+import 'quiz_review_page.dart';
 
 class QuizResultPage extends StatefulWidget {
   final int score;

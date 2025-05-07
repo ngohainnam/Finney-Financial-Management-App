@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:finney/assets/theme/app_color.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:finney/localization/locales.dart';
+import 'package:finney/components/time_selector.dart';
 
 class BalanceCard extends StatelessWidget {
   final double balance;
   final double income;
   final double expenses;
-  final String timeRange;
+  final TimeRangeData timeRange;
 
   const BalanceCard({
     super.key,
     required this.balance,
     required this.income,
     required this.expenses,
-    this.timeRange = 'This Month',
+    required this.timeRange,
   });
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormat = NumberFormat.currency(symbol: '\$');
-
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -37,7 +37,7 @@ class BalanceCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Balance ($timeRange)',
+            '${LocaleData.balance.getString(context)} (${timeRange.getLocalizedLabel(context)})',
             style: const TextStyle(
               color: Colors.white,
               fontSize: 17,
@@ -46,7 +46,7 @@ class BalanceCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            currencyFormat.format(balance),
+            '৳ ${balance.toStringAsFixed(2)}',
             style: const TextStyle(
               color: Colors.white,
               fontSize: 32,
@@ -58,15 +58,15 @@ class BalanceCard extends StatelessWidget {
             children: [
               _buildIncomeExpenseIndicator(
                 Icons.add_circle_outline,
-                'Income',
-                currencyFormat.format(income),
+                LocaleData.income.getString(context),
+                '৳ ${income.toStringAsFixed(2)}',
                 Colors.greenAccent,
               ),
               const SizedBox(width: 40),
               _buildIncomeExpenseIndicator(
                 Icons.remove_circle_outline,
-                'Expenses',
-                currencyFormat.format(expenses),
+                LocaleData.expenses.getString(context),
+                '৳ ${expenses.toStringAsFixed(2)}',
                 Colors.redAccent,
               ),
             ],
@@ -77,11 +77,11 @@ class BalanceCard extends StatelessWidget {
   }
 
   Widget _buildIncomeExpenseIndicator(
-    IconData icon,
-    String label,
-    String amount,
-    Color iconColor,
-  ) {
+      IconData icon,
+      String label,
+      String amount,
+      Color iconColor,
+      ) {
     return Row(
       children: [
         Container(
@@ -96,7 +96,7 @@ class BalanceCard extends StatelessWidget {
             size: 30,
           ),
         ),
-        
+
         const SizedBox(width: 10),
 
         Column(
@@ -105,7 +105,7 @@ class BalanceCard extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.8), 
+                color: Colors.white.withValues(alpha: 0.8),
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
