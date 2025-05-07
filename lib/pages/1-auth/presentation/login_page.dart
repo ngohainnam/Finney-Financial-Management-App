@@ -10,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import './google_sign_in.dart';
 import './forget_password.dart';
+import 'package:finney/localization/locales.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 
 class LoginPage extends StatefulWidget {
   final Function()? onTap;
@@ -102,19 +104,14 @@ void signUserIn() async {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const SizedBox(height: 50),
-            
-                //logo
-                Image.asset(AppImages.appLogo),
-            
+                Image.asset(AppImages.appLogo),            
                 const SizedBox(height: 50),
-            
-                //login text
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
                   child: Align(
                     alignment: Alignment.centerLeft, 
                     child: Text(
-                      'Login to your Account',
+                      LocaleData.loginTitle.getString(context),
                       style: TextStyle(
                         color: AppColors.darkBlue,
                         fontSize: 20,
@@ -129,7 +126,7 @@ void signUserIn() async {
                 //email textfield
                 MyTextField(
                   controller: emailController,
-                  hintText: 'Email',
+                  hintText: LocaleData.emailHint.getString(context),
                   obscureText: false,
                 ),
             
@@ -138,7 +135,7 @@ void signUserIn() async {
                 //password textfield
                 MyTextField(
                   controller: passwordController,
-                  hintText: 'Password',
+                  hintText: LocaleData.passwordHint.getString(context),
                   obscureText: true,
                 ),
             
@@ -157,7 +154,7 @@ void signUserIn() async {
                         );
                       },
                       child: Text(
-                        'Forgot Password?',
+                        LocaleData.forgotPassword.getString(context),
                         style: TextStyle(
                           color: AppColors.primary,
                           fontWeight: FontWeight.w500,
@@ -171,7 +168,7 @@ void signUserIn() async {
             
                 //sign in button
                 MyButton(
-                  text: 'Sign In',
+                  text: LocaleData.signInButton.getString(context),
                   onTap: signUserIn,
                 ),
             
@@ -191,7 +188,7 @@ void signUserIn() async {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10.0),
                         child: Text(
-                          'Or continue with',
+                          LocaleData.continueWith.getString(context),
                           style: TextStyle(
                             color: AppColors.blurGray,
                           ),
@@ -230,14 +227,14 @@ void signUserIn() async {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Not a member?',
+                      LocaleData.notMember.getString(context),
                       style: TextStyle(color: AppColors.blurGray),
                     ),
                     const SizedBox(width: 4),
                     GestureDetector(
                       onTap: widget.onTap,
-                      child: const Text(
-                        'Register now',
+                      child: Text(
+                        LocaleData.registerNow.getString(context),
                         style: TextStyle(
                           color: AppColors.primary,
                           fontWeight: FontWeight.w500,

@@ -8,6 +8,7 @@ class LanguageButton extends StatefulWidget {
   final bool showText;
   final String? initialLanguage;
   final Function(String)? onLanguageChanged;
+  final bool showFlag;
 
   const LanguageButton({
     super.key,
@@ -15,6 +16,7 @@ class LanguageButton extends StatefulWidget {
     this.showText = false,
     this.initialLanguage,
     this.onLanguageChanged,
+    this.showFlag = true,
   });
 
   @override
@@ -35,7 +37,6 @@ class _LanguageButtonState extends State<LanguageButton> {
     if (widget.initialLanguage != null) {
       _currentLanguage = widget.initialLanguage!;
     } else {
-      // If no initial language provided, detect from the current locale
       _currentLanguage = FlutterLocalization.instance.currentLocale!.languageCode == 'en'
           ? 'English'
           : 'Bengali';
@@ -58,12 +59,14 @@ class _LanguageButtonState extends State<LanguageButton> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              _languageFlags[_currentLanguage] ?? '🇺🇸',
-              style: TextStyle(fontSize: widget.size * 0.5),
-            ),
-            if (widget.showText) ...[
+            if (widget.showFlag)
+              Text(
+                _languageFlags[_currentLanguage] ?? '🇺🇸',
+                style: TextStyle(fontSize: widget.size * 0.5),
+              ),
+            if (widget.showFlag && widget.showText)
               const SizedBox(width: 8),
+            if (widget.showText)
               Text(
                 _currentLanguage,
                 style: TextStyle(
@@ -71,7 +74,6 @@ class _LanguageButtonState extends State<LanguageButton> {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-            ],
           ],
         ),
       ),
@@ -81,16 +83,14 @@ class _LanguageButtonState extends State<LanguageButton> {
   void _showLanguageSelector(BuildContext context) {
     final availableLanguages = [
       {
-        'code': 'en', 
-        'name': 'English', 
+        'code': 'en',
+        'name': 'English',
         'localName': LocaleData.languageEnglish.getString(context),
-        'flag': '🇺🇸'
       },
       {
-        'code': 'bn', 
-        'name': 'Bengali', 
+        'code': 'bn',
+        'name': 'Bengali',
         'localName': LocaleData.languageBengali.getString(context),
-        'flag': '🇧🇩'
       },
     ];
     
@@ -105,7 +105,6 @@ class _LanguageButtonState extends State<LanguageButton> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Handle bar
             Container(
               margin: const EdgeInsets.only(top: 8),
               height: 4,
@@ -115,7 +114,6 @@ class _LanguageButtonState extends State<LanguageButton> {
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
-            // Title
             Padding(
               padding: const EdgeInsets.all(16),
               child: Text(
@@ -128,7 +126,6 @@ class _LanguageButtonState extends State<LanguageButton> {
               ),
             ),
             const Divider(),
-            // Language list
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -138,48 +135,26 @@ class _LanguageButtonState extends State<LanguageButton> {
                 final isSelected = language['name'] == _currentLanguage;
                 
                 return ListTile(
-                  leading: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? AppColors.primary.withValues(alpha: 0.1)
-                          : Colors.grey.withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Text(
-                        language['flag']!,
-                        style: const TextStyle(fontSize: 20),
-                      ),
-                    ),
-                  ),
+                  leading: isSelected
+                      ? Icon(Icons.check_circle, color: AppColors.primary, size: 24)
+                      : const SizedBox(width: 24),
                   title: Text(
                     language['localName']!,
                     style: TextStyle(
                       fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                     ),
                   ),
-                  trailing: isSelected
-                      ? Icon(Icons.check_circle, color: AppColors.primary)
-                      : null,
+                  trailing: null,
                   onTap: () {
-                    // Update the current language in the widget state
                     setState(() {
                       _currentLanguage = language['name']!;
                     });
                     
-                    // Update the app's locale
-                    FlutterLocalization.instance.translate(
-                      language['code']!,
-                    );
-                    
-                    // Call the callback if provided
+                    // Remove translate call to avoid navigation reset
                     if (widget.onLanguageChanged != null) {
                       widget.onLanguageChanged!(_currentLanguage);
                     }
                     
-                    // Close the bottom sheet
                     Navigator.pop(context);
                   },
                 );

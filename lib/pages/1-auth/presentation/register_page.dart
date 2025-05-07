@@ -8,6 +8,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import './google_sign_in.dart';
+import 'package:finney/localization/locales.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 
 class RegisterPage extends StatefulWidget {
   final Function()? onTap;
@@ -57,13 +59,13 @@ class _RegisterPageState extends State<RegisterPage> {
 
     if (!isValidGmail(email)) {
       Navigator.pop(context);
-      showErrorMessage(context, "Please enter a valid Gmail address.");
+      showErrorMessage(context, LocaleData.invalidGmailError.getString(context));
       return;
     }
 
     if (password != confirmPassword) {
       Navigator.pop(context);
-      showErrorMessage(context, 'Passwords do not match.');
+      showErrorMessage(context, LocaleData.passwordsNotMatchError.getString(context));
       return;
     }
 
@@ -71,8 +73,7 @@ class _RegisterPageState extends State<RegisterPage> {
       Navigator.pop(context);
       showErrorMessage(
         context,
-        'Password must be at least 12 characters long and include uppercase, lowercase, number, and symbol.',
-      );
+        LocaleData.weakPasswordError.getString(context));
       return;
     }
 
@@ -130,7 +131,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      'Create your Account',
+                      LocaleData.registerTitle.getString(context),
                       style: TextStyle(
                         color: AppColors.darkBlue,
                         fontSize: 20,
@@ -144,7 +145,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                 MyTextField(
                   controller: emailController,
-                  hintText: 'Email',
+                  hintText: LocaleData.emailHint.getString(context),
                   obscureText: false,
                 ),
 
@@ -152,14 +153,14 @@ class _RegisterPageState extends State<RegisterPage> {
 
                 MyTextField(
                   controller: passwordController,
-                  hintText: 'Password',
+                  hintText: LocaleData.passwordHint.getString(context),
                   obscureText: _obscurePassword,
                   onChanged: (value) {
                     final valid = isPasswordStrong(value);
                     setState(() {
                       _passwordHint = valid
-                          ? '✅ Strong password'
-                          : '❌ Use 12+ chars w/ upper, lower, number & symbol';
+                          ? LocaleData.passwordStrong.getString(context)
+                          : LocaleData.passwordWeak.getString(context);
                       _hintColor = valid ? Colors.green : Colors.red;
                     });
                   },
@@ -190,14 +191,14 @@ class _RegisterPageState extends State<RegisterPage> {
 
                 MyTextField(
                   controller: confirmedController,
-                  hintText: 'Confirm Password',
+                  hintText: LocaleData.confirmPasswordHint.getString(context),
                   obscureText: true,
                 ),
 
                 const SizedBox(height: 25),
 
                 MyButton(
-                  text: 'Sign Up',
+                  text: LocaleData.signUpButton.getString(context),
                   onTap: signUserUp,
                 ),
 
@@ -213,7 +214,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10.0),
                         child: Text(
-                          'Or continue with',
+                          LocaleData.continueWith.getString(context),
                           style: TextStyle(color: AppColors.blurGray),
                         ),
                       ),
@@ -241,12 +242,14 @@ class _RegisterPageState extends State<RegisterPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('Already a member?', style: TextStyle(color: AppColors.blurGray)),
+                    Text(
+                      LocaleData.alreadyMember.getString(context),
+                      style: TextStyle(color: AppColors.blurGray)),
                     const SizedBox(width: 4),
                     GestureDetector(
                       onTap: widget.onTap,
-                      child: const Text(
-                        'Log in now',
+                      child: Text(
+                        LocaleData.loginNow.getString(context),
                         style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -258,5 +261,12 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
       ),
     );
+  }
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    confirmedController.dispose();
+    super.dispose();
   }
 }

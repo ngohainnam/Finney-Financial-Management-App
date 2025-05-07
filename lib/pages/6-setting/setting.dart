@@ -8,7 +8,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finney/assets/theme/app_color.dart';
 import 'package:flutter_localization/flutter_localization.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:finney/utils/auth_utils.dart';
 
 class Setting extends StatefulWidget {
   const Setting({super.key});
@@ -48,10 +50,9 @@ class _SettingState extends State<Setting> {
   void initState() {
     super.initState();
     _loadUserData();
-    // Set initial language based on current locale
-    selectedLanguage = FlutterLocalization.instance.currentLocale!.languageCode == 'en'
-        ? 'English'
-        : 'Bengali';
+    // Set initial language based on Hive
+    var box = Hive.box('appSettings');
+    selectedLanguage = box.get('language', defaultValue: 'en') == 'en' ? 'English' : 'Bengali';
   }
 
   Future<void> _loadUserData() async {
@@ -70,7 +71,7 @@ class _SettingState extends State<Setting> {
           addressController.text = address;
           selectedTextSize = doc['textSize'] ?? 'Medium';
           selectedCurrency = doc['currency'] ?? 'BDT';
-          selectedLanguage = doc['language'] ?? (FlutterLocalization.instance.currentLocale!.languageCode == 'en' ? 'English' : 'Bengali');
+          selectedLanguage = doc['language'] ?? selectedLanguage;
         });
       } else {
         await FirebaseFirestore.instance
@@ -83,7 +84,7 @@ class _SettingState extends State<Setting> {
           'email': user?.email ?? '',
           'textSize': 'Medium',
           'currency': 'BDT',
-          'language': FlutterLocalization.instance.currentLocale!.languageCode == 'en' ? 'English' : 'Bengali',
+          'language': selectedLanguage,
         });
       }
     } catch (e) {
@@ -101,6 +102,12 @@ class _SettingState extends State<Setting> {
 
   Future<void> _saveUserData() async {
     try {
+      // Update Hive language preference
+      var box = await Hive.openBox('appSettings');
+      String languageCode = selectedLanguage == 'English' ? 'en' : 'bn';
+      await box.put('language', languageCode);
+
+      // Update Firestore
       await FirebaseFirestore.instance.collection('users').doc(user?.uid).set({
         'name': nameController.text,
         'phone': phoneController.text,
@@ -111,8 +118,13 @@ class _SettingState extends State<Setting> {
         'language': selectedLanguage,
       }, SetOptions(merge: true));
 
+      // Update app locale
+      if (mounted) {
+        FlutterLocalization.instance.translate(languageCode);
+      }
+
       CurrencyFormatter.updateCurrency(selectedCurrency);
-    
+
       setState(() {
         fullName = nameController.text;
         phoneNumber = phoneController.text;
@@ -290,17 +302,6 @@ class _SettingState extends State<Setting> {
     );
   }
 
-  Future<void> _signOut() async {
-    await FirebaseAuth.instance.signOut();
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(LocaleData.signedOut.getString(context)),
-        ),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     double textScaleFactor;
@@ -465,7 +466,7 @@ class _SettingState extends State<Setting> {
                           subtitle: null,
                           iconColor: Colors.white,
                           textColor: Colors.white,
-                          onTap: _signOut,
+                          onTap: () => signOut(context),
                         ),
                       ],
                     ),
@@ -637,6 +638,7 @@ class _SettingState extends State<Setting> {
           LanguageButton(
             size: 36,
             showText: true,
+            showFlag: false,
             initialLanguage: selectedLanguage,
             onLanguageChanged: (language) {
               setState(() {
@@ -697,7 +699,7 @@ class _SettingState extends State<Setting> {
     );
   }
 
-    Widget _buildCurrencyOption({
+  Widget _buildCurrencyOption({
     required IconData icon,
     required String title,
     required String value,

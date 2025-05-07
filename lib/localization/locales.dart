@@ -422,6 +422,37 @@ mixin LocaleData {
   static const String nonFinancialImage = 'non_financial_image';
   static const String categorySpentAmount = 'categorySpentAmount';
   static const String categoryEarnedAmount = 'categoryEarnedAmount';
+  // ForgotPasswordPage keys
+  static const String forgotPasswordTitle = 'forgot_password_title';
+  static const String emailHint = 'email_hint';
+  static const String sendResetLink = 'send_reset_link';
+  static const String backToLogin = 'back_to_login';
+  static const String passwordResetSuccess = 'password_reset_success';
+  static const String passwordResetError = 'password_reset_error';
+  static const String dialogOk = 'dialog_ok';
+  // LoginPage keys
+  static const String loginTitle = 'login_title';
+  static const String passwordHint = 'password_hint';
+  static const String forgotPassword = 'forgot_password';
+  static const String signInButton = 'sign_in_button';
+  static const String continueWith = 'continue_with';
+  static const String notMember = 'not_member';
+  static const String registerNow = 'register_now';
+  static const String loginError = 'login_error';
+  static const String userNotFoundError = 'user_not_found_error';
+  // RegisterPage keys
+  static const String registerTitle = 'register_title';
+  static const String confirmPasswordHint = 'confirm_password_hint';
+  static const String signUpButton = 'sign_up_button';
+  static const String alreadyMember = 'already_member';
+  static const String loginNow = 'login_now';
+  static const String passwordStrong = 'password_strong';
+  static const String passwordWeak = 'password_weak';
+  static const String invalidGmailError = 'invalid_gmail_error';
+  static const String passwordsNotMatchError = 'passwords_not_match_error';
+  static const String weakPasswordError = 'weak_password_error';
+  static const String hiveStorageError = 'hive_storage_error';
+  static const String selectLanguage = 'select_language';
 
   static const Map<String, String> en = {
     appTitle: 'Finney',
@@ -806,6 +837,34 @@ mixin LocaleData {
     'incomeSummary': 'Total income: %s, average: %s. Highest income: %s on %s, and lowest income: %s on %s.',
     'expenseCategorySummary': 'Highest expense is in %s category, which is %s (%s%%).',
     'incomeCategorySummary': 'Highest income is from %s category, which is %s (%s%%).',
+    forgotPasswordTitle: 'Forgot Password',
+    emailHint: 'Enter your email',
+    sendResetLink: 'Send Reset Link',
+    backToLogin: 'Back to login',
+    passwordResetSuccess: 'A password reset link has been sent to your email.',
+    passwordResetError: 'Failed to send reset link. Please check your email and try again.',
+    dialogOk: 'OK',
+    loginTitle: 'Login to your Account',
+    passwordHint: 'Password',
+    forgotPassword: 'Forgot Password?',
+    signInButton: 'Sign In',
+    continueWith: 'Or continue with',
+    notMember: 'Not a member?',
+    registerNow: 'Register now',
+    loginError: 'Incorrect email/password. Please check again.',
+    userNotFoundError: 'User details not found in local storage.',
+    registerTitle: 'Create your Account',
+    confirmPasswordHint: 'Confirm Password',
+    signUpButton: 'Sign Up',
+    alreadyMember: 'Already a member?',
+    loginNow: 'Log in now',
+    passwordStrong: '✅ Strong password',
+    passwordWeak: '❌ Use 12+ chars w/ upper, lower, number & symbol',
+    invalidGmailError: 'Please enter a valid Gmail address.',
+    passwordsNotMatchError: 'Passwords do not match.',
+    weakPasswordError: 'Password must be at least 12 characters long and include uppercase, lowercase, number, and symbol.',
+    hiveStorageError: 'Failed to store user in local storage.',
+    selectLanguage: 'Select Language',
   };
 
   static const Map<String, String> bd = {
@@ -1189,6 +1248,34 @@ mixin LocaleData {
     'incomeSummary': 'মোট আয় হয়েছে %s, গড়ে %s। সর্বোচ্চ আয় হয়েছে %s %s তারিখে, এবং সর্বনিম্ন আয় হয়েছে %s %s তারিখে।',
     'expenseCategorySummary': 'সর্বোচ্চ খরচ হয়েছে %s বিভাগে, যা %s (%s%%)।',
     'incomeCategorySummary': 'সর্বোচ্চ আয় হয়েছে %s বিভাগ থেকে, যা %s (%s%%)।',
+    forgotPasswordTitle: 'পাসওয়ার্ড ভুলে গেছেন',
+    emailHint: 'আপনার ইমেল লিখুন',
+    sendResetLink: 'রিসেট লিঙ্ক পাঠান',
+    backToLogin: 'লগইন এ ফিরুন',
+    passwordResetSuccess: 'আপনার ইমেলে একটি পাসওয়ার্ড রিসেট লিঙ্ক পাঠানো হয়েছে।',
+    passwordResetError: 'রিসেট লিঙ্ক পাঠাতে ব্যর্থ। দয়া করে আপনার ইমেল চেক করুন এবং আবার চেষ্টা করুন।',
+    dialogOk: 'ঠিক আছে',
+    loginTitle: 'আপনার অ্যাকাউন্টে লগইন করুন',
+    passwordHint: 'পাসওয়ার্ড',
+    forgotPassword: 'পাসওয়ার্ড ভুলে গেছেন?',
+    signInButton: 'সাইন ইন',
+    continueWith: 'অথবা এর সাথে চালিয়ে যান',
+    notMember: 'সদস্য নন?',
+    registerNow: 'এখন নিবন্ধন করুন',
+    loginError: 'ভুল ইমেল/পাসওয়ার্ড। দয়া করে আবার চেক করুন।',
+    userNotFoundError: 'স্থানীয় স্টোরেজে ব্যবহারকারীর বিবরণ পাওয়া যায়নি।',
+    registerTitle: 'আপনার অ্যাকাউন্ট তৈরি করুন',
+    confirmPasswordHint: 'পাসওয়ার্ড নিশ্চিত করুন',
+    signUpButton: 'সাইন আপ',
+    alreadyMember: 'ইতিমধ্যে সদস্য?',
+    loginNow: 'এখন লগইন করুন',
+    passwordStrong: '✅ শক্তিশালী পাসওয়ার্ড',
+    passwordWeak: '❌ ১২+ অক্ষর ব্যবহার করুন, বড় হাতের, ছোট হাতের, সংখ্যা এবং প্রতীক সহ',
+    invalidGmailError: 'দয়া করে একটি বৈধ জিমেইল ঠিকানা লিখুন।',
+    passwordsNotMatchError: 'পাসওয়ার্ড মিলছে না।',
+    weakPasswordError: 'পাসওয়ার্ড কমপক্ষে ১২ অক্ষরের হতে হবে এবং বড় হাতের, ছোট হাতের, সংখ্যা এবং প্রতীক অন্তর্ভুক্ত করতে হবে।',
+    hiveStorageError: 'স্থানীয় স্টোরেজে ব্যবহারকারী সংরক্ষণ করতে ব্যর্থ হয়েছে।',
+    selectLanguage: 'ভাষা নির্বাচন করুন',
   };
 }
 
