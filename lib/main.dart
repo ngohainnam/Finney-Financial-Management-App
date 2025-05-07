@@ -3,6 +3,7 @@ import 'package:finney/localization/locales.dart';
 import 'package:finney/pages/2-chatbot/models/chat_message_model.dart';
 import 'package:finney/pages/1-auth/auth_page.dart';
 import 'package:finney/assets/path/api.dart';
+import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
@@ -26,11 +27,13 @@ void main() async {
   Hive.registerAdapter(UserModelAdapter());
   Hive.registerAdapter(ChatMessageModelAdapter());
   Hive.registerAdapter(QuizResultAdapter());
+  Hive.registerAdapter(TransactionModelAdapter());
 
   // Open boxes
   await Hive.openBox<UserModel>('userBox');
   await Hive.openBox<ChatMessageModel>('chatMessage');
   await Hive.openBox('learning_progress');
+  await Hive.openBox<TransactionModel>('transactions');
   await Hive.openBox<QuizResult>('quiz_results');
 
   // Initialize Gemini
@@ -63,15 +66,12 @@ class _MyAppState extends State<MyApp> {
         fontFamily: 'Poppins',
       ),
       debugShowCheckedModeBanner: false,
-<<<<<<< HEAD
       locale: localization.currentLocale,
       supportedLocales: const [
         Locale('en', 'US'),
         Locale('bn', 'BD'),
       ],
       localizationsDelegates: localization.localizationsDelegates,
-=======
->>>>>>> learn
       home: const AuthPage(),
     );
   }

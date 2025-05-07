@@ -85,10 +85,6 @@ class AppNavbar extends StatelessWidget {
                     text: 'Dashboard',
                   ),
                   GButton(
-                    icon: Icons.chat,
-                    text: 'AI Chat',
-                  ),
-                  GButton(
                     icon: Icons.bar_chart,
                     text: 'Reports',
                   ),

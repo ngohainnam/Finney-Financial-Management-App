@@ -18,7 +18,6 @@ class _MainLayoutState extends State<MainLayout> {
 
   static const List<Widget> _pages = [
     Dashboard(),
-    Chatbot(),
     Report(),
     Learn(),
     Setting(),
