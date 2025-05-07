@@ -99,6 +99,8 @@ class CategoryExpense {
   CategoryExpense(this.name, this.amount)
       : color = CategoryUtils.getColorForCategory(name),
         icon = CategoryUtils.getIconForCategory(name);
+
+  get category => null;
 }
 
 class MonthlyExpense {
