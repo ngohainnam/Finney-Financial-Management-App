@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:finney/assets/theme/app_color.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/localization/locales.dart';
 import 'package:finney/components/time_selector.dart';
@@ -21,8 +20,6 @@ class BalanceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormat = NumberFormat.currency(symbol: '\$');
-
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -49,7 +46,7 @@ class BalanceCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            currencyFormat.format(balance),
+            '৳ ${balance.toStringAsFixed(2)}',
             style: const TextStyle(
               color: Colors.white,
               fontSize: 32,
@@ -62,14 +59,14 @@ class BalanceCard extends StatelessWidget {
               _buildIncomeExpenseIndicator(
                 Icons.add_circle_outline,
                 LocaleData.income.getString(context),
-                currencyFormat.format(income),
+                '৳ ${income.toStringAsFixed(2)}',
                 Colors.greenAccent,
               ),
               const SizedBox(width: 40),
               _buildIncomeExpenseIndicator(
                 Icons.remove_circle_outline,
                 LocaleData.expenses.getString(context),
-                currencyFormat.format(expenses),
+                '৳ ${expenses.toStringAsFixed(2)}',
                 Colors.redAccent,
               ),
             ],
@@ -80,11 +77,11 @@ class BalanceCard extends StatelessWidget {
   }
 
   Widget _buildIncomeExpenseIndicator(
-    IconData icon,
-    String label,
-    String amount,
-    Color iconColor,
-  ) {
+      IconData icon,
+      String label,
+      String amount,
+      Color iconColor,
+      ) {
     return Row(
       children: [
         Container(
@@ -99,7 +96,7 @@ class BalanceCard extends StatelessWidget {
             size: 30,
           ),
         ),
-        
+
         const SizedBox(width: 10),
 
         Column(
@@ -108,7 +105,7 @@ class BalanceCard extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.8), 
+                color: Colors.white.withValues(alpha: 0.8),
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
