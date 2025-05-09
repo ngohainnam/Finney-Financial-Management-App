@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finney/pages/3-dashboard/models/saving_goal_model.dart';
+import 'package:finney/pages/3-dashboard/saving/services/saving_notification_service.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/localization/locales.dart';
 
@@ -67,7 +68,10 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
       try {
         final amount = double.tryParse(_targetAmountController.text);
         if (amount == null || amount <= 0) {
-          _showErrorMessage(LocaleData.pleaseEnterPositiveAmount.getString(context));
+          SavingNotificationService.showError(
+            context: context,
+            message: LocaleData.pleaseEnterPositiveAmount.getString(context),
+          );
           return;
         }
 
@@ -91,8 +95,9 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
             .doc(goal.id)
             .set(goal.toMap());
 
-        _showSuccessMessage(
-          widget.existingGoal == null
+        SavingNotificationService.showSuccess(
+          context: context,
+          message: widget.existingGoal == null
               ? LocaleData.goalCreated.getString(context).replaceFirst('%s', goal.title)
               : LocaleData.goalUpdated.getString(context).replaceFirst('%s', goal.title),
         );
@@ -103,31 +108,12 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
 
         Navigator.of(context).pop();
       } catch (e) {
-        _showErrorMessage(LocaleData.errorSavingGoal.getString(context));
+        SavingNotificationService.showError(
+          context: context,
+          message: LocaleData.errorSavingGoal.getString(context),
+        );
       }
     }
-  }
-
-  void _showSuccessMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-    );
-  }
-
-  void _showErrorMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-    );
   }
 
   @override
@@ -154,12 +140,11 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Amount Field
-              // Replace the Amount Field section with this:
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const Text(
-                    '\$',
+                    '৳',
                     style: TextStyle(
                       fontSize: 40,
                       fontWeight: FontWeight.bold,

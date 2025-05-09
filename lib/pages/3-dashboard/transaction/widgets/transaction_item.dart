@@ -93,8 +93,8 @@ Widget build(BuildContext context) {
                 children: [
                   Text(
                     transaction.amount > 0
-                        ? '+${NumberFormat.currency(symbol: '\$').format(transaction.amount)}'
-                        : NumberFormat.currency(symbol: '\$').format(transaction.amount),
+                        ? '+${transaction.amount.toStringAsFixed(2)}'
+                        : transaction.amount.toStringAsFixed(2),
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
