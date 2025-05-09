@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localization/flutter_localization.dart';
-import 'package:finney/localization/locales.dart';
 
 class SavingNotificationService {
   // Color constants

@@ -5,7 +5,6 @@ import 'package:finney/pages/7-insights/insights.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
-import 'package:sprintf/sprintf.dart';
 import 'package:finney/localization/locales.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 
@@ -29,9 +28,32 @@ class UnifiedBarChart extends StatefulWidget {
   State<UnifiedBarChart> createState() => _UnifiedBarChartState();
 }
 
-class _UnifiedBarChartState extends State<UnifiedBarChart> {
+class _UnifiedBarChartState extends State<UnifiedBarChart> with SingleTickerProviderStateMixin {
   final int _itemsPerPage = 12;
   int _currentPage = 0;
+  String? _selectedPeriodInfo;
+  int? _selectedBarIndex;
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _animation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   // Get bar color based on view type
   Color get _barColor {
@@ -70,6 +92,27 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> {
   void _previousPage() {
     if (_currentPage > 0) {
       setState(() => _currentPage--);
+    }
+  }
+
+  String _formatFullDate(String period, ChartInterval interval) {
+    final now = DateTime.now();
+    switch (interval) {
+      case ChartInterval.week:
+        final weekday = period.toLowerCase();
+        final weekdayIndex = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].indexOf(weekday);
+        final daysToSubtract = now.weekday - (weekdayIndex + 1);
+        final date = now.subtract(Duration(days: daysToSubtract));
+        return DateFormat('EEEE, MMMM d, yyyy').format(date);
+      case ChartInterval.month:
+        final day = int.parse(period);
+        final date = DateTime(now.year, now.month, day);
+        return DateFormat('EEEE, MMMM d, yyyy').format(date);
+      case ChartInterval.year:
+        final month = period.toLowerCase();
+        final monthIndex = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'].indexOf(month);
+        final date = DateTime(now.year, monthIndex + 1, 1);
+        return DateFormat('MMMM yyyy').format(date);
     }
   }
 
@@ -181,57 +224,26 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> {
   Widget _buildSummaryText(NumberFormat currencyFormat) {
     if (widget.periodExpenses.isEmpty) return const SizedBox.shrink();
 
-    final total = widget.periodExpenses.fold(0.0, (sum, expense) => sum + expense.amount);
-    final average = total / widget.periodExpenses.length;
-    final maxExpense = widget.periodExpenses.reduce((a, b) => a.amount > b.amount ? a : b);
-    final minExpense = widget.periodExpenses.reduce((a, b) => a.amount < b.amount ? a : b);
-
-    String summary = '';
-    if (widget.viewType == ChartViewType.expenses) {
-      summary = sprintf(
-        FlutterLocalization.instance.currentLocale!.languageCode == 'en' 
-            ? LocaleData.en['expenseSummary']! 
-            : LocaleData.bd['expenseSummary']!,
-        [
-          currencyFormat.format(total),
-          currencyFormat.format(average),
-          currencyFormat.format(maxExpense.amount),
-          maxExpense.period,
-          currencyFormat.format(minExpense.amount),
-          minExpense.period,
-        ],
-      );
-    } else {
-      summary = sprintf(
-        FlutterLocalization.instance.currentLocale!.languageCode == 'en' 
-            ? LocaleData.en['incomeSummary']! 
-            : LocaleData.bd['incomeSummary']!,
-        [
-          currencyFormat.format(total),
-          currencyFormat.format(average),
-          currencyFormat.format(maxExpense.amount),
-          maxExpense.period,
-          currencyFormat.format(minExpense.amount),
-          minExpense.period,
-        ],
+    if (_selectedPeriodInfo != null) {
+      return Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(
+          _selectedPeriodInfo!,
+          style: const TextStyle(
+            fontSize: 14,
+            height: 1.5,
+            fontWeight: FontWeight.bold,
+          ),
+          textAlign: TextAlign.center,
+        ),
       );
     }
 
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Text(
-        summary,
-        style: const TextStyle(
-          fontSize: 14,
-          height: 1.5,
-        ),
-        textAlign: TextAlign.center,
-      ),
-    );
+    return const SizedBox.shrink();
   }
 
   FlTitlesData _buildTitlesData(NumberFormat currencyFormat) {
@@ -306,19 +318,26 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> {
 
   List<BarChartGroupData> _buildBarGroups() {
     return _currentPageData.asMap().entries.map((entry) {
+      final isSelected = entry.key == _selectedBarIndex;
+      final baseColor = _barColor;
+      final color = isSelected 
+          ? baseColor.withValues(alpha: (_animation.value * 0.3 + 0.7).clamp(0.0, 1.0))
+          : baseColor;
+
       return BarChartGroupData(
         x: entry.key,
         barRods: [
           BarChartRodData(
             toY: entry.value.amount,
-            color: _barColor, // Use dynamic color based on type
-            width: _getBarWidth(),
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(4),
-              topRight: Radius.circular(4),
-            ),
+            color: color,
+            width: 20,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+            borderSide: isSelected 
+              ? const BorderSide(color: Colors.white, width: 2)
+              : BorderSide.none,
           ),
         ],
+        showingTooltipIndicators: isSelected ? [0] : [],
       );
     }).toList();
   }
@@ -327,8 +346,30 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> {
     return BarTouchData(
       touchCallback: (FlTouchEvent event, response) {
         if (response == null || response.spot == null) {
+          setState(() {
+            _selectedBarIndex = null;
+            _selectedPeriodInfo = null;
+          });
           return;
         }
+        
+        final index = response.spot!.touchedBarGroupIndex;
+        final expense = _currentPageData[index];
+        final amount = currencyFormat.format(expense.amount);
+        final fullDate = _formatFullDate(expense.period, widget.interval);
+        
+        setState(() {
+          _selectedBarIndex = index;
+          if (widget.viewType == ChartViewType.expenses) {
+            _selectedPeriodInfo = 'You spent $amount on $fullDate';
+          } else {
+            _selectedPeriodInfo = 'You earned $amount on $fullDate';
+          }
+        });
+
+        // Reset animation
+        _animationController.reset();
+        _animationController.forward();
       },
       touchTooltipData: BarTouchTooltipData(
         tooltipBgColor: Colors.transparent,
@@ -339,6 +380,7 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> {
           return null;
         },
       ),
+      handleBuiltInTouches: true,
     );
   }
 
@@ -373,13 +415,6 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> {
     );
   }
 
-  double _getBarWidth() {
-    final itemCount = _currentPageData.length;
-    if (itemCount <= 4) return 30;
-    if (itemCount <= 8) return 20;
-    return 12;
-  }
-
   double _calculateMaxY(List<PeriodExpense> data) {
     if (data.isEmpty) return 100;
 
@@ -409,7 +444,6 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> {
 
   int min(int a, int b) => a < b ? a : b;
   int max(int a, int b) => a > b ? a : b;
-
 
   Map<String, dynamic> _getChartDataForLLM() {
     final Map<String, dynamic> data = {};

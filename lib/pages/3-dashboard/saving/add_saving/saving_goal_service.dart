@@ -117,7 +117,7 @@ class SavingGoalService {
     } catch (e) {
       debugPrint('Error adding to savings: $e');
       if (e.toString().contains('amount_exceeds_target')) {
-        throw e; // Re-throw the specific exception
+        rethrow; // Re-throw the specific exception
       }
       return false; // Failed for other reasons
     }

@@ -7,7 +7,6 @@ import 'package:finney/pages/3-dashboard/utils/category.dart';
 import 'package:finney/pages/7-insights/insights.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/localization/locales.dart';
-import 'package:sprintf/sprintf.dart';
 
 class CategoryPieChart extends StatefulWidget {
   final List<dynamic> categoryData;
@@ -23,7 +22,31 @@ class CategoryPieChart extends StatefulWidget {
   State<CategoryPieChart> createState() => _CategoryPieChartState();
 }
 
-class _CategoryPieChartState extends State<CategoryPieChart> {
+class _CategoryPieChartState extends State<CategoryPieChart> with SingleTickerProviderStateMixin {
+  String? _selectedCategoryInfo;
+  int? _selectedSectionIndex;
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _animation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
   Color get _themeColor {
     return widget.viewType == ChartViewType.income
         ? Colors.green
@@ -78,7 +101,7 @@ class _CategoryPieChartState extends State<CategoryPieChart> {
             ],
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
           //Chart container
           if (widget.categoryData.isEmpty)
@@ -87,16 +110,16 @@ class _CategoryPieChartState extends State<CategoryPieChart> {
             Column(
               children: [
                 Container(
-                  height: 220,
+                  height: 160,
                   width: double.infinity,
-                  padding: const EdgeInsets.only(top: 10, bottom: 20),
+                  padding: const EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Center(
                     child: SizedBox(
-                      height: 180,
-                      width: 180,
+                      height: 120,
+                      width: 120,
                       child: PieChart(
                         PieChartData(
                           sections: _createPieChartSections(widget.categoryData, currencyFormat),
@@ -105,11 +128,49 @@ class _CategoryPieChartState extends State<CategoryPieChart> {
                           startDegreeOffset: -90,
                           pieTouchData: PieTouchData(
                             touchCallback: (FlTouchEvent event, pieTouchResponse) {
-                              if (!event.isInterestedForInteractions ||
-                                  pieTouchResponse == null ||
-                                  pieTouchResponse.touchedSection == null) {
+                              // If it's not a tap event, ignore it
+                              if (event is! FlTapUpEvent) {
                                 return;
                               }
+
+                              // If clicking outside or no section is touched, clear selection
+                              if (pieTouchResponse == null || pieTouchResponse.touchedSection == null) {
+                                setState(() {
+                                  _selectedSectionIndex = null;
+                                  _selectedCategoryInfo = null;
+                                });
+                                return;
+                              }
+
+                              final index = pieTouchResponse.touchedSection!.touchedSectionIndex;
+                              
+                              // If clicking the same section, deselect it
+                              if (_selectedSectionIndex == index) {
+                                setState(() {
+                                  _selectedSectionIndex = null;
+                                  _selectedCategoryInfo = null;
+                                });
+                                return;
+                              }
+
+                              // Select the new section
+                              final category = widget.categoryData[index];
+                              final amount = currencyFormat.format(category['amount']);
+                              final categoryName = category['name'];
+                              final percentage = (category['amount'] / total * 100).toStringAsFixed(1);
+
+                              setState(() {
+                                _selectedSectionIndex = index;
+                                if (widget.viewType == ChartViewType.expenses) {
+                                  _selectedCategoryInfo = 'You spent $amount ($percentage%) on $categoryName';
+                                } else {
+                                  _selectedCategoryInfo = 'You earned $amount ($percentage%) from $categoryName';
+                                }
+                              });
+
+                              // Reset animation
+                              _animationController.reset();
+                              _animationController.forward();
                             },
                             enabled: true,
                             mouseCursorResolver: (FlTouchEvent touchEvent, PieTouchResponse? pieTouchResponse) {
@@ -198,19 +259,32 @@ class _CategoryPieChartState extends State<CategoryPieChart> {
           color: Colors.grey.shade300,
           value: 100,
           title: '',
-          radius: 80,
+          radius: 50,
           showTitle: false,
         )
       ];
     }
 
-    return data.map((category) {
+    return data.asMap().entries.map((entry) {
+      final isSelected = entry.key == _selectedSectionIndex;
+      final baseColor = entry.value['color'] as Color;
+      final color = isSelected 
+          ? baseColor.withValues(alpha: (_animation.value * 0.3 + 0.7).clamp(0.0, 1.0))
+          : baseColor;
+
       return PieChartSectionData(
-        color: category['color'],
-        value: category['amount'],
+        color: color,
+        value: entry.value['amount'],
         title: '',
-        radius: 80,
-        showTitle: false,
+        radius: isSelected ? 55 : 50,
+        titleStyle: const TextStyle(
+          fontSize: 0,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+        borderSide: isSelected 
+          ? const BorderSide(color: Colors.white, width: 2)
+          : BorderSide.none,
       );
     }).toList();
   }
@@ -237,55 +311,25 @@ class _CategoryPieChartState extends State<CategoryPieChart> {
   Widget _buildSummaryText(NumberFormat currencyFormat) {
     if (widget.categoryData.isEmpty) return const SizedBox.shrink();
 
-    // Sort categories by amount
-    final sortedCategories = List<dynamic>.from(widget.categoryData)
-      ..sort((a, b) => b['amount'].compareTo(a['amount']));
-
-    final topCategory = sortedCategories.first;
-    final topCategoryAmount = currencyFormat.format(topCategory['amount']);
-    final topCategoryName = topCategory['name'];
-    final total = widget.categoryData.fold(0.0, (sum, category) => sum + category['amount']);
-    final topCategoryPercentage = (topCategory['amount'] / total * 100).toStringAsFixed(1);
-
-    String summary = '';
-    if (widget.viewType == ChartViewType.expenses) {
-      summary = sprintf(
-        FlutterLocalization.instance.currentLocale!.languageCode == 'en' 
-            ? LocaleData.en['expenseCategorySummary']! 
-            : LocaleData.bd['expenseCategorySummary']!,
-        [
-          topCategoryName,
-          topCategoryAmount,
-          topCategoryPercentage,
-        ],
-      );
-    } else {
-      summary = sprintf(
-        FlutterLocalization.instance.currentLocale!.languageCode == 'en' 
-            ? LocaleData.en['incomeCategorySummary']! 
-            : LocaleData.bd['incomeCategorySummary']!,
-        [
-          topCategoryName,
-          topCategoryAmount,
-          topCategoryPercentage,
-        ],
+    if (_selectedCategoryInfo != null) {
+      return Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(
+          _selectedCategoryInfo!,
+          style: const TextStyle(
+            fontSize: 14,
+            height: 1.5,
+            fontWeight: FontWeight.bold,
+          ),
+          textAlign: TextAlign.center,
+        ),
       );
     }
 
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Text(
-        summary,
-        style: const TextStyle(
-          fontSize: 14,
-          height: 1.5,
-        ),
-        textAlign: TextAlign.center,
-      ),
-    );
+    return const SizedBox.shrink();
   }
 }
