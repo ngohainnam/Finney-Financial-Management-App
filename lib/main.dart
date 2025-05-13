@@ -7,42 +7,41 @@ import 'package:finney/pages/5-learn/quiz/quiz_result_model.dart';
 import 'package:finney/pages/language_selection.dart';
 import 'package:finney/pages/layout.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:finney/assets/path/api.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'firebase_options.dart';
 import 'pages/1-auth/models/user_model.dart';
-import 'package:finney/assets/path/api.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await FlutterLocalization.instance.ensureInitialized();
 
-  // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Initialize Hive
   await Hive.initFlutter();
   Hive.registerAdapter(UserModelAdapter());
   Hive.registerAdapter(ChatMessageModelAdapter());
+  Hive.registerAdapter(TransactionModelAdapter());
   Hive.registerAdapter(QuizResultAdapter());
   Hive.registerAdapter(TransactionModelAdapter());
 
-  // Open boxes
   await Hive.openBox<UserModel>('userBox');
   await Hive.openBox<ChatMessageModel>('chatMessage');
+  await Hive.openBox<TransactionModel>('transactions');
   await Hive.openBox('learning_progress');
   await Hive.openBox<TransactionModel>('transactions');
   await Hive.openBox<QuizResult>('quiz_results');
   await Hive.openBox('appSettings');
 
-  // Initialize Gemini
-  Gemini.init(apiKey: geminiApiKey);
-
+  Gemini.init(
+    apiKey: geminiApiKey,
+  );
   runApp(const MyApp());
 }
 

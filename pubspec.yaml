@@ -54,6 +54,7 @@ dependencies:
   flutter_slidable: ^3.0.1
   url_launcher: ^6.2.5
   speech_to_text: ^7.0.0
+<<<<<<< HEAD
   lottie: ^3.0.0
   flutter_localization: ^0.3.2
   sprintf: ^7.0.0
@@ -64,6 +65,13 @@ dependencies:
   google_fonts: 4.0.4
   shared_preferences: ^2.2.2
 
+=======
+  lottie: ^3.3.1
+  flutter_localization: ^0.3.2
+  lucide_icons: ^0.257.0
+  youtube_player_flutter: ^9.1.1
+  flutter_inappwebview: ^6.0.0
+>>>>>>> learn
 
 dev_dependencies:
   flutter_test:
@@ -93,9 +101,14 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+<<<<<<< HEAD
   - lib/images/
   - lib/animations/robot_idle.json
   - lib/animations/robot_typing.json
+=======
+    - lib/images/
+    - lib/animations/
+>>>>>>> learn
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

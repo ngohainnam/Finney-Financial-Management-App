@@ -253,7 +253,7 @@ class SavingGoalPageState extends State<SavingGoalPage> {
           },
         ),
       ),
-    );
+    ); 
   }
 
   void _navigateToEditGoal(SavingGoal goal) {
@@ -310,7 +310,7 @@ class SavingGoalPageState extends State<SavingGoalPage> {
           message: LocaleData.errorAddingSavings.getString(context),
         );
       }
-    }
+    } // Fixed missing closing bracket
   }
 
   Future<void> _deleteGoal(SavingGoal goal) async {

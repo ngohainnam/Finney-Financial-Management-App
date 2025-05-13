@@ -15,20 +15,20 @@ class _SavingMoneyEasyState extends State<SavingMoneyEasy> {
 
   final List<Map<String, String>> steps = [
     {
-      'title': 'সঞ্চয়ের অভ্যাস গড়া',
+      'title': 'Making Saving a Habit',
       'description':
-          'নিয়মিত সঞ্চয় করা বুদ্ধিমানের কাজ এবং অভ্যাসে পরিণত করা উচিত। খরচের আগে সঞ্চয়ের পরিকল্পনা করাই হলো স্মার্ট আর্থিক আচরণ।',
-      'videoId': 'RUz9yjgnGi8', // https://www.youtube.com/watch?v=RUz9yjgnGi8
+          'It’s smart to save money regularly and turn it into a habit. The best way is to plan your savings before you spend.',
+      'videoId': 'RUz9yjgnGi8',
     },
     {
-      'title': 'সঞ্চয়ের গুরুত্ব',
+      'title': 'Why Saving Is Important',
       'description':
-          'জরুরি সময়ের জন্য সঞ্চয় রাখা অত্যন্ত জরুরি। আয় থেকে শুরুতেই টাকা আলাদা করে রাখার অভ্যাস আমাদের ভবিষ্যতকে নিরাপদ রাখে।',
-      'videoId': 'QNu4u0XsIoM', // https://www.youtube.com/watch?v=QNu4u0XsIoM
+          'Saving money for emergencies is super important. If you keep some money aside as soon as you get paid, your future will feel more secure.',
+      'videoId': 'QNu4u0XsIoM',
     },
   ];
 
-  final Color contentColor = Color(0xFFE1D5F0); // Soft lavender tone
+  final Color contentColor = Color(0xFFE1D5F0);
 
   late List<YoutubePlayerController> _controllers;
   late List<bool> _completed;

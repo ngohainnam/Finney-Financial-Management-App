@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:finney/components/currency_button.dart';
-import 'package:finney/components/language_button.dart';
 import 'package:finney/localization/locales.dart';
 import 'package:finney/utils/currency_formatter.dart';
 import 'package:flutter/material.dart';
@@ -634,18 +633,6 @@ class _SettingState extends State<Setting> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-          ),
-          LanguageButton(
-            size: 36,
-            showText: true,
-            showFlag: false,
-            initialLanguage: selectedLanguage,
-            onLanguageChanged: (language) {
-              setState(() {
-                selectedLanguage = language;
-                _saveUserData();
-              });
-            },
           ),
         ],
       ),
