@@ -3,7 +3,7 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:finney/pages/5-learn/learn_progress.dart';
 
 class SettingsEduPage extends StatefulWidget {
-  const SettingsEduPage({Key? key}) : super(key: key);
+  const SettingsEduPage({super.key});
 
   @override
   State<SettingsEduPage> createState() => _SettingsEduPageState();

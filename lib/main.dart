@@ -1,11 +1,13 @@
 import 'package:finney/assets/theme/app_color.dart';
 import 'package:finney/localization/locales.dart';
+import 'package:finney/pages/0-onboarding/onboarding.dart';
 import 'package:finney/pages/1-auth/auth_page.dart';
 import 'package:finney/pages/2-chatbot/models/chat_message_model.dart';
 import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
 import 'package:finney/pages/5-learn/quiz/quiz_result_model.dart';
 import 'package:finney/pages/language_selection.dart';
 import 'package:finney/pages/layout.dart';
+import 'package:finney/utils/currency_formatter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:finney/assets/path/api.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +15,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'pages/1-auth/models/user_model.dart';
 
@@ -20,29 +23,65 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await FlutterLocalization.instance.ensureInitialized();
 
+  // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  // Initialize Hive
   await Hive.initFlutter();
-  Hive.registerAdapter(UserModelAdapter());
-  Hive.registerAdapter(ChatMessageModelAdapter());
-  Hive.registerAdapter(TransactionModelAdapter());
-  Hive.registerAdapter(QuizResultAdapter());
-  Hive.registerAdapter(TransactionModelAdapter());
 
+  // Register adapters (safely, avoiding duplicates)
+  final adapters = {
+    0: () => Hive.registerAdapter(UserModelAdapter()),
+    1: () => Hive.registerAdapter(ChatMessageModelAdapter()),
+    2: () => Hive.registerAdapter(TransactionModelAdapter()),
+    3: () => Hive.registerAdapter(QuizResultAdapter()),
+  };
+
+  // Register each adapter only if not already registered
+  adapters.forEach((typeId, registerFn) {
+    if (!Hive.isAdapterRegistered(typeId)) {
+      registerFn();
+    }
+  });
+
+  // Open boxes
   await Hive.openBox<UserModel>('userBox');
   await Hive.openBox<ChatMessageModel>('chatMessage');
   await Hive.openBox<TransactionModel>('transactions');
   await Hive.openBox('learning_progress');
-  await Hive.openBox<TransactionModel>('transactions');
   await Hive.openBox<QuizResult>('quiz_results');
   await Hive.openBox('appSettings');
+  await Hive.openBox('settings');
 
-  Gemini.init(
-    apiKey: geminiApiKey,
-  );
+  // Initialize app settings
+  await initializeAppSettings();
+
+  // Initialize Gemini AI
+  Gemini.init(apiKey: geminiApiKey);
+  
   runApp(const MyApp());
+}
+
+/// Initialize app settings from storage
+Future<void> initializeAppSettings() async {
+  try {
+    // Initialize currency from settings box
+    if (Hive.isBoxOpen('settings')) {
+      final settingsBox = Hive.box('settings');
+      final savedCurrency = settingsBox.get('currency', defaultValue: 'BDT') as String;
+      CurrencyFormatter.updateCurrency(savedCurrency);
+    }
+    
+    // Check for first-time onboarding status
+    final prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey('onboarding_completed')) {
+      await prefs.setBool('onboarding_completed', false);
+    }
+  } catch (e) {
+    debugPrint('Error initializing app settings: $e');
+  }
 }
 
 class MyApp extends StatefulWidget {
@@ -120,18 +159,50 @@ class _MyAppState extends State<MyApp> {
         Locale('bn', 'BD'),
       ],
       localizationsDelegates: localization.localizationsDelegates,
-      home: StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+      home: FutureBuilder<bool>(
+        future: _checkFirstTimeUser(),
+        builder: (context, prefSnapshot) {
+          // Still loading preferences
+          if (!prefSnapshot.hasData) {
             return const Scaffold(body: Center(child: CircularProgressIndicator()));
           }
-          if (snapshot.hasData) {
-            return const MainLayout();
-          }
-          return const AuthPage();
+          
+          // Check if this is a first-time user that needs onboarding
+          final needsOnboarding = prefSnapshot.data == true;
+          
+          return StreamBuilder<User?>(
+            stream: FirebaseAuth.instance.authStateChanges(),
+            builder: (context, authSnapshot) {
+              if (authSnapshot.connectionState == ConnectionState.waiting) {
+                return const Scaffold(body: Center(child: CircularProgressIndicator()));
+              }
+              
+              // User is logged in
+              if (authSnapshot.hasData) {
+                // Show onboarding if it's the first time
+                if (needsOnboarding) {
+                  return Onboarding(
+                    onComplete: () {
+                      setState(() {});  // Refresh to show main app
+                    },
+                  );
+                }
+                // Otherwise show the main app layout
+                return const MainLayout();
+              }
+              
+              // User is not logged in, show auth page
+              return const AuthPage();
+            },
+          );
         },
       ),
     );
+  }
+  
+  Future<bool> _checkFirstTimeUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final hasCompletedOnboarding = prefs.getBool('onboarding_completed') ?? false;
+    return !hasCompletedOnboarding;
   }
 }

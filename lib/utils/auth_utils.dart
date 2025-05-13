@@ -1,3 +1,4 @@
+import 'package:finney/pages/1-auth/models/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -9,7 +10,7 @@ Future<void> signOut(BuildContext context) async {
   var appSettingsBox = await Hive.openBox('appSettings');
   await appSettingsBox.delete('language');
 
-  var userBox = await Hive.openBox('userBox');
+  var userBox = await Hive.openBox<UserModel>('userBox');
   await userBox.clear();
 
   if (context.mounted) {
