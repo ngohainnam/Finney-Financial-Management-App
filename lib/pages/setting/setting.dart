@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:finney/components/currency_button.dart';
 import 'package:finney/localization/locales.dart';
 import 'package:finney/utils/currency_formatter.dart';
 import 'package:flutter/material.dart';
@@ -409,12 +408,6 @@ class _SettingState extends State<Setting> {
                           value: selectedLanguage,
                         ),
                         const SizedBox(height: 10),
-                        _buildCurrencyOption(
-                          icon: Icons.currency_exchange,
-                          title: LocaleData.currency.getString(context),
-                          value: selectedCurrency,
-                        ),
-                        const SizedBox(height: 10),
                         _buildDropdownOption(
                           icon: Icons.text_fields,
                           title: LocaleData.textSize.getString(context),
@@ -680,47 +673,6 @@ class _SettingState extends State<Setting> {
                     .toList(),
             onChanged: onChanged,
             underline: const SizedBox(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCurrencyOption({
-    required IconData icon,
-    required String title,
-    required String value,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: AppColors.primary),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: AppColors.primary),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          CurrencyButton(
-            size: 36,
-            showText: true,
-            initialCurrency: selectedCurrency,
-            onCurrencyChanged: (currency) {
-              setState(() {
-                selectedCurrency = currency;
-                _saveUserData();
-              });
-            },
           ),
         ],
       ),
