@@ -1,10 +1,10 @@
 import 'package:finney/components/charts/pie/pie_category_item.dart';
-import 'package:finney/pages/7-insights/chart_query.dart';
+import 'package:finney/pages/insights/chart_query.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
-import 'package:finney/pages/3-dashboard/utils/category.dart';
-import 'package:finney/pages/7-insights/insights.dart';
+import 'package:finney/pages/dashboard/utils/category.dart';
+import 'package:finney/pages/insights/insights.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/localization/locales.dart';
 import 'package:sprintf/sprintf.dart';

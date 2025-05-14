@@ -1,6 +1,6 @@
 import 'package:finney/components/time_selector.dart';
-import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
-import 'package:finney/pages/3-dashboard/utils/category.dart';
+import 'package:finney/pages/dashboard/models/transaction_model.dart';
+import 'package:finney/pages/dashboard/utils/category.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/localization/locales.dart';

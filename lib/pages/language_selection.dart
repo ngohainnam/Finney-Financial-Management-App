@@ -1,7 +1,7 @@
 import 'package:finney/assets/path/app_images.dart';
 import 'package:finney/assets/theme/app_color.dart';
 import 'package:finney/assets/widgets/common/my_button.dart';
-import 'package:finney/pages/1-auth/auth_page.dart';
+import 'package:finney/pages/auth/auth_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:hive_flutter/hive_flutter.dart';

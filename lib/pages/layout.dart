@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:finney/assets/widgets/common/app_navbar.dart';
-import 'package:finney/pages/2-chatbot/chatbot.dart';
-import 'package:finney/pages/3-dashboard/dashboard.dart';
-import 'package:finney/pages/5-learn/learn.dart';
-import 'package:finney/pages/6-setting/setting.dart';
+import 'package:finney/pages/chatbot/chatbot.dart';
+import 'package:finney/pages/dashboard/dashboard.dart';
+import 'package:finney/pages/learn/learn.dart';
+import 'package:finney/pages/setting/setting.dart';
 
 
 class MainLayout extends StatefulWidget {

@@ -1,7 +1,7 @@
 import 'package:finney/components/charts/chart_service.dart';
 import 'package:finney/components/time_selector.dart';
-import 'package:finney/pages/7-insights/chart_query.dart';
-import 'package:finney/pages/7-insights/insights.dart';
+import 'package:finney/pages/insights/chart_query.dart';
+import 'package:finney/pages/insights/insights.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';

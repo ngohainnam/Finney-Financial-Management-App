@@ -1,10 +1,10 @@
 import 'package:finney/assets/theme/app_color.dart';
 import 'package:finney/localization/locales.dart';
-import 'package:finney/pages/0-onboarding/onboarding.dart';
-import 'package:finney/pages/1-auth/auth_page.dart';
-import 'package:finney/pages/2-chatbot/models/chat_message_model.dart';
-import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
-import 'package:finney/pages/5-learn/quiz/quiz_result_model.dart';
+import 'package:finney/pages/onboarding/onboarding.dart';
+import 'package:finney/pages/auth/auth_page.dart';
+import 'package:finney/pages/chatbot/models/chat_message_model.dart';
+import 'package:finney/pages/dashboard/models/transaction_model.dart';
+import 'package:finney/pages/learn/quiz/quiz_result_model.dart';
 import 'package:finney/pages/language_selection.dart';
 import 'package:finney/pages/layout.dart';
 import 'package:finney/utils/currency_formatter.dart';
@@ -17,7 +17,7 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
-import 'pages/1-auth/models/user_model.dart';
+import 'pages/auth/models/user_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
