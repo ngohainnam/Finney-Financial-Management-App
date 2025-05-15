@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:finney/pages/3-dashboard/transaction/transaction_services.dart';
+import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
 
 class Report extends StatefulWidget {
   const Report({super.key});
@@ -13,17 +14,14 @@ class Report extends StatefulWidget {
 class _ReportState extends State<Report> {
   final TransactionService _transactionService = TransactionService();
   bool _loading = true;
-  Map<String, dynamic> _prediction = {};
+  Map<String, dynamic> _prediction = {
+    "predictedExpense": 0.0,
+    "predictedSavings": 0.0,
+    "suggestedBudget": 0.0
+  };
 
-  @override
-  void initState() {
-    super.initState();
-    _fetchPrediction();
-  }
-
-  Future<void> _fetchPrediction() async {
+  Future<void> _fetchPrediction(List<TransactionModel> transactions) async {
     try {
-      final transactions = await _transactionService.getTransactions().first;
       final jsonTransactions = transactions.map((tx) => {
         'name': tx.name,
         'category': tx.category,
@@ -67,26 +65,39 @@ class _ReportState extends State<Report> {
         title: const Text("Spending Prediction Report"),
         centerTitle: true,
       ),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _buildCard("📉 Predicted Expense (Next Month)", "\$${_prediction["predictedExpense"]?.toStringAsFixed(2) ?? '0.00'}"),
-                  const SizedBox(height: 16),
-                  _buildCard("💰 Predicted Savings", "\$${_prediction["predictedSavings"]?.toStringAsFixed(2) ?? '0.00'}"),
-                  const SizedBox(height: 16),
-                  _buildCard("📊 Suggested Monthly Budget", "\$${_prediction["suggestedBudget"]?.toStringAsFixed(2) ?? '0.00'}"),
-                  const SizedBox(height: 32),
-                  const Text(
-                    "Warning: If your spending stays consistent, this is how your finances may look next month.",
-                    style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
-                  ),
-                ],
-              ),
+      body: StreamBuilder<List<TransactionModel>>(
+        stream: _transactionService.getTransactions(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final transactions = snapshot.data!;
+          _fetchPrediction(transactions); // 🔁 Automatically run on every change
+
+          return Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildCard("📉 Predicted Expense (Next Month)",
+                    "\$${_prediction["predictedExpense"]?.toStringAsFixed(2) ?? '0.00'}"),
+                const SizedBox(height: 16),
+                _buildCard("💰 Predicted Savings",
+                    "\$${_prediction["predictedSavings"]?.toStringAsFixed(2) ?? '0.00'}"),
+                const SizedBox(height: 16),
+                _buildCard("📊 Suggested Monthly Budget",
+                    "\$${_prediction["suggestedBudget"]?.toStringAsFixed(2) ?? '0.00'}"),
+                const SizedBox(height: 32),
+                const Text(
+                  "Warning: If your spending stays consistent, this is how your finances may look next month.",
+                  style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
+                ),
+              ],
             ),
+          );
+        },
+      ),
     );
   }
 
@@ -99,9 +110,11 @@ class _ReportState extends State<Report> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(title,
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
-            Text(value, style: const TextStyle(fontSize: 20, color: Colors.teal)),
+            Text(value,
+                style: const TextStyle(fontSize: 20, color: Colors.teal)),
           ],
         ),
       ),
