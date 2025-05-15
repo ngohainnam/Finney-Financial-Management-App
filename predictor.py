@@ -4,19 +4,19 @@ from typing import List
 import pandas as pd
 import joblib
 
-# ✅ Load models
+#Load models
 expense_model = joblib.load("predicted_expense_model.joblib")
 savings_model = joblib.load("predicted_savings_model.joblib")
 budget_model = joblib.load("suggested_budget_model.joblib")
 
-# ✅ Load features
+#Load features
 with open("model_features.txt", "r") as f:
     model_features = f.read().split(",")
 
-# ✅ Create FastAPI app
+#Create FastAPI app
 app = FastAPI()
 
-# ✅ Define schemas
+#schemas
 class Transaction(BaseModel):
     name: str
     category: str
@@ -27,7 +27,7 @@ class Transaction(BaseModel):
 class PredictionRequest(BaseModel):
     transactions: List[Transaction]
 
-# ✅ Define feature preprocessing
+# feature preprocessing
 def preprocess_transactions(transactions: List[Transaction]) -> pd.DataFrame:
     df = pd.DataFrame([t.dict() for t in transactions])
     df["amount"] = pd.to_numeric(df["amount"], errors="coerce").fillna(0)
@@ -60,7 +60,7 @@ def preprocess_transactions(transactions: List[Transaction]) -> pd.DataFrame:
 
     return pd.DataFrame([feature_row])[model_features]
 
-# ✅ Define POST route (most important!)
+#POST route (most important!)
 @app.post("/predict")
 def predict(request: PredictionRequest):
     try:

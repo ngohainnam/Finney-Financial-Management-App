@@ -24,4 +24,4 @@ for column in targets.columns:
 with open("model_features.txt", "w") as f:
     f.write(",".join(features.columns.tolist()))
 
-print("✅ Models trained and saved.")
+print("Models trained and saved.")
