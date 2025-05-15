@@ -1,4 +1,4 @@
-import 'package:finney/pages/dashboard/models/transaction_model.dart';
+import 'package:finney/core/storage/local/models/transaction/transaction_model.dart';
 import 'package:finney/pages/dashboard/transaction/add_transaction/add_expense_screen.dart';
 import 'package:finney/pages/dashboard/transaction/add_transaction/add_income_screen.dart';
 import 'package:finney/assets/theme/app_color.dart';

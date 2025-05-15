@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'quiz_result_model.dart';
+import '../../../core/storage/local/models/quiz/quiz_result_model.dart';
 import 'package:intl/intl.dart';
 
 class QuizResultsPage extends StatelessWidget {

@@ -3,20 +3,20 @@ import 'package:finney/pages/chatbot/presentation/chat_interface.dart';
 import 'package:finney/pages/chatbot/presentation/transaction_preview.dart';
 import 'package:finney/pages/chatbot/presentation/voicechat_interface.dart';
 import 'package:finney/pages/chatbot/services/llm_transactionparser.dart';
-import 'package:finney/pages/chatbot/services/local_storage_service.dart';
-import 'package:finney/pages/chatbot/services/cloud_storage_service.dart'; // Added cloud storage import
 import 'package:finney/pages/chatbot/utils/chat_constants.dart'; 
 import 'package:finney/pages/dashboard/transaction/transaction_services.dart'; 
 import 'package:flutter/material.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:image_picker/image_picker.dart';
-import 'services/chat_service.dart';
+import 'services/llm_service.dart' as llm;
 import 'presentation/welcome_screen.dart';
 import 'utils/chatbot_help.dart';
-import 'dart:async'; 
-import 'package:finney/localization/locales.dart';
+import 'dart:async';
+import 'package:finney/assets/localization/locales.dart';
 import 'package:flutter_localization/flutter_localization.dart';
+import 'package:finney/core/storage/storage_manager.dart';
+import 'package:finney/core/service/chat_service.dart'; // Import without namespace
 
 class Chatbot extends StatefulWidget {
   final String? initialQuestion;
@@ -31,10 +31,10 @@ class Chatbot extends StatefulWidget {
 }
 
 class _ChatbotState extends State<Chatbot> {
-  final ChatStorageService _localStorageService = ChatStorageService();
-  final FirebaseChatStorageService _cloudStorageService = FirebaseChatStorageService();
+  // Use core service for storage directly (no namespace)
+  final ChatService _storageService = StorageManager().chatService;
   final TransactionService _transactionService = TransactionService();
-  late ChatService _chatService;
+  late llm.ChatService _llmService;
   final gemini = Gemini.instance;
   bool showWelcomeScreen = true;
   List<ChatMessage> messages = [];
@@ -78,8 +78,7 @@ class _ChatbotState extends State<Chatbot> {
   }
 
   Future<void> _initServices() async {
-    await _localStorageService.init();
-    _chatService = ChatService(
+    _llmService = llm.ChatService(
       gemini: gemini,
       conversationHistory: conversationHistory,
     );
@@ -94,7 +93,7 @@ class _ChatbotState extends State<Chatbot> {
     });
     
     // Store the subscription so we can cancel it later
-    _messagesSubscription = _cloudStorageService.getMessages().listen(
+    _messagesSubscription = _storageService.streamMessages().listen(
       (cloudMessages) {
         if (!mounted) return;
         
@@ -105,8 +104,8 @@ class _ChatbotState extends State<Chatbot> {
         });
         
         // Update conversation history for LLM context
-        conversationHistory = _extractConversationHistory(cloudMessages);
-        _chatService.updateConversationHistory(conversationHistory);
+        conversationHistory = _storageService.toGeminiContent(cloudMessages);
+        _llmService.updateConversationHistory(conversationHistory);
       }, 
       onError: (error) {
         debugPrint('Error loading cloud messages: $error');
@@ -115,30 +114,11 @@ class _ChatbotState extends State<Chatbot> {
         
         setState(() {
           _isLoadingMessages = false;
-          // Fallback to local if cloud fails
-          messages = _localStorageService.loadMessages();
-          conversationHistory = _localStorageService.loadConversationHistory();
-          showWelcomeScreen = messages.isEmpty;
+          messages = [];
+          showWelcomeScreen = true;
         });
       }
     );
-  }
-
-  // Helper method to convert chat messages to conversation history
-  List<Content> _extractConversationHistory(List<ChatMessage> chatMessages) {
-    List<Content> history = [];
-    
-    for (var message in chatMessages.reversed) { // Process from oldest to newest
-      String role = message.customProperties?['role'] ?? 
-                   (message.user.id == ChatConstants.geminiUser.id ? 'model' : 'user');
-      
-      history.add(Content(
-        role: role,
-        parts: [TextPart(message.text)],
-      ));
-    }
-    
-    return history;
   }
 
   void _sendMessage(ChatMessage chatMessage) async {
@@ -153,12 +133,11 @@ class _ChatbotState extends State<Chatbot> {
       _isAiTyping = true;  // Start the typing animation
     });
     
-    // Save to both storage services for redundancy
-    await _cloudStorageService.saveMessage(chatMessage, role: 'user');
-    await _localStorageService.saveMessage(chatMessage, role: 'user');
+    // Save to cloud storage service
+    await _storageService.saveMessage(chatMessage, role: 'user');
 
     // The animation will show the AI is thinking
-    final response = await _chatService.sendMessage(chatMessage);
+    final response = await _llmService.sendMessage(chatMessage);
     
     if (TransactionParser.hasTransactionInfo(response)) {
       final transactionData = TransactionParser.extractTransactionFromMessage(response);
@@ -178,9 +157,8 @@ class _ChatbotState extends State<Chatbot> {
           messages = [message] + messages;
         });
         
-        // Save to both storage services
-        await _cloudStorageService.saveMessage(message, role: 'model');
-        await _localStorageService.saveMessage(message, role: 'model');
+        // Save to cloud storage service
+        await _storageService.saveMessage(message, role: 'model');
         
         // Show the transaction preview dialog with simplified interface (no edit)
         if (mounted) {
@@ -211,8 +189,7 @@ class _ChatbotState extends State<Chatbot> {
                   messages = [confirmMessage] + messages;
                 });
                 
-                await _cloudStorageService.saveMessage(confirmMessage, role: 'model');
-                await _localStorageService.saveMessage(confirmMessage, role: 'model');
+                await _storageService.saveMessage(confirmMessage, role: 'model');
               }
             },
           );
@@ -231,8 +208,7 @@ class _ChatbotState extends State<Chatbot> {
                 messages = [cancelMessage] + messages;
               });
               
-              await _cloudStorageService.saveMessage(cancelMessage, role: 'model');
-              await _localStorageService.saveMessage(cancelMessage, role: 'model');
+              await _storageService.saveMessage(cancelMessage, role: 'model');
             }
           }
         }
@@ -252,9 +228,8 @@ class _ChatbotState extends State<Chatbot> {
       messages = [message] + messages;
     });
     
-    // Save to both storage services
-    await _cloudStorageService.saveMessage(message, role: 'model');
-    await _localStorageService.saveMessage(message, role: 'model');
+    // Save to cloud storage service
+    await _storageService.saveMessage(message, role: 'model');
   }
 
   void _handleTransactionConfirmation(ChatMessage userMessage) async {
@@ -264,8 +239,7 @@ class _ChatbotState extends State<Chatbot> {
     });
     
     // Save user confirmation message
-    await _cloudStorageService.saveMessage(userMessage, role: 'user');
-    await _localStorageService.saveMessage(userMessage, role: 'user');
+    await _storageService.saveMessage(userMessage, role: 'user');
     
     
     if (_pendingTransaction != null) {
@@ -295,8 +269,7 @@ class _ChatbotState extends State<Chatbot> {
             messages = [message] + messages;
           });
           
-          await _cloudStorageService.saveMessage(message, role: 'model');
-          await _localStorageService.saveMessage(message, role: 'model');
+          await _storageService.saveMessage(message, role: 'model');
           
         } catch (e) {
           final message = ChatMessage(
@@ -310,8 +283,7 @@ class _ChatbotState extends State<Chatbot> {
             messages = [message] + messages;
           });
           
-          await _cloudStorageService.saveMessage(message, role: 'model');
-          await _localStorageService.saveMessage(message, role: 'model');
+          await _storageService.saveMessage(message, role: 'model');
         }
       } else if (TransactionParser.isCancelingTransaction(userMessage.text)) {
         final message = ChatMessage(
@@ -325,8 +297,7 @@ class _ChatbotState extends State<Chatbot> {
           messages = [message] + messages;
         });
         
-        await _cloudStorageService.saveMessage(message, role: 'model');
-        await _localStorageService.saveMessage(message, role: 'model');
+        await _storageService.saveMessage(message, role: 'model');
       } else {
         // If the user's response wasn't clear, show the popup
         final message = ChatMessage(
@@ -340,8 +311,7 @@ class _ChatbotState extends State<Chatbot> {
           messages = [message] + messages;
         });
         
-        await _cloudStorageService.saveMessage(message, role: 'model');
-        await _localStorageService.saveMessage(message, role: 'model');
+        await _storageService.saveMessage(message, role: 'model');
         
         // Show the popup
         if (mounted) {
@@ -362,8 +332,7 @@ class _ChatbotState extends State<Chatbot> {
                   messages = [confirmMessage] + messages;
                 });
                 
-                await _cloudStorageService.saveMessage(confirmMessage, role: 'model');
-                await _localStorageService.saveMessage(confirmMessage, role: 'model');
+                await _storageService.saveMessage(confirmMessage, role: 'model');
               }
             },
           );
@@ -382,14 +351,12 @@ class _ChatbotState extends State<Chatbot> {
         messages = [message] + messages;
       });
       
-      await _cloudStorageService.saveMessage(message, role: 'model');
-      await _localStorageService.saveMessage(message, role: 'model');
+      await _storageService.saveMessage(message, role: 'model');
     }
     
     _awaitingTransactionConfirmation = false;
     _pendingTransaction = null;
   }
-
 
   void _sendMediaMessage() async {
     final picker = ImagePicker();
@@ -424,8 +391,7 @@ class _ChatbotState extends State<Chatbot> {
   }
 
   Future<void> clearChat() async {
-    await _cloudStorageService.clearChat();
-    await _localStorageService.clearChat(); 
+    await _storageService.clearChat();
     
     setState(() {
       messages = [];
@@ -439,7 +405,6 @@ class _ChatbotState extends State<Chatbot> {
   @override
   void dispose() {
     _messagesSubscription?.cancel();
-    _localStorageService.dispose();
     super.dispose();
   }
 

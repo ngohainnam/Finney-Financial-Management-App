@@ -1,10 +1,10 @@
-import 'package:finney/pages/dashboard/models/transaction_model.dart';
+import 'package:finney/core/storage/local/models/transaction/transaction_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:finney/assets/theme/app_color.dart';
 import 'package:finney/pages/dashboard/transaction/widgets/transaction_item.dart';
 import 'package:flutter_localization/flutter_localization.dart';
-import 'package:finney/localization/locales.dart';
+import 'package:finney/assets/localization/locales.dart';
 
 class TransactionList extends StatelessWidget {
   final List<TransactionModel> transactions;

@@ -8,7 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'google_sign_in.dart';
-import 'package:finney/localization/locales.dart';
+import 'package:finney/assets/localization/locales.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 
 class RegisterPage extends StatefulWidget {

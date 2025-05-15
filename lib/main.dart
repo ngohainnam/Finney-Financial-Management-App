@@ -1,10 +1,7 @@
 import 'package:finney/assets/theme/app_color.dart';
-import 'package:finney/localization/locales.dart';
+import 'package:finney/assets/localization/locales.dart';
 import 'package:finney/pages/onboarding/onboarding.dart';
 import 'package:finney/pages/auth/auth_page.dart';
-import 'package:finney/pages/chatbot/models/chat_message_model.dart';
-import 'package:finney/pages/dashboard/models/transaction_model.dart';
-import 'package:finney/pages/learn/quiz/quiz_result_model.dart';
 import 'package:finney/pages/language_selection.dart';
 import 'package:finney/pages/layout.dart';
 import 'package:finney/utils/currency_formatter.dart';
@@ -16,8 +13,8 @@ import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'firebase_options.dart';
-import 'pages/auth/models/user_model.dart';
+import 'core/storage/cloud/firebase_options.dart';
+import 'package:finney/core/storage/storage_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,32 +25,8 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Initialize Hive
-  await Hive.initFlutter();
-
-  // Register adapters (safely, avoiding duplicates)
-  final adapters = {
-    0: () => Hive.registerAdapter(UserModelAdapter()),
-    1: () => Hive.registerAdapter(ChatMessageModelAdapter()),
-    2: () => Hive.registerAdapter(TransactionModelAdapter()),
-    3: () => Hive.registerAdapter(QuizResultAdapter()),
-  };
-
-  // Register each adapter only if not already registered
-  adapters.forEach((typeId, registerFn) {
-    if (!Hive.isAdapterRegistered(typeId)) {
-      registerFn();
-    }
-  });
-
-  // Open boxes
-  await Hive.openBox<UserModel>('userBox');
-  await Hive.openBox<ChatMessageModel>('chatMessage');
-  await Hive.openBox<TransactionModel>('transactions');
-  await Hive.openBox('learning_progress');
-  await Hive.openBox<QuizResult>('quiz_results');
-  await Hive.openBox('appSettings');
-  await Hive.openBox('settings');
+  // Initialize StorageManager (handles Hive setup, adapters, and box opening)
+  await StorageManager().initialize();
 
   // Initialize app settings
   await initializeAppSettings();

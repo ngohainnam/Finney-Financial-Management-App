@@ -1,12 +1,12 @@
 import 'package:finney/assets/theme/app_color.dart';
 import 'package:finney/components/time_selector.dart';
-import 'package:finney/pages/dashboard/models/transaction_model.dart';
+import 'package:finney/core/storage/local/models/transaction/transaction_model.dart';
 import 'package:finney/pages/dashboard/transaction/transaction_services.dart';
 import 'package:finney/pages/dashboard/transaction/widgets/transaction_list.dart';
 import 'package:finney/pages/dashboard/widgets/delete_transaction_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
-import 'package:finney/localization/locales.dart';
+import 'package:finney/assets/localization/locales.dart';
 
 class AllTransactionsScreen extends StatefulWidget {
   final List<TransactionModel> transactions;

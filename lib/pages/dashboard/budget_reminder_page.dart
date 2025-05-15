@@ -5,7 +5,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:finney/pages/dashboard/transaction/transaction_services.dart';
-import 'package:finney/pages/auth/models/user_model.dart';
+import 'package:finney/core/storage/local/models/user/user_model.dart';
 
 class BudgetReminderPage extends StatefulWidget {
   const BudgetReminderPage({super.key});

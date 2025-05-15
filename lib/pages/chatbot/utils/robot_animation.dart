@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:finney/assets/theme/app_color.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter_localization/flutter_localization.dart';
-import 'package:finney/localization/locales.dart';
+import 'package:finney/assets/localization/locales.dart';
 
 class RobotAnimationHeader extends StatelessWidget {
   final bool isTyping;

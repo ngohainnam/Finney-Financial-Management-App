@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:finney/pages/dashboard/utils/category.dart';
 import 'package:finney/pages/insights/insights.dart';
 import 'package:flutter_localization/flutter_localization.dart';
-import 'package:finney/localization/locales.dart';
+import 'package:finney/assets/localization/locales.dart';
 import 'package:sprintf/sprintf.dart';
 
 class CategoryPieChart extends StatefulWidget {

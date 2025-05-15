@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'quiz_questions.dart';
-import 'quiz_result_model.dart';
+import '../../../core/storage/local/models/quiz/quiz_result_model.dart';
 import 'quiz_result.dart';
 import 'package:hive/hive.dart';
 

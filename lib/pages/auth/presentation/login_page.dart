@@ -4,13 +4,13 @@ import 'package:finney/assets/widgets/common/error_message.dart';
 import 'package:finney/assets/widgets/common/my_button.dart';
 import 'package:finney/assets/widgets/common/my_textfield.dart';
 import 'package:finney/assets/widgets/common/square_tile.dart';
-import '../models/user_model.dart';
+import '../../../core/storage/local/models/user/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'google_sign_in.dart';
 import 'forget_password.dart';
-import 'package:finney/localization/locales.dart';
+import 'package:finney/assets/localization/locales.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 
 class LoginPage extends StatefulWidget {

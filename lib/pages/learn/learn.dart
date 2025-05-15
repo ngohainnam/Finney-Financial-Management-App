@@ -1,4 +1,4 @@
-import 'package:finney/localization/locales.dart';
+import 'package:finney/assets/localization/locales.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:finney/pages/learn/smart_spending_tips.dart';

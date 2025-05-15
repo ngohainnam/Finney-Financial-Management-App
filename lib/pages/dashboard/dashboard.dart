@@ -1,6 +1,6 @@
 import 'package:finney/components/charts/chart_service.dart' as chart_service;
 import 'package:finney/components/time_selector.dart';
-import 'package:finney/localization/locales.dart';
+import 'package:finney/assets/localization/locales.dart';
 import 'package:finney/pages/chatbot/utils/robot_animation.dart';
 import 'package:finney/pages/dashboard/widgets/navigation_tiles.dart';
 import 'package:finney/pages/dashboard/transaction/add_transaction/expense_or_income.dart';
@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:finney/assets/theme/app_color.dart';
 import 'package:finney/pages/dashboard/widgets/balance_card.dart';
 import 'package:finney/pages/dashboard/transaction/transaction_services.dart';
-import 'package:finney/pages/dashboard/models/transaction_model.dart' hide CategoryExpense;
+import 'package:finney/core/storage/local/models/transaction/transaction_model.dart' hide CategoryExpense;
 import 'package:flutter_localization/flutter_localization.dart';
 
 class Dashboard extends StatefulWidget {

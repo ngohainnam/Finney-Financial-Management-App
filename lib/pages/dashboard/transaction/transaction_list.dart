@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:finney/pages/dashboard/models/transaction_model.dart';
+import 'package:finney/core/storage/local/models/transaction/transaction_model.dart';
 
 class TransactionList extends StatelessWidget {
   final List<TransactionModel> transactions;

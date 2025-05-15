@@ -4,11 +4,11 @@ import 'package:finney/components/charts/chart_service.dart' as chart_service;
 import 'package:finney/components/charts/pie/pie_chart.dart';
 import 'package:finney/components/time_selector.dart';
 import 'package:finney/pages/dashboard/dashboard.dart';
-import 'package:finney/pages/dashboard/models/transaction_model.dart';
+import 'package:finney/core/storage/local/models/transaction/transaction_model.dart';
 import 'package:finney/pages/dashboard/transaction/transaction_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
-import 'package:finney/localization/locales.dart';
+import 'package:finney/assets/localization/locales.dart';
 
 enum ChartViewType { expenses, income }
 

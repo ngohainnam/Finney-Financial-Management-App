@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:finney/assets/widgets/common/help_dialog.dart';
-import 'package:finney/localization/locales.dart';
+import 'package:finney/assets/localization/locales.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 
 class ChatbotHelp {

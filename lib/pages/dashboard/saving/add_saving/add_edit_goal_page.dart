@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finney/pages/dashboard/models/saving_goal_model.dart';
 import 'package:finney/pages/dashboard/saving/services/saving_notification_service.dart';
 import 'package:flutter_localization/flutter_localization.dart';
-import 'package:finney/localization/locales.dart';
+import 'package:finney/assets/localization/locales.dart';
 
 class AddEditGoalPage extends StatefulWidget {
   final SavingGoal? existingGoal;

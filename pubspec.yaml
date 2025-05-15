@@ -63,6 +63,8 @@ dependencies:
   translator: 0.1.7
   google_fonts: 4.0.4
   shared_preferences: ^2.2.2
+  connectivity_plus: ^3.0.6
+  uuid: ^3.0.7
 
 dev_dependencies:
   flutter_test:

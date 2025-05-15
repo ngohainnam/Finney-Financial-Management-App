@@ -5,7 +5,7 @@ import 'package:finney/assets/theme/app_color.dart';
 import 'package:finney/assets/widgets/common/error_message.dart';
 import 'package:finney/assets/widgets/common/my_button.dart';
 import 'package:finney/assets/widgets/common/my_textfield.dart';
-import 'package:finney/localization/locales.dart';
+import 'package:finney/assets/localization/locales.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 
 

@@ -1,4 +1,4 @@
-import 'package:finney/pages/dashboard/models/transaction_model.dart';
+import 'package:finney/core/storage/local/models/transaction/transaction_model.dart';
 import 'package:intl/intl.dart';
 
 class TransactionParser {

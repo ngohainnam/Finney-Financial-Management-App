@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finney/pages/dashboard/models/saving_goal_model.dart';
-import 'package:finney/pages/dashboard/models/transaction_model.dart';
+import 'package:finney/core/storage/local/models/transaction/transaction_model.dart';
 import 'package:finney/pages/dashboard/transaction/transaction_services.dart';
 import 'package:flutter/foundation.dart';
 

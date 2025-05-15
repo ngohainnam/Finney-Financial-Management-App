@@ -5,7 +5,7 @@ import 'package:finney/pages/dashboard/saving/add_saving/add_edit_goal_page.dart
 import 'package:finney/pages/dashboard/widgets/goal_card.dart';
 import 'package:finney/pages/dashboard/saving/services/saving_notification_service.dart';
 import 'package:flutter_localization/flutter_localization.dart';
-import 'package:finney/localization/locales.dart';
+import 'package:finney/assets/localization/locales.dart';
 
 // Color constants
 const _successColor = Color(0xFF4CAF50);

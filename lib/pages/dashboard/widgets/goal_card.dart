@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:finney/pages/dashboard/models/saving_goal_model.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_localization/flutter_localization.dart';
-import 'package:finney/localization/locales.dart';
+import 'package:finney/assets/localization/locales.dart';
 
 class GoalCard extends StatelessWidget {
   final SavingGoal goal;
