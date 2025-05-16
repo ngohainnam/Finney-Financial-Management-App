@@ -1,3 +1,4 @@
+import 'package:finney/assets/path/app_animations.dart';
 import 'package:flutter/material.dart';
 import 'package:finney/assets/theme/app_color.dart';
 import 'package:lottie/lottie.dart';
@@ -29,7 +30,7 @@ class RobotAnimationHeader extends StatelessWidget {
               height: 200,
               width: 200,
               child: Lottie.asset(
-                isTyping ? 'lib/animations/robot_typing.json' : 'lib/animations/robot_idle.json',
+                isTyping ? AppAnimations.roboTyping : AppAnimations.robotIdle,
                 repeat: true,
                 frameRate: FrameRate.max, 
                 fit: BoxFit.contain, 

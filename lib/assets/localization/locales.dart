@@ -11,7 +11,9 @@ mixin LocaleData {
   static const String email = 'email';
   static const String userId = 'userId';
   static const String edit = 'edit';
+  static const String feature= 'feature';
   static const String save = 'save';
+  static const String prediction = 'prediction';
   static const String close = 'close';
   static const String appearance = 'appearance';
   static const String language = 'language';
@@ -39,6 +41,9 @@ mixin LocaleData {
   static const String user = 'user';
   static const String notAvailable = 'notAvailable';
   // Previous Learn page keys
+  static const String financeAcademy = 'financeAcademy';
+  static const String learnFinanceDescription = 'learnFinanceDescription';
+  static const String reminder = 'reminder';
   static const String financialBasics = 'financialBasics';
   static const String askFinneyAI = 'askFinneyAI';
   static const String moneyManagement = 'moneyManagement';
@@ -495,6 +500,7 @@ mixin LocaleData {
     financialBasics: 'Financial Basics',
     askFinneyAI: 'Ask Finney AI for any help',
     moneyManagement: 'Money Management',
+    prediction: 'Prediction',
     moneyManagementSubtitle: 'Track, plan, and control your money',
     savingBudgeting: 'Saving & Budgeting',
     savingBudgetingSubtitle: 'Learn how to save and budget smartly',
@@ -828,6 +834,7 @@ mixin LocaleData {
     transactionPreviewCancel: 'Cancel',
     transactionPreviewConfirm: 'Confirm',
     chatInputHint: 'Ask me a financial question...',
+    feature: 'Feature',
     nonFinancialQuestion: 'I\'m here to help with your financial questions. What money matters can I assist with?',
     nonFinancialImage: 'I can only analyze financial documents or receipts. Need help with something financial?',
     addNew : 'Add New',
@@ -865,6 +872,9 @@ mixin LocaleData {
     weakPasswordError: 'Password must be at least 12 characters long and include uppercase, lowercase, number, and symbol.',
     hiveStorageError: 'Failed to store user in local storage.',
     selectLanguage: 'Select Language',
+    reminder: 'Reminder',
+    financeAcademy: 'Finance Academy',
+    learnFinanceDescription: 'Learn the basics of finance and money management',
   };
 
   static const Map<String, String> bd = {
@@ -919,6 +929,7 @@ mixin LocaleData {
     learnMore: 'আরও জানুন',
     backToTopics: 'বিষয়গুলোতে ফিরে যান',
     aiAssistant: 'এআই সহকারী',
+    feature: 'ফিচার',
     moneyManagementPoint1: 'নিয়মিত আয় এবং খরচ ট্র্যাক করুন',
     moneyManagementPoint2: 'প্রয়োজন এবং চাওয়ার মধ্যে পার্থক্য করুন',
     moneyManagementPoint3: 'বেসিক ব্যাংকিং পরিষেবা বুঝুন',
@@ -970,6 +981,9 @@ mixin LocaleData {
     aiPoweredFeatures: 'এআই চালিত বৈশিষ্ট্য',
     moneyTools: 'অর্থের সরঞ্জাম',
     insights: 'ইনসাইট',
+    financeAcademy: 'অর্থ একাডেমি',
+    reminder: 'রিমাইন্ডার',
+    learnFinanceDescription: 'বিশেষজ্ঞ কোর্সগুলির সাথে আপনার আর্থিক জ্ঞান বাড়ান',
     goals: 'লক্ষ্য',
     thinking: 'চিন্তা করছে...',
     balance: 'হিসাব নিকাশ ',
@@ -1134,6 +1148,7 @@ mixin LocaleData {
     quizQuestion3Answer2: 'একটি নির্দিষ্ট বাজার সূচক ট্র্যাক করে',
     quizQuestion3Answer3: 'গ্যারান্টিযুক্ত রিটার্ন',
     quizQuestion4: '4% অবসর নিয়ম কী?',
+    prediction: 'ভবিষ্যদ্বাণী',
     quizQuestion4Answer1: 'অবসরে বছরে 4% সঞ্চয় উত্তোলন করা',
     quizQuestion4Answer2: 'অবসরের জন্য আয়ের 4% সঞ্চয় করা',
     quizQuestion4Answer3: 'পরিকল্পিত সময়ের চেয়ে 4% বেশি কাজ করা',

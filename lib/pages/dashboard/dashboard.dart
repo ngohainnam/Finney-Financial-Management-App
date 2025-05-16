@@ -1,6 +1,8 @@
+import 'package:finney/assets/widgets/common/chatbot_bar.dart';
 import 'package:finney/components/charts/chart_service.dart' as chart_service;
 import 'package:finney/components/time_selector.dart';
 import 'package:finney/assets/localization/locales.dart';
+import 'package:finney/pages/chatbot/chatbot.dart';
 import 'package:finney/pages/chatbot/utils/robot_animation.dart';
 import 'package:finney/pages/dashboard/widgets/navigation_tiles.dart';
 import 'package:finney/pages/dashboard/transaction/add_transaction/expense_or_income.dart';
@@ -137,62 +139,89 @@ class DashboardState extends State<Dashboard> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.lightBackground,
-      appBar: AppBar(
-        backgroundColor: AppColors.lightBackground,
-        title: Text(
-          LocaleData.chatbotTitle.getString(context),
-          style: TextStyle(
-            color: AppColors.primary,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        automaticallyImplyLeading: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.help_outline),
-            onPressed: () => DashboardHelp.show(context),
-          ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-        onRefresh: _loadDashboardData,
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              BalanceCard(
-                balance: _currentBalance,
-                income: _monthlyIncome,
-                expenses: _monthlyExpenseTotal,
-                timeRange: currentTimeRange,
-              ),
-              TimeRangeSelector(
-                initialTimeRange: currentTimeRange,
-                onTimeRangeChanged: _onTimeRangeChanged,
-              ),
-              RobotAnimationHeader(),
-              const NavigationTiles(),
-              _buildRecentTransactions(),
-              const SizedBox(height: 80),
-            ],
-          ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.darkBlue,
-        onPressed: () => _showAddTransactionModal(context),
-        child: const Icon(Icons.add, color: Colors.white),
+  void _navigateToChatbot(String question) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Chatbot(initialQuestion: question),
       ),
     );
   }
+
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: AppColors.lightBackground,
+    appBar: AppBar(
+      backgroundColor: AppColors.lightBackground,
+      title: Text(
+        LocaleData.chatbotTitle.getString(context), // Changed from chatbotTitle to dashboardTitle
+        style: TextStyle(
+          color: AppColors.primary,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      automaticallyImplyLeading: true,
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.help_outline),
+          onPressed: () => DashboardHelp.show(context),
+        ),
+      ],
+    ),
+    body: _isLoading
+      ? const Center(child: CircularProgressIndicator())
+      : Stack(
+          children: [
+            Column(
+              children: [
+                Expanded(
+                  child: RefreshIndicator(
+                    onRefresh: _loadDashboardData,
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          BalanceCard(
+                            balance: _currentBalance,
+                            income: _monthlyIncome,
+                            expenses: _monthlyExpenseTotal,
+                            timeRange: currentTimeRange,
+                          ),
+                          TimeRangeSelector(
+                            initialTimeRange: currentTimeRange,
+                            onTimeRangeChanged: _onTimeRangeChanged,
+                          ),
+                          RobotAnimationHeader(),
+                          const NavigationTiles(),
+                          _buildRecentTransactions(),
+                          // Add extra padding at the bottom to ensure content isn't hidden behind the chatbot bar
+                          const SizedBox(height: 100),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                // Chatbot bar at the bottom
+                AppNavbar(onSearchSubmitted: _navigateToChatbot),
+              ],
+            ),
+
+            Positioned(
+              right: 16,
+              bottom: 90, // Position above the chatbot bar
+              child: FloatingActionButton(
+                backgroundColor: AppColors.darkBlue,
+                onPressed: () => _showAddTransactionModal(context),
+                child: const Icon(Icons.add, color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+  );
+}
 
   Widget _buildRecentTransactions() {
     final filteredTransactions = _chartService.filterTransactionsByTimeRange(

@@ -1,12 +1,12 @@
 import 'package:finney/assets/theme/app_color.dart';
 import 'package:finney/assets/localization/locales.dart';
+import 'package:finney/pages/dashboard/dashboard.dart';
 import 'package:finney/pages/onboarding/onboarding.dart';
 import 'package:finney/pages/auth/auth_page.dart';
 import 'package:finney/pages/language_selection.dart';
-import 'package:finney/pages/layout.dart';
 import 'package:finney/utils/currency_formatter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:finney/assets/path/api.dart';
+import 'package:finney/assets/path/api_key.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
@@ -161,7 +161,7 @@ class _MyAppState extends State<MyApp> {
                   );
                 }
                 // Otherwise show the main app layout
-                return const MainLayout();
+                return const Dashboard();
               }
               
               // User is not logged in, show auth page
