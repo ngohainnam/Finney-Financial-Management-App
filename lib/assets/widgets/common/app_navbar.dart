@@ -80,6 +80,7 @@ class AppNavbar extends StatelessWidget {
                 selectedIndex: selectedIndex,
                 tabs: const [
                   GButton(icon: Icons.dashboard, text: 'Dashboard'),
+                  GButton(icon: Icons.dashboard, text: 'Report'),
                   GButton(icon: Icons.school, text: 'Learning'),
                   GButton(icon: Icons.settings, text: 'Settings'),
                 ],

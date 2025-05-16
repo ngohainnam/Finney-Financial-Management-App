@@ -1,3 +1,4 @@
+import 'package:finney/pages/4-report/report.dart';
 import 'package:flutter/material.dart';
 import 'package:finney/assets/widgets/common/app_navbar.dart';
 import 'package:finney/pages/2-chatbot/chatbot.dart';
@@ -17,6 +18,7 @@ class _MainLayoutState extends State<MainLayout> {
 
   static const List<Widget> _pages = [
     Dashboard(),
+    Report(),
     Learn(),
     Setting(),
   ];
