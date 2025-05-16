@@ -5,6 +5,7 @@ import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
 import 'package:finney/pages/3-dashboard/transaction/transaction_services.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/localization/locales.dart';
+import 'package:finney/utils/currency_formatter.dart';
 
 abstract class BaseTransactionScreen extends StatefulWidget {
   final Function? onTransactionAdded;
@@ -40,14 +41,14 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
       // if the transaction exists
       _selectedCategory = widget.existingTransaction!.category;
       _selectedDate = widget.existingTransaction!.date;
-      _amountController.text = widget.existingTransaction!.amount.abs().toStringAsFixed(2);
+      _amountController.text = CurrencyFormatter.formatWithoutSymbol(widget.existingTransaction!.amount.abs());
       _descriptionController.text = widget.existingTransaction!.description ?? '';
     } else {
       // if it is a new transaction
       if (categories.isNotEmpty) {
         _selectedCategory = categories[0].name;
       }
-      _amountController.text = '0.00';
+      _amountController.text = '0';
     }
   }
 
@@ -58,84 +59,84 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
     super.dispose();
   }
 
-Future<void> _saveTransaction() async {
-  // Validate amount
-  if (_amountController.text == '0.00' || _amountController.text.isEmpty) {
-    _showErrorSnackBar(LocaleData.pleaseEnterValidAmount.getString(context));
-    return;
-  }
-
-  try {
-    double amount = double.parse(_amountController.text);
-    if (amount <= 0) {
-      _showErrorSnackBar(LocaleData.pleaseEnterPositiveAmount.getString(context));
+  Future<void> _saveTransaction() async {
+    // Validate amount
+    if (_amountController.text.isEmpty || _amountController.text == '0') {
+      _showErrorSnackBar(LocaleData.pleaseEnterValidAmount.getString(context));
       return;
     }
-  } catch (e) {
-    _showErrorSnackBar(LocaleData.pleaseEnterValidNumber.getString(context));
-    return;
-  }
 
-  if (_selectedCategory.isEmpty) {
-    _showErrorSnackBar(LocaleData.pleaseSelectCategory.getString(context));
-    return;
-  }
-
-  setState(() {
-    _isSaving = true;
-  });
-
-  try {
-    double amountValue = getTransactionAmount();
-
-    final transaction = TransactionModel(
-      id: widget.existingTransaction?.id,
-      name: _selectedCategory,
-      category: _selectedCategory,
-      amount: amountValue,
-      date: _selectedDate,
-      description: _descriptionController.text.trim(),
-    );
-
-    // Optimistic UI update - call callback first
-    if (widget.onTransactionAdded != null) {
-      widget.onTransactionAdded!(transaction);
+    try {
+      double amount = CurrencyFormatter.parse(_amountController.text);
+      if (amount <= 0) {
+        _showErrorSnackBar(LocaleData.pleaseEnterPositiveAmount.getString(context));
+        return;
+      }
+    } catch (e) {
+      _showErrorSnackBar(LocaleData.pleaseEnterValidNumber.getString(context));
+      return;
     }
 
-    // Show success message and pop screen
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(widget.existingTransaction != null 
-            ? LocaleData.transactionUpdated.getString(context)
-            : LocaleData.transactionSaved.getString(context)),
-          backgroundColor: Colors.green,
-        ),
+    if (_selectedCategory.isEmpty) {
+      _showErrorSnackBar(LocaleData.pleaseSelectCategory.getString(context));
+      return;
+    }
+
+    setState(() {
+      _isSaving = true;
+    });
+
+    try {
+      double amountValue = getTransactionAmount();
+
+      final transaction = TransactionModel(
+        id: widget.existingTransaction?.id,
+        name: _selectedCategory,
+        category: _selectedCategory,
+        amount: amountValue,
+        date: _selectedDate,
+        description: _descriptionController.text.trim(),
       );
-      Navigator.pop(context);
-    }
 
-    // Save to Firestore in the background
-    if (widget.existingTransaction != null) {
-      _transactionService.updateTransaction(transaction).catchError((e) {
-        debugPrint('Error updating transaction: $e');
-      });
-    } else {
-      _transactionService.addTransaction(transaction).catchError((e) {
-        debugPrint('Error saving transaction: $e');
-      });
-    }
+      // Optimistic UI update - call callback first
+      if (widget.onTransactionAdded != null) {
+        widget.onTransactionAdded!(transaction);
+      }
 
-  } catch (e) {
-    debugPrint('Error processing transaction: $e');
-    if (mounted) {
-      setState(() {
-        _isSaving = false;
-      });
-      _showErrorSnackBar(LocaleData.failedToSaveTransaction.getString(context));
+      // Show success message and pop screen
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(widget.existingTransaction != null
+                ? LocaleData.transactionUpdated.getString(context)
+                : LocaleData.transactionSaved.getString(context)),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.pop(context);
+      }
+
+      // Save to Firestore in the background
+      if (widget.existingTransaction != null) {
+        _transactionService.updateTransaction(transaction).catchError((e) {
+          debugPrint('Error updating transaction: $e');
+        });
+      } else {
+        _transactionService.addTransaction(transaction).catchError((e) {
+          debugPrint('Error saving transaction: $e');
+        });
+      }
+
+    } catch (e) {
+      debugPrint('Error processing transaction: $e');
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+        });
+        _showErrorSnackBar(LocaleData.failedToSaveTransaction.getString(context));
+      }
     }
   }
-}
 
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -185,7 +186,7 @@ Future<void> _saveTransaction() async {
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.zero,
                 hintText: LocaleData.amountHint.getString(context),
-                prefixText: '\$',
+                prefixText: '৳ ',
                 prefixStyle: TextStyle(
                   color: amountColor,
                   fontWeight: FontWeight.bold,
@@ -197,6 +198,26 @@ Future<void> _saveTransaction() async {
                   fontSize: 40,
                 ),
               ),
+              onChanged: (value) {
+                // Simple number input without formatting
+                if (value.isEmpty) {
+                  _amountController.text = '';
+                  return;
+                }
+                
+                // Only allow numbers and one decimal point
+                String cleanValue = value.replaceAll(RegExp(r'[^\d.]'), '');
+                if (cleanValue.split('.').length > 2) {
+                  cleanValue = cleanValue.substring(0, cleanValue.lastIndexOf('.'));
+                }
+                
+                if (cleanValue != value) {
+                  _amountController.text = cleanValue;
+                  _amountController.selection = TextSelection.fromPosition(
+                    TextPosition(offset: cleanValue.length),
+                  );
+                }
+              },
             ),
           ),
 
@@ -319,18 +340,18 @@ Future<void> _saveTransaction() async {
       ),
       floatingActionButton: _isSaving
           ? const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: CircularProgressIndicator(),
-            )
+        padding: EdgeInsets.all(16.0),
+        child: CircularProgressIndicator(),
+      )
           : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: FloatingActionButton(
-                onPressed: _saveTransaction,
-                backgroundColor: amountColor,
-                elevation: 4,
-                child: const Icon(Icons.check, color: Colors.white),
-              ),
-            ),
+        padding: const EdgeInsets.all(16.0),
+        child: FloatingActionButton(
+          onPressed: _saveTransaction,
+          backgroundColor: amountColor,
+          elevation: 4,
+          child: const Icon(Icons.check, color: Colors.white),
+        ),
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
@@ -392,7 +413,7 @@ class CategoryData {
   final IconData icon;
   final Color color;
 
-  CategoryData(this.name) : 
-    icon = CategoryUtils.getIconForCategory(name),
-    color = CategoryUtils.getColorForCategory(name);
+  CategoryData(this.name) :
+        icon = CategoryUtils.getIconForCategory(name),
+        color = CategoryUtils.getColorForCategory(name);
 }

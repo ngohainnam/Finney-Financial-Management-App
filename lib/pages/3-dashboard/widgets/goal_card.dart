@@ -80,14 +80,14 @@ class GoalCard extends StatelessWidget {
                   Text(
                     LocaleData.savedAmount.getString(context).replaceFirst(
                       '%s',
-                      '\$${goal.savedAmount.toStringAsFixed(2)}',
+                      '৳${goal.savedAmount.toStringAsFixed(2)}',
                     ),
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   Text(
                     LocaleData.targetAmount.getString(context).replaceFirst(
                       '%s',
-                      '\$${goal.targetAmount.toStringAsFixed(2)}',
+                      '৳${goal.targetAmount.toStringAsFixed(2)}',
                     ),
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
@@ -159,7 +159,7 @@ class GoalCard extends StatelessWidget {
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   labelText: LocaleData.amount.getString(context),
-                  prefixText: '\$',
+                  prefixText: '৳',
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
@@ -172,6 +172,12 @@ class GoalCard extends StatelessWidget {
                   }
                   if (amount <= 0) {
                     return LocaleData.amountMustBePositive.getString(context);
+                  }
+                  // Check if amount exceeds remaining target
+                  final remainingAmount = goal.targetAmount - goal.savedAmount;
+                  if (amount > remainingAmount) {
+                    return LocaleData.amountExceedsTarget.getString(context)
+                        .replaceFirst('%s', '৳${remainingAmount.toStringAsFixed(2)}');
                   }
                   return null;
                 },
