@@ -8,37 +8,28 @@ class ConnectivityService {
 
   ConnectivityService() {
     _initConnectivity();
-    _connectionChecker.onStatusChange.listen(_updateConnectionStatus);
+    // Listen for changes in connectivity
+    _connectionChecker.onStatusChange.listen((status) {
+      _isConnected = status == InternetConnectionStatus.connected;
+      _connectionStatusController.add(_isConnected);
+    });
   }
 
   bool get isConnected => _isConnected;
   Stream<bool> get connectionStatus => _connectionStatusController.stream;
 
   Future<void> _initConnectivity() async {
-    try {
-      final hasConnection = await _connectionChecker.hasConnection;
-      _updateConnectionStatus(
-        hasConnection 
-          ? InternetConnectionStatus.connected 
-          : InternetConnectionStatus.disconnected
-      );
-    } catch (e) {
-      _isConnected = false;
-      _connectionStatusController.add(false);
-    }
+    _isConnected = await _connectionChecker.hasConnection;
+    _connectionStatusController.add(_isConnected);
   }
 
-  void _updateConnectionStatus(InternetConnectionStatus status) {
-    _isConnected = status == InternetConnectionStatus.connected;
+  Future<bool> checkConnectivity() async {
+    _isConnected = await _connectionChecker.hasConnection;
     _connectionStatusController.add(_isConnected);
+    return _isConnected;
   }
 
   void dispose() {
     _connectionStatusController.close();
-  }
-
-  // Add this method for more detailed connection info if needed
-  Future<bool> hasInternetAccess() async {
-    return await _connectionChecker.hasConnection;
   }
 }
