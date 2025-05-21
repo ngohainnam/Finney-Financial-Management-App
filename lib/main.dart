@@ -14,6 +14,7 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/storage/cloud/firebase_options.dart';
 import 'package:finney/core/storage/storage_manager.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,29 +27,11 @@ void main() async {
 
   // Initialize StorageManager (now just initializes Firebase and connectivity services)
   await StorageManager().initialize();
-
-  // Initialize app settings
-  await initializeAppSettings();
-
+  
   // Initialize Gemini AI
   Gemini.init(apiKey: geminiApiKey);
   
   runApp(const MyApp());
-}
-
-/// Initialize app settings from storage
-Future<void> initializeAppSettings() async {
-  try {
-    // Initialize currency from shared preferences
-    final prefs = await SharedPreferences.getInstance();
-    
-    // Check for first-time onboarding status
-    if (!prefs.containsKey('onboarding_completed')) {
-      await prefs.setBool('onboarding_completed', false);
-    }
-  } catch (e) {
-    debugPrint('Error initializing app settings: $e');
-  }
 }
 
 class MyApp extends StatefulWidget {
@@ -134,51 +117,94 @@ class _MyAppState extends State<MyApp> {
         localizationsDelegates: localization.localizationsDelegates,
         home: !hasLanguage 
           ? const LanguageSelectionPage()
-          : FutureBuilder<bool>(
-              future: _checkFirstTimeUser(),
-              builder: (context, prefSnapshot) {
-                // Still loading preferences
-                if (!prefSnapshot.hasData) {
+          : StreamBuilder<User?>(
+              stream: FirebaseAuth.instance.authStateChanges(),
+              builder: (context, authSnapshot) {
+                if (authSnapshot.connectionState == ConnectionState.waiting) {
                   return const Scaffold(body: Center(child: CircularProgressIndicator()));
                 }
                 
-                // Check if this is a first-time user that needs onboarding
-                final needsOnboarding = prefSnapshot.data == true;
-                
-                return StreamBuilder<User?>(
-                  stream: FirebaseAuth.instance.authStateChanges(),
-                  builder: (context, authSnapshot) {
-                    if (authSnapshot.connectionState == ConnectionState.waiting) {
-                      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-                    }
-                    
-                    // User is logged in
-                    if (authSnapshot.hasData) {
-                      // Show onboarding if it's the first time
+                // User is logged in
+                if (authSnapshot.hasData) {
+                  final user = authSnapshot.data!;
+                  
+                  // Check if user has completed onboarding in Firestore
+                  return FutureBuilder<bool>(
+                    future: _checkNeedsOnboarding(user),
+                    builder: (context, onboardingSnapshot) {
+                      if (onboardingSnapshot.connectionState == ConnectionState.waiting) {
+                        return const Scaffold(body: Center(child: CircularProgressIndicator()));
+                      }
+                      
+                      final needsOnboarding = onboardingSnapshot.data ?? true;
+                      
                       if (needsOnboarding) {
                         return Onboarding(
-                          onComplete: () {
+                          onComplete: () async {
+                            // Mark onboarding as completed in Firestore
+                            await _markOnboardingCompleted(user.uid);
                             setState(() {});  // Refresh to show main app
                           },
                         );
                       }
+                      
                       // Otherwise show the main app layout
                       return const Dashboard();
-                    }
-                    
-                    // User is not logged in, show auth page
-                    return const AuthPage();
-                  },
-                );
+                    },
+                  );
+                }
+                
+                // User is not logged in, show auth page
+                return const AuthPage();
               },
             ),
       ),
     );
   }
   
-  Future<bool> _checkFirstTimeUser() async {
-    final hasCompletedOnboarding = _prefs.getBool('onboarding_completed') ?? false;
-    return !hasCompletedOnboarding;
+  // Check if user needs onboarding by looking at Firestore
+  Future<bool> _checkNeedsOnboarding(User user) async {
+    try {
+      // First check - is this a brand new user?
+      final isNewUser = user.metadata.creationTime!
+          .isAfter(DateTime.now().subtract(const Duration(minutes: 1)));
+      
+      if (isNewUser) {
+        return true; // New users always need onboarding
+      }
+      
+      // Otherwise check the user's profile in Firestore
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+      
+      // If the user document doesn't exist or doesn't have onboardingCompleted field
+      if (!userDoc.exists || !userDoc.data()!.containsKey('onboardingCompleted')) {
+        return true;
+      }
+      
+      // Return based on the value in Firestore
+      return !(userDoc.data()!['onboardingCompleted'] as bool);
+    } catch (e) {
+      debugPrint('Error checking onboarding status: $e');
+      return true; // Default to showing onboarding if there's an error
+    }
+  }
+  
+  // Mark onboarding as completed in Firestore
+  Future<void> _markOnboardingCompleted(String userId) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .set({
+        'onboardingCompleted': true,
+        'onboardingCompletedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    } catch (e) {
+      debugPrint('Error marking onboarding as completed: $e');
+    }
   }
   
   // Method to save language preference
