@@ -1,5 +1,7 @@
 import 'package:finney/shared/theme/app_color.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:finney/shared/localization/locales.dart';
 
 class AppNavbar extends StatelessWidget {
   final Function(String)? onSearchSubmitted;
@@ -22,7 +24,7 @@ class AppNavbar extends StatelessWidget {
           child: TextField(
             controller: _searchController,
             decoration: InputDecoration(
-              hintText: 'Ask me financial question...',
+              hintText: LocaleData.searchHint.getString(context),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none, 

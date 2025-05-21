@@ -12,10 +12,12 @@ import 'package:finney/pages/6-transaction/view_transaction/recent_transactions.
 import 'package:flutter/material.dart';
 import 'package:finney/shared/theme/app_color.dart';
 import 'package:finney/pages/3-dashboard/widgets/balance_card.dart';
-import 'package:finney/core/storage/storage_manager.dart'; // Added for singleton access
+import 'package:finney/core/storage/storage_manager.dart';
 import 'package:finney/core/storage/cloud/models/transaction_model.dart' hide CategoryExpense;
 import 'package:flutter_localization/flutter_localization.dart';
-import 'package:finney/shared/widgets/common/snack_bar.dart'; // Added for snackbars
+import 'package:finney/shared/widgets/common/snack_bar.dart';
+import 'package:finney/shared/widgets/common/settings_notifier.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -25,7 +27,7 @@ class Dashboard extends StatefulWidget {
 }
 
 class DashboardState extends State<Dashboard> {
-  late final TransactionCloudService _transactionService; 
+  late final TransactionCloudService _transactionService;
   final chart_service.ChartService _chartService = chart_service.ChartService();
 
   static TimeRangeData currentTimeRange = TimeRangeData.month();
@@ -42,9 +44,15 @@ class DashboardState extends State<Dashboard> {
   @override
   void initState() {
     super.initState();
-    // Get the transaction service from StorageManager
     _transactionService = StorageManager().transactionService;
     _loadDashboardData();
+    _loadTextSize();
+  }
+
+  Future<void> _loadTextSize() async {
+    final prefs = await SharedPreferences.getInstance();
+    final textSize = prefs.getString('textSize') ?? 'Medium';
+    SettingsNotifier().updateTextSize(textSize);
   }
 
   void _onTimeRangeChanged(TimeRangeData newTimeRange) {
@@ -102,14 +110,12 @@ class DashboardState extends State<Dashboard> {
             _isRefreshing = false;
           });
         }
-      },
-      onError: (error) {
+      }, onError: (error) {
         if (mounted) {
           setState(() {
             _isLoading = false;
             _isRefreshing = false;
           });
-          // Use AppSnackBar for error messages
           AppSnackBar.showError(
             context,
             message: LocaleData.failedToLoadDashboardData.getString(context),
@@ -123,8 +129,6 @@ class DashboardState extends State<Dashboard> {
           _isLoading = false;
           _isRefreshing = false;
         });
-
-        // Use AppSnackBar for error messages
         AppSnackBar.showError(
           context,
           message: LocaleData.failedToLoadDashboardData.getString(context),
@@ -139,8 +143,6 @@ class DashboardState extends State<Dashboard> {
       _updateChartsForTimeRange();
     });
 
-    // Use the core transaction service to add the transaction
-    // No need to check if id is null as the service will generate one
     _transactionService.addTransaction(transaction).then((_) {
       if (mounted) {
         AppSnackBar.showSuccess(
@@ -160,13 +162,11 @@ class DashboardState extends State<Dashboard> {
   }
 
   void _handleDeleteTransaction(TransactionModel transaction) {
-    // Remove from local state first for immediate UI update
     setState(() {
       _transactions.remove(transaction);
       _updateChartsForTimeRange();
     });
 
-    // Then delete from storage
     if (transaction.id != null) {
       _transactionService.deleteTransaction(transaction.id!).then((_) {
         if (mounted) {
@@ -178,12 +178,10 @@ class DashboardState extends State<Dashboard> {
       }).catchError((error) {
         debugPrint('Error deleting transaction: $error');
         if (mounted) {
-          // Add back to local state if deletion fails
           setState(() {
             _transactions.add(transaction);
             _updateChartsForTimeRange();
           });
-          
           AppSnackBar.showError(
             context,
             message: LocaleData.failedToDeleteTransaction.getString(context),
@@ -204,76 +202,97 @@ class DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.lightBackground,
-      appBar: AppBar(
-        backgroundColor: AppColors.lightBackground,
-        title: Text(
-          LocaleData.chatbotTitle.getString(context), 
-          style: const TextStyle( // Added const
-            color: AppColors.primary,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        automaticallyImplyLeading: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.help_outline),
-            onPressed: () => DashboardHelp.show(context),
-          ),
-        ],
-      ),
-      body: _isLoading
-        ? const Center(child: CircularProgressIndicator())
-        : Stack(
-            children: [
-              Column(
-                children: [
-                  Expanded(
-                    child: RefreshIndicator(
-                      onRefresh: _loadDashboardData,
-                      child: SingleChildScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            BalanceCard(
-                              balance: _currentBalance,
-                              income: _monthlyIncome,
-                              expenses: _monthlyExpenseTotal,
-                              timeRange: currentTimeRange,
-                            ),
-                            TimeRangeSelector(
-                              initialTimeRange: currentTimeRange,
-                              onTimeRangeChanged: _onTimeRangeChanged,
-                            ),
-                            const RobotAnimationHeader(), // Added const
-                            const NavigationTiles(),
-                            _buildRecentTransactions(),
-                            // Add extra padding at the bottom to ensure content isn't hidden behind the chatbot bar
-                            const SizedBox(height: 100),
-                          ],
-                        ),
-                      ),
-                    ),
+    return ValueListenableBuilder<String>(
+      valueListenable: SettingsNotifier().textSizeNotifier,
+      builder: (context, textSize, child) {
+        double textScaleFactor;
+        switch (textSize) {
+          case 'Small':
+            textScaleFactor = 0.8;
+            break;
+          case 'Large':
+            textScaleFactor = 1.2;
+            break;
+          default:
+            textScaleFactor = 1.0;
+        }
+
+        return Builder(
+          builder: (context) => MediaQuery(
+            data: MediaQuery.of(context).copyWith(
+              textScaler: TextScaler.linear(textScaleFactor),
+            ),
+            child: Scaffold(
+              backgroundColor: AppColors.lightBackground,
+              appBar: AppBar(
+                backgroundColor: AppColors.lightBackground,
+                title: Text(
+                  LocaleData.chatbotTitle.getString(context),
+                  style: const TextStyle(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.bold,
                   ),
-                  // Chatbot bar at the bottom
-                  AppNavbar(onSearchSubmitted: _navigateToChatbot),
+                ),
+                automaticallyImplyLeading: true,
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.help_outline),
+                    onPressed: () => DashboardHelp.show(context),
+                  ),
                 ],
               ),
-
-              Positioned(
-                right: 16,
-                bottom: 90, // Position above the chatbot bar
-                child: FloatingActionButton(
-                  backgroundColor: AppColors.darkBlue,
-                  onPressed: () => _showAddTransactionModal(context),
-                  child: const Icon(Icons.add, color: Colors.white),
-                ),
-              ),
-            ],
+              body: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : Stack(
+                      children: [
+                        Column(
+                          children: [
+                            Expanded(
+                              child: RefreshIndicator(
+                                onRefresh: _loadDashboardData,
+                                child: SingleChildScrollView(
+                                  physics: const AlwaysScrollableScrollPhysics(),
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      BalanceCard(
+                                        balance: _currentBalance,
+                                        income: _monthlyIncome,
+                                        expenses: _monthlyExpenseTotal,
+                                        timeRange: currentTimeRange,
+                                      ),
+                                      TimeRangeSelector(
+                                        initialTimeRange: currentTimeRange,
+                                        onTimeRangeChanged: _onTimeRangeChanged,
+                                      ),
+                                      const RobotAnimationHeader(),
+                                      const NavigationTiles(),
+                                      _buildRecentTransactions(),
+                                      const SizedBox(height: 100),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            AppNavbar(onSearchSubmitted: _navigateToChatbot),
+                          ],
+                        ),
+                        Positioned(
+                          right: 16,
+                          bottom: 90,
+                          child: FloatingActionButton(
+                            backgroundColor: AppColors.darkBlue,
+                            onPressed: () => _showAddTransactionModal(context),
+                            child: const Icon(Icons.add, color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+            ),
           ),
+        );
+      },
     );
   }
 

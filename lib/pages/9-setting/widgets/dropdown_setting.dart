@@ -20,10 +20,9 @@ class DropdownSettingOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: AppColors.primary),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
