@@ -1,7 +1,7 @@
 import 'package:finney/shared/localization/locales.dart';
 import 'package:finney/pages/2-chatbot/chatbot.dart';
 import 'package:finney/pages/3-dashboard/budget_reminder_page.dart';
-import 'package:finney/pages/4-saving/add_saving/saving_goal_page.dart';
+import 'package:finney/pages/4-saving/saving_goal_page.dart';
 import 'package:finney/pages/7-insights/insights.dart';
 import 'package:finney/pages/5-learn/learn.dart';
 import 'package:finney/pages/8-report/report.dart';
@@ -22,7 +22,7 @@ class NavigationTiles extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(left: 16, bottom: 16),
           child: Text(
-            LocaleData.feature.getString(context),
+            LocaleData.features.getString(context),
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -46,11 +46,12 @@ class NavigationTiles extends StatelessWidget {
   }
 
   Widget _buildFeatureGrid(BuildContext context) {
-    // Define our navigation items
+    // Define our navigation items with custom colors
     final features = [
       _FeatureItem(
         title: 'Insights',
         icon: Icons.bar_chart,
+        color: Colors.blue,
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => const Insights()),
@@ -58,7 +59,8 @@ class NavigationTiles extends StatelessWidget {
       ),
       _FeatureItem(
         title: 'AI Assistant',
-        icon: Icons.support_agent_rounded,
+        icon: Icons.question_answer,
+        color: Colors.indigo,
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => const Chatbot()),
@@ -67,6 +69,7 @@ class NavigationTiles extends StatelessWidget {
       _FeatureItem(
         title: 'Prediction',
         icon: Icons.insights_rounded,
+        color: Colors.orange,
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => const Report()),
@@ -75,6 +78,7 @@ class NavigationTiles extends StatelessWidget {
       _FeatureItem(
         title: 'Goals',
         icon: Icons.flag,
+        color: Colors.green,
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => const SavingGoalPage()),
@@ -83,6 +87,7 @@ class NavigationTiles extends StatelessWidget {
       _FeatureItem(
         title: 'Reminder',
         icon: Icons.alarm,
+        color: Colors.red,
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => const BudgetReminderPage()),
@@ -91,6 +96,7 @@ class NavigationTiles extends StatelessWidget {
       _FeatureItem(
         title: 'Settings',
         icon: Icons.settings,
+        color: Colors.blueGrey,
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => const Setting()),
@@ -106,11 +112,12 @@ class NavigationTiles extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       mainAxisSpacing: 16,
       crossAxisSpacing: 12,
-      childAspectRatio: 0.9, // Adjust for better tile proportions
+      childAspectRatio: 0.9,
       children: features.map((feature) => _buildNavigationTile(
         context,
         feature.title,
         feature.icon,
+        feature.color,
         feature.onTap,
       )).toList(),
     );
@@ -210,6 +217,7 @@ class NavigationTiles extends StatelessWidget {
     BuildContext context,
     String title,
     IconData icon,
+    Color color,
     VoidCallback onTap,
   ) {
     return InkWell(
@@ -220,19 +228,19 @@ class NavigationTiles extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: 56,
-            height: 56,
+            width: 80,
+            height: 80,
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: Icon(icon, color: AppColors.primary, size: 26),
+            child: Icon(icon, color: color, size: 50),
           ),
           const SizedBox(height: 8),
           Text(
             _getLocalizedTitle(context, title),
             style: TextStyle(
-              fontSize: 11,
+              fontSize: 12,
               color: AppColors.darkBlue,
               fontWeight: FontWeight.w500,
             ),
@@ -250,11 +258,13 @@ class NavigationTiles extends StatelessWidget {
 class _FeatureItem {
   final String title;
   final IconData icon;
+  final Color color;
   final VoidCallback onTap;
   
   _FeatureItem({
     required this.title,
     required this.icon,
+    this.color = AppColors.primary, // Default to primary app color
     required this.onTap,
   });
 }

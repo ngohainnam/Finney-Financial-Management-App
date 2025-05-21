@@ -1,4 +1,5 @@
 import 'package:finney/shared/theme/app_color.dart';
+import 'package:finney/shared/widgets/common/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:finney/pages/2-chatbot/services/stt_service.dart';
@@ -37,8 +38,9 @@ class _VoiceChatInterfaceState extends State<VoiceChatInterface> {
   Future<void> _initializeSpeechService() async {
     bool available = await _sttService.initialize();
     if (!available && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(LocaleData.voiceSttNotAvailable.getString(context)),),
+      AppSnackBar.showError(
+        context,
+        message: LocaleData.voiceSttNotAvailable.getString(context),
       );
     }
   }

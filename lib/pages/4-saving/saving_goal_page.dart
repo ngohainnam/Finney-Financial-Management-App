@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:finney/core/storage/cloud/models/saving_goal_model.dart';
 import 'package:finney/core/storage/cloud/service/saving_goal_service.dart';
-import 'package:finney/pages/4-saving/add_saving/add_edit_goal_page.dart';
+import 'package:finney/pages/4-saving/add_edit_goal_page.dart';
 import 'package:finney/pages/3-dashboard/widgets/goal_card.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/shared/localization/locales.dart';

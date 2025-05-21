@@ -13,7 +13,7 @@ mixin LocaleData {
   static const String email = 'email';
   static const String userId = 'userId';
   static const String edit = 'edit';
-  static const String feature= 'feature';
+  static const String features= 'features';
   static const String save = 'save';
   static const String prediction = 'prediction';
   static const String close = 'close';
@@ -853,7 +853,7 @@ mixin LocaleData {
     transactionPreviewCancel: 'Cancel',
     transactionPreviewConfirm: 'Confirm',
     chatInputHint: 'Ask me a financial question...',
-    feature: 'Feature',
+    features: 'Features',
     nonFinancialQuestion: 'I\'m here to help with your financial questions. What money matters can I assist with?',
     nonFinancialImage: 'I can only analyze financial documents or receipts. Need help with something financial?',
     addNew : 'Add New',
@@ -955,7 +955,7 @@ mixin LocaleData {
     learnMore: 'আরও জানুন',
     backToTopics: 'বিষয়গুলোতে ফিরে যান',
     aiAssistant: 'এআই সহকারী',
-    feature: 'ফিচার',
+    features: 'ফিচার',
     chatCleared: 'চ্যাট ইতিহাস মুছে ফেলা হয়েছে',
     moneyManagementPoint1: 'নিয়মিত আয় এবং খরচ ট্র্যাক করুন',
     moneyManagementPoint2: 'প্রয়োজন এবং চাওয়ার মধ্যে পার্থক্য করুন',

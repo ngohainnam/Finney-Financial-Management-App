@@ -299,11 +299,6 @@ class _InsightsState extends State<Insights> with SingleTickerProviderStateMixin
                 ),
               ],
             ),
-      floatingActionButton: _isLoading ? null : FloatingActionButton(
-        onPressed: _loadData,
-        backgroundColor: AppColors.primary,
-        child: const Icon(Icons.refresh),
-      ),
     );
   }
 }
