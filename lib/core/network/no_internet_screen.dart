@@ -1,34 +1,88 @@
 import 'package:flutter/material.dart';
 import 'package:finney/core/storage/storage_manager.dart';
+import 'package:finney/shared/theme/app_color.dart';
+import 'dart:async';
 
-class InternetConnectionHandler extends StatelessWidget {
+class InternetConnectionHandler extends StatefulWidget {
   final Widget child;
   final Widget? offlineWidget;
+  final Duration initialCheckDelay;
   
   const InternetConnectionHandler({
     super.key,
     required this.child,
     this.offlineWidget,
+    this.initialCheckDelay = const Duration(seconds: 2),
   });
+
+  @override
+  State<InternetConnectionHandler> createState() => _InternetConnectionHandlerState();
+}
+
+class _InternetConnectionHandlerState extends State<InternetConnectionHandler> {
+  bool _initialCheckComplete = false;
+  late Timer _initialCheckTimer;
+  
+  @override
+  void initState() {
+    super.initState();
+    // Set a timer to complete the initial check
+    _initialCheckTimer = Timer(widget.initialCheckDelay, () {
+      if (mounted) {
+        setState(() {
+          _initialCheckComplete = true;
+        });
+      }
+    });
+  }
+  
+  @override
+  void dispose() {
+    _initialCheckTimer.cancel();
+    super.dispose();
+  }
   
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<bool>(
       stream: StorageManager().connectionStatus,
-      initialData: StorageManager().isConnected,
+      initialData: true, // Assume connected initially
       builder: (context, snapshot) {
-        final isConnected = snapshot.data ?? false;
+        final isConnected = snapshot.data ?? true;
+        
+        // Always show main app during initial check
+        if (!_initialCheckComplete) {
+          return widget.child;
+        }
         
         if (isConnected) {
-          return child;
+          return widget.child;
         } else {
-          return offlineWidget ?? _buildDefaultOfflineWidget(context);
+          // If we have a custom offline widget, use that
+          if (widget.offlineWidget != null) {
+            return widget.offlineWidget!;
+          }
+          
+          // Default offline widget with proper directionality
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              primaryColor: AppColors.primary,
+              fontFamily: 'NotoSerifBengali',
+            ),
+            home: _NoInternetScreen(),
+          );
         }
       },
     );
   }
-  
-  Widget _buildDefaultOfflineWidget(BuildContext context) {
+}
+
+class _NoInternetScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final Color primaryColor = Theme.of(context).primaryColor;
+    
     return Scaffold(
       body: Center(
         child: Column(
@@ -37,7 +91,7 @@ class InternetConnectionHandler extends StatelessWidget {
             Icon(
               Icons.signal_wifi_off,
               size: 80.0,
-              color: Theme.of(context).primaryColor,
+              color: primaryColor,
             ),
             const SizedBox(height: 24.0),
             const Text(
@@ -63,6 +117,8 @@ class InternetConnectionHandler extends StatelessWidget {
             const SizedBox(height: 32.0),
             ElevatedButton(
               onPressed: () {
+                // This is just a visual indicator - actual connectivity checking
+                // happens in the stream
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Checking connection...'),
@@ -71,7 +127,7 @@ class InternetConnectionHandler extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).primaryColor,
+                backgroundColor: primaryColor,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 24.0,
                   vertical: 12.0,

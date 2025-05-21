@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finney/core/storage/cloud/models/saving_goal_model.dart';
-import 'package:finney/pages/4-saving/services/saving_notification_service.dart';
+import 'package:finney/shared/widgets/common/snack_bar.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/shared/localization/locales.dart';
 
@@ -68,8 +68,8 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
       try {
         final amount = double.tryParse(_targetAmountController.text);
         if (amount == null || amount <= 0) {
-          SavingNotificationService.showError(
-            context: context,
+          AppSnackBar.showError(
+            context,
             message: LocaleData.pleaseEnterPositiveAmount.getString(context),
           );
           return;
@@ -95,8 +95,8 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
             .doc(goal.id)
             .set(goal.toMap());
 
-        SavingNotificationService.showSuccess(
-          context: context,
+        AppSnackBar.showSuccess(
+          context,
           message: widget.existingGoal == null
               ? LocaleData.goalCreated.getString(context).replaceFirst('%s', goal.title)
               : LocaleData.goalUpdated.getString(context).replaceFirst('%s', goal.title),
@@ -108,8 +108,8 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
 
         Navigator.of(context).pop();
       } catch (e) {
-        SavingNotificationService.showError(
-          context: context,
+        AppSnackBar.showError(
+          context,
           message: LocaleData.errorSavingGoal.getString(context),
         );
       }
