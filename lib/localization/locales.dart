@@ -462,6 +462,17 @@ mixin LocaleData {
   static const String weakPasswordError = 'weak_password_error';
   static const String hiveStorageError = 'hive_storage_error';
   static const String selectLanguage = 'select_language';
+  static const String searchHint = 'searchHint';
+  static const String expenseSummary = 'expenseSummary';
+  static const String incomeSummary = 'incomeSummary';
+  static const String expenseCategorySummary = 'expenseCategorySummary';
+  static const String incomeCategorySummary = 'incomeCategorySummary';
+  static const String greeting = 'greeting';
+  static const String languageUpdated = 'languageUpdated';
+  static const String textSizeUpdated = 'textSizeUpdated';
+  static const String small = 'small';
+  static const String medium = 'medium';
+  static const String large = 'large';
 
   static const Map<String, String> en = {
     appTitle: 'Finney',
@@ -621,7 +632,7 @@ mixin LocaleData {
     savedAmount: 'Saved: %s',
     targetAmount: 'Target: %s',
     percentCompleted: '%s% completed',
-    targetDate: 'Target date: %s',
+    targetDate: 'Target date:',
     daysLeft: '%d days left',
     daysOverdue: '%d days overdue',
     addSavings: 'Add Savings',
@@ -848,10 +859,10 @@ mixin LocaleData {
     addNew : 'Add New',
     categorySpentAmount: 'Spent %s in %s category (%s%%)',
     categoryEarnedAmount: 'Earned %s from %s category (%s%%)',
-    'expenseSummary': 'Total expenses: %s, average: %s. Highest expense: %s on %s, and lowest expense: %s on %s.',
-    'incomeSummary': 'Total income: %s, average: %s. Highest income: %s on %s, and lowest income: %s on %s.',
-    'expenseCategorySummary': 'Highest expense is in %s category, which is %s (%s%%).',
-    'incomeCategorySummary': 'Highest income is from %s category, which is %s (%s%%).',
+    expenseSummary: 'Total expenses: %s, average: %s. Highest expense: %s on %s, and lowest expense: %s on %s.',
+    incomeSummary: 'Total income: %s, average: %s. Highest income: %s on %s, and lowest income: %s on %s.',
+    expenseCategorySummary: 'Highest expense is in %s category, which is %s (%s%%).',
+    incomeCategorySummary: 'Highest income is from %s category, which is %s (%s%%).',
     forgotPasswordTitle: 'Forgot Password',
     emailHint: 'Enter your email',
     sendResetLink: 'Send Reset Link',
@@ -883,6 +894,13 @@ mixin LocaleData {
     reminder: 'Reminder',
     financeAcademy: 'Finance Academy',
     learnFinanceDescription: 'Learn the basics of finance and money management',
+    searchHint: 'Ask me financial question...',
+    greeting: 'Hi',
+    languageUpdated : 'Language Updated',
+    textSizeUpdated : 'Text Size Updated',
+    small: 'Small',
+    medium : 'Medium',
+    large : 'Large',
   };
 
   static const Map<String, String> bd = {
@@ -1271,10 +1289,17 @@ mixin LocaleData {
     addNew : 'Add New',
     categorySpentAmount: '%s টাকা %s শ্রেণী থেকে খরচ হয়েছে (%s%%)',
     categoryEarnedAmount: '%s টাকা %s শ্রেণী থেকে আয় হয়েছে (%s%%)',
-    'expenseSummary': 'মোট খরচ হয়েছে %s, গড়ে %s। সর্বোচ্চ খরচ হয়েছে %s %s তারিখে, এবং সর্বনিম্ন খরচ হয়েছে %s %s তারিখে।',
-    'incomeSummary': 'মোট আয় হয়েছে %s, গড়ে %s। সর্বোচ্চ আয় হয়েছে %s %s তারিখে, এবং সর্বনিম্ন আয় হয়েছে %s %s তারিখে।',
-    'expenseCategorySummary': 'সর্বোচ্চ খরচ হয়েছে %s শ্রেণী থেকে , যা %s (%s%%)।',
-    'incomeCategorySummary': 'সর্বোচ্চ আয় হয়েছে %s শ্রেণী থেকে, যা %s (%s%%)।',
+    expenseSummary: 'মোট খরচ হয়েছে %s, গড়ে %s। সর্বোচ্চ খরচ হয়েছে %s %s তারিখে, এবং সর্বনিম্ন খরচ হয়েছে %s %s তারিখে।',
+    incomeSummary: 'মোট আয় হয়েছে %s, গড়ে %s। সর্বোচ্চ আয় হয়েছে %s %s তারিখে, এবং সর্বনিম্ন আয় হয়েছে %s %s তারিখে।',
+    expenseCategorySummary: 'সর্বোচ্চ খরচ হয়েছে %s শ্রেণী থেকে , যা %s (%s%%)।',
+    incomeCategorySummary: 'সর্বোচ্চ আয় হয়েছে %s শ্রেণী থেকে, যা %s (%s%%)।',
+    searchHint: 'আমাকে আর্থিক প্রশ্ন জিজ্ঞাসা করুন...',
+    greeting: 'হাই',
+    languageUpdated : 'ভাষা আপডেট হয়েছে',
+    textSizeUpdated : 'টেক্সট সাইজ আপডেট হয়েছে',
+    small: 'ছোট',
+    medium : 'মাঝারি',
+    large : 'বড়',
   };
 }
 
