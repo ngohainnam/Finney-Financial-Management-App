@@ -14,24 +14,24 @@ class UserModel extends HiveObject {
   final String name;
 
   @HiveField(3)
-  final String incomeRange;
+  String? incomeRange;
 
   @HiveField(4)
-  final String ageGroup;
+  String? ageGroup;
 
   @HiveField(5)
-  final String financialGoals;
+  String? financialGoals;
 
   @HiveField(6)
-  final double currentBalance;
+  double currentBalance;
 
   UserModel({
     required this.uid,
     required this.email,
     required this.name,
-    this.incomeRange = '',
-    this.ageGroup = '',
-    this.financialGoals = '',
+    this.incomeRange,
+    this.ageGroup,
+    this.financialGoals,
     this.currentBalance = 0.0,
   });
 }

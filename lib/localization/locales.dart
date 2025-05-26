@@ -1,6 +1,8 @@
 import 'package:flutter_localization/flutter_localization.dart';
 
 mixin LocaleData {
+  static const String transactionDeleted = 'transactionDeleted';
+  static const String failedToDeleteTransaction = 'failedToDeleteTransaction';
   static const String appTitle = 'appTitle';
   static const String settings = 'settings';
   static const String viewProfile = 'viewProfile';
@@ -11,7 +13,9 @@ mixin LocaleData {
   static const String email = 'email';
   static const String userId = 'userId';
   static const String edit = 'edit';
+  static const String features= 'features';
   static const String save = 'save';
+  static const String prediction = 'prediction';
   static const String close = 'close';
   static const String appearance = 'appearance';
   static const String language = 'language';
@@ -39,6 +43,9 @@ mixin LocaleData {
   static const String user = 'user';
   static const String notAvailable = 'notAvailable';
   // Previous Learn page keys
+  static const String financeAcademy = 'financeAcademy';
+  static const String learnFinanceDescription = 'learnFinanceDescription';
+  static const String reminder = 'reminder';
   static const String financialBasics = 'financialBasics';
   static const String askFinneyAI = 'askFinneyAI';
   static const String moneyManagement = 'moneyManagement';
@@ -67,6 +74,7 @@ mixin LocaleData {
   static const String investingFundamentalsPoint4 = 'investingFundamentalsPoint4';
   static const String financialSafetyPoint1 = 'financialSafetyPoint1';
   static const String financialSafetyPoint2 = 'financialSafetyPoint2';
+  static const String errorLoadingMessages = 'errorLoadingMessages';
   static const String financialSafetyPoint3 = 'financialSafetyPoint3';
   static const String financialSafetyPoint4 = 'financialSafetyPoint4';
   static const String resourceMoneyManagementVideo = 'resourceMoneyManagementVideo';
@@ -178,6 +186,7 @@ mixin LocaleData {
   static const String pleaseEnterAmount = 'pleaseEnterAmount';
   static const String pleaseEnterValidNumber = 'pleaseEnterValidNumber';
   static const String amountMustBePositive = 'amountMustBePositive';
+  static const String amountExceedsTarget = 'amountExceedsTarget';
   static const String add = 'add';
   static const String deleteGoal = 'deleteGoal';
   static const String confirmDeleteGoal = 'confirmDeleteGoal';
@@ -221,6 +230,9 @@ mixin LocaleData {
   static const String setTargetDates = 'setTargetDates';
   static const String setTargetDatesDescription = 'setTargetDatesDescription';
   static const String gotIt = 'gotIt';
+  static const String savingsAddedSuccessfully = 'savingsAddedSuccessfully';
+  static const String insufficientBalance = 'insufficientBalance';
+  static const String errorAddingSavings = 'errorAddingSavings';
   // add income
   static const String addExpense = 'addExpense';
   static const String editExpense = 'editExpense';
@@ -256,6 +268,7 @@ mixin LocaleData {
   static const String business = 'business';
   static const String gift = 'gift';
   // Dashboard help
+  static const String chatCleared = 'chatCleared';
   static const String dashboardHelpTitle = 'dashboardHelpTitle';
   static const String dashboardHelpSubtitle = 'dashboardHelpSubtitle';
   static const String dashboardHelpBalance = 'dashboardHelpBalance';
@@ -416,6 +429,39 @@ mixin LocaleData {
   // New ChatConstants non-financial response keys
   static const String nonFinancialQuestion = 'non_financial_question';
   static const String nonFinancialImage = 'non_financial_image';
+  static const String categorySpentAmount = 'categorySpentAmount';
+  static const String categoryEarnedAmount = 'categoryEarnedAmount';
+  // ForgotPasswordPage keys
+  static const String forgotPasswordTitle = 'forgot_password_title';
+  static const String emailHint = 'email_hint';
+  static const String sendResetLink = 'send_reset_link';
+  static const String backToLogin = 'back_to_login';
+  static const String passwordResetSuccess = 'password_reset_success';
+  static const String passwordResetError = 'password_reset_error';
+  static const String dialogOk = 'dialog_ok';
+  // LoginPage keys
+  static const String loginTitle = 'login_title';
+  static const String passwordHint = 'password_hint';
+  static const String forgotPassword = 'forgot_password';
+  static const String signInButton = 'sign_in_button';
+  static const String continueWith = 'continue_with';
+  static const String notMember = 'not_member';
+  static const String registerNow = 'register_now';
+  static const String loginError = 'login_error';
+  static const String userNotFoundError = 'user_not_found_error';
+  // RegisterPage keys
+  static const String registerTitle = 'register_title';
+  static const String confirmPasswordHint = 'confirm_password_hint';
+  static const String signUpButton = 'sign_up_button';
+  static const String alreadyMember = 'already_member';
+  static const String loginNow = 'login_now';
+  static const String passwordStrong = 'password_strong';
+  static const String passwordWeak = 'password_weak';
+  static const String invalidGmailError = 'invalid_gmail_error';
+  static const String passwordsNotMatchError = 'passwords_not_match_error';
+  static const String weakPasswordError = 'weak_password_error';
+  static const String hiveStorageError = 'hive_storage_error';
+  static const String selectLanguage = 'select_language';
 
   static const Map<String, String> en = {
     appTitle: 'Finney',
@@ -458,6 +504,7 @@ mixin LocaleData {
     financialBasics: 'Financial Basics',
     askFinneyAI: 'Ask Finney AI for any help',
     moneyManagement: 'Money Management',
+    prediction: 'Prediction',
     moneyManagementSubtitle: 'Track, plan, and control your money',
     savingBudgeting: 'Saving & Budgeting',
     savingBudgetingSubtitle: 'Learn how to save and budget smartly',
@@ -565,6 +612,8 @@ mixin LocaleData {
     deleteTransactions: 'Delete Transactions',
     confirmDeleteTransactions: 'Are you sure you want to delete %d transaction(s)?',
     delete: 'Delete',
+    transactionDeleted: 'Transaction deleted successfully',
+    failedToDeleteTransaction: 'Failed to delete transaction. Please try again.',
     errorLoadingTransactions: 'Error loading transactions',
     confirmDeleteAction: 'This action cannot be undone. Are you sure you want to delete %d transaction(s)?',
     deleteTransaction: 'Delete Transaction',
@@ -582,6 +631,7 @@ mixin LocaleData {
     pleaseEnterAmount: 'Please enter an amount',
     pleaseEnterValidNumber: 'Please enter a valid number',
     amountMustBePositive: 'Amount must be positive',
+    amountExceedsTarget: 'Amount exceeds remaining target of %s. Please enter a smaller amount.',
     add: 'Add',
     deleteGoal: 'Delete Goal',
     confirmDeleteGoal: 'Are you sure you want to delete "%s"?',
@@ -648,6 +698,7 @@ mixin LocaleData {
     noTransactionsYet: 'No transactions yet',
     today: 'Today',
     yesterday: 'Yesterday',
+    chatCleared: 'Chat history cleared',
     dashboardHelpTitle: 'How to use the Dashboard',
     dashboardHelpSubtitle: 'Track your finances easily',
     dashboardHelpBalance: 'View your current balance, income, and expenses at a glance',
@@ -737,6 +788,7 @@ mixin LocaleData {
     intermediateQuizTitle: 'Intermediate Quiz',
     intermediateQuizQuestion1: 'What is the purpose of an emergency fund?',
     intermediateQuizQuestion1Answer1: 'To pay for vacations',
+    errorLoadingMessages: 'Error loading chat messages',
     intermediateQuizQuestion1Answer2: 'To cover unexpected expenses',
     intermediateQuizQuestion1Answer3: 'To invest in stocks',
     intermediateQuizQuestion2: 'What percentage of your income should go to needs in the 50-30-20 rule?',
@@ -790,9 +842,47 @@ mixin LocaleData {
     transactionPreviewCancel: 'Cancel',
     transactionPreviewConfirm: 'Confirm',
     chatInputHint: 'Ask me a financial question...',
+    features: 'Features',
     nonFinancialQuestion: 'I\'m here to help with your financial questions. What money matters can I assist with?',
     nonFinancialImage: 'I can only analyze financial documents or receipts. Need help with something financial?',
     addNew : 'Add New',
+    categorySpentAmount: 'Spent %s in %s category (%s%%)',
+    categoryEarnedAmount: 'Earned %s from %s category (%s%%)',
+    'expenseSummary': 'Total expenses: %s, average: %s. Highest expense: %s on %s, and lowest expense: %s on %s.',
+    'incomeSummary': 'Total income: %s, average: %s. Highest income: %s on %s, and lowest income: %s on %s.',
+    'expenseCategorySummary': 'Highest expense is in %s category, which is %s (%s%%).',
+    'incomeCategorySummary': 'Highest income is from %s category, which is %s (%s%%).',
+    forgotPasswordTitle: 'Forgot Password',
+    emailHint: 'Enter your email',
+    sendResetLink: 'Send Reset Link',
+    backToLogin: 'Back to login',
+    passwordResetSuccess: 'A password reset link has been sent to your email.',
+    passwordResetError: 'Failed to send reset link. Please check your email and try again.',
+    dialogOk: 'OK',
+    loginTitle: 'Login to your Account',
+    passwordHint: 'Password',
+    forgotPassword: 'Forgot Password?',
+    signInButton: 'Sign In',
+    continueWith: 'Or continue with',
+    notMember: 'Not a member?',
+    registerNow: 'Register now',
+    loginError: 'Incorrect email/password. Please check again.',
+    userNotFoundError: 'User details not found in local storage.',
+    registerTitle: 'Create your Account',
+    confirmPasswordHint: 'Confirm Password',
+    signUpButton: 'Sign Up',
+    alreadyMember: 'Already a member?',
+    loginNow: 'Log in now',
+    passwordStrong: '✅ Strong password',
+    passwordWeak: '❌ Use 12+ chars w/ upper, lower, number & symbol',
+    invalidGmailError: 'Please enter a valid Gmail address.',
+    passwordsNotMatchError: 'Passwords do not match.',
+    weakPasswordError: 'Password must be at least 12 characters long and include uppercase, lowercase, number, and symbol.',
+    hiveStorageError: 'Failed to store user in local storage.',
+    selectLanguage: 'Select Language',
+    reminder: 'Reminder',
+    financeAcademy: 'Finance Academy',
+    learnFinanceDescription: 'Learn the basics of finance and money management',
   };
 
   static const Map<String, String> bd = {
@@ -829,8 +919,8 @@ mixin LocaleData {
     helpSupportComingSoon: 'সহায়তা ও সমর্থন পৃষ্ঠা শীঘ্রই আসছে!',
     logOut: 'লগ আউট',
     signedOut: 'সফলভাবে সাইন আউট হয়েছে',
-    errorLoadingData: 'ব্যবহারকারীর ডেটা লোড করতে ব্যর্থ',
-    errorSavingData: 'ব্যবহারকারীর ডেটা সংরক্ষণ করতে ব্যর্থ',
+    errorLoadingData: 'তথ্য লোড করতে ব্যর্থ',
+    errorSavingData: 'তথ্য সংরক্ষণের ত্রুটি',
     user: 'ব্যবহারকারী',
     notAvailable: 'পাওয়া যায়নি',
     financialBasics: 'আর্থিক মৌলিক বিষয়',
@@ -847,7 +937,9 @@ mixin LocaleData {
     learnMore: 'আরও জানুন',
     backToTopics: 'বিষয়গুলোতে ফিরে যান',
     aiAssistant: 'এআই সহকারী',
-    moneyManagementPoint1: 'নিয়মিত আয় এবং ব্যয় ট্র্যাক করুন',
+    features: 'ফিচার',
+    chatCleared: 'চ্যাট ইতিহাস মুছে ফেলা হয়েছে',
+    moneyManagementPoint1: 'নিয়মিত আয় এবং খরচ ট্র্যাক করুন',
     moneyManagementPoint2: 'প্রয়োজন এবং চাওয়ার মধ্যে পার্থক্য করুন',
     moneyManagementPoint3: 'বেসিক ব্যাংকিং পরিষেবা বুঝুন',
     moneyManagementPoint4: 'একটি সাধারণ আর্থিক রেকর্ড বজায় রাখুন',
@@ -856,6 +948,8 @@ mixin LocaleData {
     savingBudgetingPoint3: 'আপনার সঞ্চয় স্বয়ংক্রিয় করুন',
     savingBudgetingPoint4: 'মাসিক বাজেট পর্যালোচনা এবং সমন্বয় করুন',
     investingFundamentalsPoint1: 'ঝুঁকি এবং রিটার্ন বুঝুন',
+    transactionDeleted: 'লেনদেন সফলভাবে মুছে ফেলা হয়েছে',
+    failedToDeleteTransaction: 'লেনদেন মুছতে ব্যর্থ হয়েছে। আবার চেষ্টা করুন।',
     investingFundamentalsPoint2: 'আপনার বিনিয়োগ বৈচিত্র্যময় করুন',
     investingFundamentalsPoint3: 'স্টক, বন্ড এবং মিউচুয়াল ফান্ড সম্পর্কে জানুন',
     investingFundamentalsPoint4: 'ছোট বিনিয়োগ দিয়ে শুরু করুন এবং ধীরে ধীরে বাড়ান',
@@ -887,29 +981,33 @@ mixin LocaleData {
     intermediate: 'মধ্যবর্তী',
     intermediateSubtitle: 'উন্নত আর্থিক অভ্যাস গড়ে তুলুন',
     advanced: 'উন্নত',
+    errorLoadingMessages: 'চ্যাট বার্তা লোড করতে সমস্যা হয়েছে',
     advancedSubtitle: 'আপনার সম্পদ বাড়ান',
     testYourKnowledge: 'আপনার জ্ঞান পরীক্ষা করুন',
     testYourKnowledgeSubtitle: 'আপনার বোঝার পরীক্ষা করতে একটি কুইজ দিন',
-    failedToLoadDashboardData: 'ড্যাশবোর্ড ডেটা লোড করতে ব্যর্থ',
-    balanceCardTitle: 'ব্যালেন্স ওভারভিউ',
+    failedToLoadDashboardData: 'ড্যাশবোর্ড তথ্য লোড করতে ব্যর্থ',
+    balanceCardTitle: 'হিসাব নিকাশ  ওভারভিউ',
     timeRangeSelectorLabel: 'সময়সীমা নির্বাচন করুন',
     recentTransactionsTitle: 'সাম্প্রতিক লেনদেন',
     addTransactionTitle: 'লেনদেন যোগ করুন',
     aiPoweredFeatures: 'এআই চালিত বৈশিষ্ট্য',
     moneyTools: 'অর্থের সরঞ্জাম',
     insights: 'ইনসাইট',
+    financeAcademy: 'অর্থ একাডেমি',
+    reminder: 'রিমাইন্ডার',
+    learnFinanceDescription: 'বিশেষজ্ঞ কোর্সগুলির সাথে আপনার আর্থিক জ্ঞান বাড়ান',
     goals: 'লক্ষ্য',
     thinking: 'চিন্তা করছে...',
-    balance: 'ব্যালেন্স',
+    balance: 'হিসাব নিকাশ ',
     income: 'আয়',
-    expenses: 'ব্যয়',
-    expense: 'ব্যয়',
+    expenses: 'খরচ',
+    expense: 'খরচ',
     saving: 'সঞ্চয়',
     savings: 'সঞ্চয়',
     thisMonth: 'এই মাস',
     thisWeek: 'এই সপ্তাহ',
     thisYear: 'এই বছর',
-    customRange: 'কাস্টম রেঞ্জ',
+    customRange: 'কাস্টম পরিসীমা',
     selectTimePeriod: 'সময়কাল নির্বাচন করুন',
     allTime: 'সব সময়',
     mon: 'সোম',
@@ -931,19 +1029,19 @@ mixin LocaleData {
     oct: 'অক্টো',
     nov: 'নভে',
     dec: 'ডিসে',
-    spendingAnalysis: 'ব্যয় বিশ্লেষণ',
-    categoryBreakdown: 'বিভাগ ভাঙ্গন',
-    expenseAnalysis: 'ব্যয় বিশ্লেষণ',
+    spendingAnalysis: 'খরচ বিশ্লেষণ',
+    categoryBreakdown: 'শ্রেণী বিন্যাস ',
+    expenseAnalysis: 'খরচ বিশ্লেষণ',
     incomeAnalysis: 'আয় বিশ্লেষণ',
     transactions: 'লেনদেন',
-    selectItemsToDelete: 'মুছে ফেলার জন্য আইটেম নির্বাচন করুন',
+    selectItemsToDelete: 'নির্বাচিত আইটেমগুলি মুছুন',
     noTransactionsInThisPeriod: 'এই সময়কালে কোনো লেনদেন নেই',
     seeAll: 'সব দেখুন',
     deleteTransactions: 'লেনদেন মুছুন',
     confirmDeleteTransactions: 'আপনি কি নিশ্চিত যে %dটি লেনদেন মুছতে চান?',
     delete: 'মুছুন',
     errorLoadingTransactions: 'লেনদেন লোড করতে ত্রুটি',
-    confirmDeleteAction: 'এই ক্রিয়াটি পূর্বাবস্থায় ফেরানো যাবে না। আপনি কি নিশ্চিত যে %dটি লেনদেন মুছতে চান?',
+    confirmDeleteAction: 'এই ক্রিয়াটি পূর্বাবস্থায় ফেরানো যাবে না। আপনি কি লেনদেন (গুলি) মুছে ফেলার বিষয়ে নিশ্চিত?',
     deleteTransaction: 'লেনদেন মুছুন',
     confirmDeleteSingleTransaction: 'এই ক্রিয়াটি পূর্বাবস্থায় ফেরানো যাবে না। আপনি কি নিশ্চিত যে এই লেনদেনটি মুছতে চান?',
     savedAmount: 'সঞ্চিত: %s',
@@ -955,6 +1053,7 @@ mixin LocaleData {
     addSavings: 'সঞ্চয় যোগ করুন',
     addToSavings: 'সঞ্চয়ে যোগ করুন',
     amount: 'পরিমাণ',
+    //savings: 'সঞ্চয়',
     pleaseEnterAmount: 'অনুগ্রহ করে একটি পরিমাণ লিখুন',
     pleaseEnterValidNumber: 'অনুগ্রহ করে একটি বৈধ সংখ্যা লিখুন',
     amountMustBePositive: 'পরিমাণ অবশ্যই ধনাত্মক হতে হবে',
@@ -988,19 +1087,19 @@ mixin LocaleData {
     goalDeleted: '"%s" মুছে ফেলা হয়েছে',
     goalWasDeleted: 'লক্ষ্য মুছে ফেলা হয়েছে',
     amountGreaterThanZero: 'অনুগ্রহ করে শূন্যের চেয়ে বেশি পরিমাণ লিখুন',
-    couldNotAddSavings: 'সঞ্চয়ে যোগ করা যায়নি। আবার চেষ্টা করুন।',
-    couldNotDeleteGoal: 'লক্ষ্য মুছতে পারেনি। আবার চেষ্টা করুন।',
-    goalsRefreshed: 'আপনার লক্ষ্য রিফ্রেশ করা হয়েছে',
-    aboutSavingGoals: 'সঞ্চয় লক্ষ্য সম্পর্কে',
-    trackProgress: 'আপনার অগ্রগতি ট্র্যাক করুন',
-    trackProgressDescription: 'আপনি প্রতিটি লক্ষ্যের কতটা কাছাকাছি দেখুন',
+    couldNotAddSavings: 'সঞ্চয় যোগ করা যায়নি',
+    couldNotDeleteGoal: 'লক্ষ্য মুছে ফেলা যায়নি',
+    goalsRefreshed: 'লক্ষ্য পুনরায় নিশ্চিত',
+    aboutSavingGoals: 'লক্ষ্য নির্ধারণ সম্পর্কে',
+    trackProgress: 'আপনার লক্ষ্যের অগ্রগতি দেখুন',
+    trackProgressDescription: 'লক্ষ্য অগ্রগতি বিবরণ',
     addMoneyAnytime: 'যেকোনো সময় অর্থ যোগ করুন',
     addMoneyAnytimeDescription: 'যখনই আপনি অর্থ সঞ্চয় করেন তখন আপনার লক্ষ্যে অবদান রাখুন',
     setTargetDates: 'লক্ষ্য তারিখ নির্ধারণ করুন',
     setTargetDatesDescription: 'স্পষ্ট সময়সীমা দিয়ে অনুপ্রাণিত থাকুন',
     gotIt: 'বুঝেছি',
-    addExpense: 'ব্যয় যোগ করুন',
-    editExpense: 'ব্যয় সম্পাদনা করুন',
+    addExpense: 'খরচ যোগ করুন',
+    editExpense: 'খরচ সম্পাদনা করুন',
     addIncome: 'আয় যোগ করুন',
     editIncome: 'আয় সম্পাদনা করুন',
     category: 'বিভাগ',
@@ -1026,14 +1125,14 @@ mixin LocaleData {
     yesterday: 'গতকাল',
     dashboardHelpTitle: 'ড্যাশবোর্ড কীভাবে ব্যবহার করবেন',
     dashboardHelpSubtitle: 'আপনার আর্থিক সহজে ট্র্যাক করুন',
-    dashboardHelpBalance: 'আপনার বর্তমান ব্যালেন্স, আয় এবং ব্যয় এক নজরে দেখুন',
-    dashboardHelpAddTransaction: '+ বোতাম ব্যবহার করে নতুন লেনদেন যোগ করুন',
+    dashboardHelpBalance: 'আপনার বর্তমান হিসাব নিকাশ , আয় এবং খরচ এক নজরে দেখুন',
+    dashboardHelpAddTransaction: '+ ব্যবহার করে নতুন লেনদেন যোগ করুন',
     dashboardHelpDeleteTransaction: 'লেনদেন মুছে ফেলতে বাম দিকে সোয়াইপ করুন',
-    dashboardHelpSpendingPatterns: 'সাপ্তাহিক ব্যয়ের ধরণ এবং বিভাগের বিভাজন পর্যবেক্ষণ করুন',
-    dashboardHelpRefresh: 'আপনার আর্থিক ডেটা রিফ্রেশ করতে নিচে টানুন',
+    dashboardHelpSpendingPatterns: 'সাপ্তাহিক খরচের ধরণ এবং শ্রেণী বিন্যাস পর্যবেক্ষণ করুন',
+    dashboardHelpRefresh: 'আপনার আর্থিক তথ্য রিফ্রেশ করতে নিচে টানুন',
     total: 'মোট',
-    noExpenseData: 'এই সময়ের জন্য কোনো ব্যয় ডেটা নেই',
-    noIncomeData: 'এই সময়ের জন্য কোনো আয় ডেটা নেই',
+    noExpenseData: 'এই সময়ের জন্য কোনো খরচ তথ্য নেই',
+    noIncomeData: 'এই সময়ের জন্য কোনো আয় তথ্য নেই',
     pagination: 'পৃষ্ঠা %d এর %d',
     hideAssistant: 'সহকারী লুকান',
     askAboutChart: 'এই চার্ট সম্পর্কে জিজ্ঞাসা করুন',
@@ -1041,8 +1140,8 @@ mixin LocaleData {
     assistant: 'সহকারী',
     queryError: 'দুঃখিত, আমি সেই প্রশ্নটি প্রক্রিয়া করতে পারিনি।',
     queryErrorWithMessage: 'দুঃখিত, একটি ত্রুটি ঘটেছে: %s',
-    chartContext: 'আমি একটি %s চার্ট দেখছি যা আমার %s ডেটা দেখাচ্ছে। চার্ট ডেটা: %s।',
-    queryPrompt: 'আপনি একজন সহায়ক আর্থিক সহকারী। চার্ট ডেটা সম্পর্কে নিম্নলিখিত প্রশ্নের উত্তর দিন। আপনার উত্তর সংক্ষিপ্ত (১০০ শব্দের নিচে) এবং চার্ট ডেটার উপর কেন্দ্রীভূত রাখুন। যদি প্রদত্ত ডেটা থেকে উত্তর দিতে না পারেন, তা স্পষ্টভাবে বলুন। চার্ট প্রেক্ষাপট: %s প্রশ্ন: %s',
+    chartContext: 'আমি একটি %s চার্ট দেখছি যা আমার %s তথ্য দেখাচ্ছে। চার্ট তথ্য: %s।',
+    queryPrompt: 'আপনি একজন সহায়ক আর্থিক সহকারী। চার্ট তথ্য সম্পর্কে নিম্নলিখিত প্রশ্নের উত্তর দিন। আপনার উত্তর সংক্ষিপ্ত (১০০ শব্দের নিচে) এবং চার্ট তথ্যর উপর কেন্দ্রীভূত রাখুন। যদি প্রদত্ত তথ্য থেকে উত্তর দিতে না পারেন, তা স্পষ্টভাবে বলুন। চার্ট প্রেক্ষাপট: %s প্রশ্ন: %s',
     quizTitle: 'উন্নত কুইজ',
     quizCompleted: 'কুইজ সম্পন্ন!',
     quizScore: 'আপনার স্কোর: %s/%s',
@@ -1061,6 +1160,7 @@ mixin LocaleData {
     quizQuestion3Answer2: 'একটি নির্দিষ্ট বাজার সূচক ট্র্যাক করে',
     quizQuestion3Answer3: 'গ্যারান্টিযুক্ত রিটার্ন',
     quizQuestion4: '4% অবসর নিয়ম কী?',
+    prediction: 'ভবিষ্যদ্বাণী',
     quizQuestion4Answer1: 'অবসরে বছরে 4% সঞ্চয় উত্তোলন করা',
     quizQuestion4Answer2: 'অবসরের জন্য আয়ের 4% সঞ্চয় করা',
     quizQuestion4Answer3: 'পরিকল্পিত সময়ের চেয়ে 4% বেশি কাজ করা',
@@ -1115,7 +1215,7 @@ mixin LocaleData {
     intermediateQuizQuestion1Answer1: 'ছুটির জন্য অর্থ প্রদান করা',
     intermediateQuizQuestion1Answer2: 'অপ্রত্যাশিত খরচ কভার করা',
     intermediateQuizQuestion1Answer3: 'স্টকে বিনিয়োগ করা',
-    intermediateQuizQuestion2: '50-30-20 নিয়মে আপনার আয়ের কত শতাংশ চাহিদার জন্য ব্যয় করা উচিত?',
+    intermediateQuizQuestion2: '50-30-20 নিয়মে আপনার আয়ের কত শতাংশ চাহিদার জন্য খরচ করা উচিত?',
     intermediateQuizQuestion2Answer1: '20%',
     intermediateQuizQuestion2Answer2: '30%',
     intermediateQuizQuestion2Answer3: '50%',
@@ -1158,20 +1258,23 @@ mixin LocaleData {
     chatbotHelpInstruction4: 'প্রস্তাবিত প্রশ্নগুলি চেষ্টা করুন বা নিজের প্রশ্ন টাইপ করুন',
     welcomeTryAsking: 'জিজ্ঞাসা করে দেখুন',
     welcomeWriteQuestion: 'নিজের প্রশ্ন লিখুন',
-    voiceListening: 'শোনা হচ্ছে... শেষ হলে আবার ট্যাপ করুন',
-    voiceProcessing: 'প্রক্রিয়াকরণ হচ্ছে...',
+    voiceListening: 'কণ্ঠস্বর শোনা যাচ্ছে... শেষ হলে আবার ট্যাপ করুন',
+    voiceProcessing: 'কণ্ঠস্বর প্রক্রিয়াকরণ...',
     voiceTapMic: 'ফিনি এআই-এর সাথে কথা বলতে মাইক্রোফোন ট্যাপ করুন',
     voiceSttNotAvailable: 'এই ডিভাইসে স্পিচ রিকগনিশন উপলব্ধ নয়',
-    transactionPreviewTitle: 'লেনদেন প্রিভিউ',
+    transactionPreviewTitle: 'লেনদেনের শিরোনাম',
     transactionPreviewCancel: 'বাতিল',
     transactionPreviewConfirm: 'নিশ্চিত করুন',
     chatInputHint: 'আমাকে একটি আর্থিক প্রশ্ন জিজ্ঞাসা করুন...',
     nonFinancialQuestion: 'আমি আপনার আর্থিক প্রশ্নগুলির সাথে সাহায্য করতে এখানে আছি। কোন অর্থের বিষয়ে আমি সহায়তা করতে পারি?',
     nonFinancialImage: 'আমি কেবল আর্থিক নথি বা রসিদ বিশ্লেষণ করতে পারি। আর্থিক কিছু নিয়ে সাহায্য প্রয়োজন?',
-    chatbotsuggestedQuestion1:  "এই মাসের আমার খরচের সারসংক্ষেপ লিখুন",
-    chatbotsuggestedQuestion2: 'আমার সর্বোচ্চ ব্যয়ের বিভাগ কোনটি?',
-    chatbotsuggestedQuestion3: 'আমার দৈনন্দিন খরচ কমানোর টিপস',
-    addNew : 'নতুন যোগ করুন',
+    addNew : 'Add New',
+    categorySpentAmount: '%s টাকা %s শ্রেণী থেকে খরচ হয়েছে (%s%%)',
+    categoryEarnedAmount: '%s টাকা %s শ্রেণী থেকে আয় হয়েছে (%s%%)',
+    'expenseSummary': 'মোট খরচ হয়েছে %s, গড়ে %s। সর্বোচ্চ খরচ হয়েছে %s %s তারিখে, এবং সর্বনিম্ন খরচ হয়েছে %s %s তারিখে।',
+    'incomeSummary': 'মোট আয় হয়েছে %s, গড়ে %s। সর্বোচ্চ আয় হয়েছে %s %s তারিখে, এবং সর্বনিম্ন আয় হয়েছে %s %s তারিখে।',
+    'expenseCategorySummary': 'সর্বোচ্চ খরচ হয়েছে %s শ্রেণী থেকে , যা %s (%s%%)।',
+    'incomeCategorySummary': 'সর্বোচ্চ আয় হয়েছে %s শ্রেণী থেকে, যা %s (%s%%)।',
   };
 }
 

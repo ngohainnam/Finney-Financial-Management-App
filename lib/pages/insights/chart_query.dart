@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:finney/assets/theme/app_color.dart';
-import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:finney/localization/locales.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 
@@ -24,7 +23,6 @@ class _ChartQueryState extends State<ChartQuery> {
   final TextEditingController _questionController = TextEditingController();
   String _answer = '';
   bool _isLoading = false;
-  final Gemini _gemini = Gemini.instance;
   bool _showQueryField = false;
 
   @override
@@ -32,47 +30,21 @@ class _ChartQueryState extends State<ChartQuery> {
     _questionController.dispose();
     super.dispose();
   }
-  String sprintf(String format, List<dynamic> args) {
-  String result = format;
-  for (int i = 0; i < args.length; i++) {
-    result = result.replaceFirst('%s', args[i].toString());
-  }
-  return result;
-  }
 
-  Future<void> _askQuestion() async {
-  if (_questionController.text.trim().isEmpty) return;
-
-  setState(() {
-    _isLoading = true;
-  });
-
-  try {
-    // Create context for the LLM about the chart data
-    final String chartContext = sprintf(
-      LocaleData.chartContext.getString(context),
-      [widget.chartType, widget.viewType, widget.chartData.toString()],
-    );
-
-    final prompt = sprintf(
-      LocaleData.queryPrompt.getString(context),
-      [chartContext, _questionController.text],
-    );
-
-    final response = await _gemini.prompt(
-      parts: [Part.text(prompt)],
-    );
+  void _askQuestion() {
+    if (_questionController.text.trim().isEmpty) return;
 
     setState(() {
-      _answer = response?.output ?? LocaleData.queryError.getString(context);
-      _isLoading = false;
+      _isLoading = true;
     });
-  } catch (e) {
-    setState(() {
-      _answer = sprintf(LocaleData.queryErrorWithMessage.getString(context), [e.toString()]);
-      _isLoading = false;
+
+    // Simulate processing delay
+    Future.delayed(const Duration(milliseconds: 500), () {
+      setState(() {
+        _answer = 'I am analyzing your chart data. Please wait for the response.';
+        _isLoading = false;
+      });
     });
-  }
   }
 
   @override

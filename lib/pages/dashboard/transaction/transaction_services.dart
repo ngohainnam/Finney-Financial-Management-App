@@ -228,4 +228,10 @@ class TransactionService {
 
     return monthlyExpenses.reversed.toList();
   }
+
+  // Get current balance from transactions
+  Future<double> getCurrentBalance() async {
+    final transactions = await getTransactions().first;
+    return transactions.fold<double>(0.0, (total, transaction) => total + transaction.amount);
+  }
 }
