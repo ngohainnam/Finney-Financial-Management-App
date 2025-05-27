@@ -161,34 +161,46 @@ class DashboardState extends State<Dashboard> {
     });
   }
 
-  void _handleDeleteTransaction(TransactionModel transaction) {
+  void _handleDeleteTransaction(dynamic transactionOrList) {
+    final List<TransactionModel> transactionsToDelete = transactionOrList is List<TransactionModel>
+        ? transactionOrList
+        : [transactionOrList];
+
+    if (transactionsToDelete.isEmpty) return;
+
     setState(() {
-      _transactions.remove(transaction);
+      for (var transaction in transactionsToDelete) {
+        _transactions.remove(transaction);
+      }
       _updateChartsForTimeRange();
     });
 
-    if (transaction.id != null) {
-      _transactionService.deleteTransaction(transaction.id!).then((_) {
-        if (mounted) {
-          AppSnackBar.showSuccess(
-            context,
-            message: LocaleData.transactionDeleted.getString(context),
-          );
-        }
-      }).catchError((error) {
-        debugPrint('Error deleting transaction: $error');
-        if (mounted) {
-          setState(() {
-            _transactions.add(transaction);
-            _updateChartsForTimeRange();
-          });
-          AppSnackBar.showError(
-            context,
-            message: LocaleData.failedToDeleteTransaction.getString(context),
-          );
-        }
-      });
-    }
+    Future.wait(
+      transactionsToDelete.where((t) => t.id != null).map((transaction) {
+        return _transactionService.deleteTransaction(transaction.id!);
+      }),
+    ).then((_) {
+      if (mounted) {
+        AppSnackBar.showSuccess(
+          context,
+          message: transactionsToDelete.length == 1
+              ? LocaleData.transactionDeleted.getString(context)
+              : '${transactionsToDelete.length} ${LocaleData.transactionDeleted.getString(context)}',
+        );
+      }
+    }).catchError((error) {
+      debugPrint('Error deleting transaction(s): $error');
+      if (mounted) {
+        setState(() {
+          _transactions.addAll(transactionsToDelete);
+          _updateChartsForTimeRange();
+        });
+        AppSnackBar.showError(
+          context,
+          message: LocaleData.failedToDeleteTransaction.getString(context),
+        );
+      }
+    });
   }
 
   void _navigateToChatbot(String question) {

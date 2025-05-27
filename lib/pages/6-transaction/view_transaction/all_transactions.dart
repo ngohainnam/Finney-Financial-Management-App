@@ -2,7 +2,7 @@ import 'package:finney/shared/theme/app_color.dart';
 import 'package:finney/pages/7-insights/components/time_selector.dart';
 import 'package:finney/core/storage/cloud/models/transaction_model.dart';
 import 'package:finney/core/storage/cloud/service/transaction_cloud_service.dart';
-import 'package:finney/core/storage/storage_manager.dart'; // Added for getting the singleton
+import 'package:finney/core/storage/storage_manager.dart';
 import 'package:finney/pages/6-transaction/widgets/transaction_list.dart';
 import 'package:finney/pages/3-dashboard/widgets/delete_transaction_dialog.dart';
 import 'package:flutter/material.dart';
@@ -11,8 +11,7 @@ import 'package:finney/shared/localization/locales.dart';
 
 class AllTransactionsScreen extends StatefulWidget {
   final List<TransactionModel> transactions;
-  final Function(TransactionModel)? onDeleteTransaction;
-  // Add these parameters
+  final Function(dynamic)? onDeleteTransaction; // Accepts single or list
   final TimeRangeData timeRange;
   final Function(TimeRangeData) onTimeRangeChanged;
 
@@ -38,7 +37,6 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
   void initState() {
     super.initState();
     _currentTimeRange = widget.timeRange;
-    // Get the transaction service from the StorageManager
     _transactionService = StorageManager().transactionService;
   }
 
@@ -61,7 +59,6 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
 
   void _toggleTransactionSelection(TransactionModel transaction) {
     if (transaction.id == null) return;
-    
     setState(() {
       if (_selectedTransactionIds.contains(transaction.id!)) {
         _selectedTransactionIds.remove(transaction.id!);
@@ -70,7 +67,7 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
       }
     });
   }
-  
+
   List<TransactionModel> _getSelectedTransactions(List<TransactionModel> allTransactions) {
     return allTransactions
         .where((transaction) => _selectedTransactionIds.contains(transaction.id))
@@ -90,13 +87,20 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
     );
 
     if (confirmed) {
-      for (var transaction in selectedTransactions) {
-        // Delete via service first
+      // Delete all selected transactions in parallel
+      await Future.wait(selectedTransactions.map((transaction) async {
         if (transaction.id != null) {
           await _transactionService.deleteTransaction(transaction.id!);
         }
-        // Then notify parent via callback if needed
-        widget.onDeleteTransaction?.call(transaction);
+      }));
+
+      // Notify parent ONCE with the list or single
+      if (widget.onDeleteTransaction != null) {
+        if (selectedTransactions.length == 1) {
+          widget.onDeleteTransaction!(selectedTransactions.first);
+        } else {
+          widget.onDeleteTransaction!(selectedTransactions);
+        }
       }
       _selectedTransactionIds.clear();
       _toggleDeleteMode();
@@ -106,7 +110,6 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
   List<TransactionModel> _filterTransactionsByTimeRange(List<TransactionModel> transactions) {
     final startDate = _currentTimeRange.startDate;
     final endDate = _currentTimeRange.endDate.add(const Duration(days: 1));
-    
     return transactions.where((transaction) {
       final date = transaction.date;
       return date.isAfter(startDate) && date.isBefore(endDate);
@@ -143,7 +146,7 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
             )
           else
             StreamBuilder<List<TransactionModel>>(
-              stream: _transactionService.getTransactions(), // Use core service
+              stream: _transactionService.getTransactions(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return const IconButton(
@@ -151,15 +154,13 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
                     onPressed: null,
                   );
                 }
-                
                 final transactions = _filterTransactionsByTimeRange(snapshot.data!);
                 final selectedTransactions = _getSelectedTransactions(transactions);
-                
                 return IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: selectedTransactions.isEmpty 
-                    ? null 
-                    : () => _showDeleteConfirmationDialog(transactions),
+                  onPressed: selectedTransactions.isEmpty
+                      ? null
+                      : () => _showDeleteConfirmationDialog(transactions),
                 );
               },
             ),
@@ -168,7 +169,6 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          // Time selector at the top
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: TimeRangeSelector(
@@ -181,38 +181,26 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
               },
             ),
           ),
-          
-          // Transaction list below
           Expanded(
             child: StreamBuilder<List<TransactionModel>>(
-              stream: _transactionService.getTransactions(), // Use core service
+              stream: _transactionService.getTransactions(),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
                   return Center(
                     child: Text(LocaleData.errorLoadingTransactions.getString(context)),
                   );
                 }
-      
                 if (!snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
                 }
-      
                 final allTransactions = snapshot.data!;
                 final filteredTransactions = _filterTransactionsByTimeRange(allTransactions);
-      
                 return SingleChildScrollView(
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: TransactionList(
                       transactions: filteredTransactions,
-                      onDeleteTransaction: (transaction) {
-                        // Delete via service first
-                        if (transaction.id != null) {
-                          _transactionService.deleteTransaction(transaction.id!);
-                        }
-                        // Then notify parent
-                        widget.onDeleteTransaction?.call(transaction);
-                      },
+                      onDeleteTransaction: widget.onDeleteTransaction,
                       showAll: true,
                       isDeleteMode: _isDeleteMode,
                       selectedTransactions: Set<TransactionModel>.from(

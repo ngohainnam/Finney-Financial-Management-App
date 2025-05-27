@@ -623,7 +623,7 @@ mixin LocaleData {
     deleteTransactions: 'Delete Transactions',
     confirmDeleteTransactions: 'Are you sure you want to delete %d transaction(s)?',
     delete: 'Delete',
-    transactionDeleted: 'Transaction deleted successfully',
+    transactionDeleted: 'Transaction(s) deleted successfully',
     failedToDeleteTransaction: 'Failed to delete transaction. Please try again.',
     errorLoadingTransactions: 'Error loading transactions',
     confirmDeleteAction: 'This action cannot be undone. Are you sure you want to delete %d transaction(s)?',
