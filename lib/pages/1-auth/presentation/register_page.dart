@@ -1,13 +1,16 @@
-import 'package:finney/assets/path/app_images.dart';
-import 'package:finney/assets/theme/app_color.dart';
-import 'package:finney/assets/widgets/common/error_message.dart';
-import 'package:finney/assets/widgets/common/my_button.dart';
-import 'package:finney/assets/widgets/common/my_textfield.dart';
-import 'package:finney/assets/widgets/common/square_tile.dart';
+import 'package:finney/shared/path/app_images.dart';
+import 'package:finney/shared/theme/app_color.dart';
+import 'package:finney/shared/widgets/common/snack_bar.dart';
+import 'package:finney/pages/1-auth/widgets/my_button.dart';
+import 'package:finney/pages/1-auth/widgets/my_textfield.dart';
+import 'package:finney/pages/1-auth/widgets/square_tile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import './google_sign_in.dart';
+import 'package:finney/core/storage/storage_manager.dart';
+import 'package:finney/core/storage/cloud/models/user_model.dart';
+import 'google_sign_in.dart';
+import 'package:finney/shared/localization/locales.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 
 class RegisterPage extends StatefulWidget {
   final Function()? onTap;
@@ -21,15 +24,16 @@ class _RegisterPageState extends State<RegisterPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmedController = TextEditingController();
+  final nameController = TextEditingController(); // Added name field controller
 
   String _passwordHint = '';
   Color _hintColor = Colors.grey;
   bool _obscurePassword = true;
 
   bool isValidGmail(String email) {
-  final gmailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@gmail\.com$');
-  return gmailRegex.hasMatch(email);
-}
+    final gmailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@gmail\.com$');
+    return gmailRegex.hasMatch(email);
+  }
 
   bool isPasswordStrong(String password) {
     final lengthValid = password.length >= 12;
@@ -54,61 +58,100 @@ class _RegisterPageState extends State<RegisterPage> {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
     final confirmPassword = confirmedController.text.trim();
+    final name = nameController.text.trim(); // Get name value
+
+    // Validate name field
+    if (name.isEmpty) {
+      Navigator.pop(context);
+      AppSnackBar.showError(
+        context, 
+        message: 'Please enter your name'
+      );
+      return;
+    }
 
     if (!isValidGmail(email)) {
       Navigator.pop(context);
-      showErrorMessage(context, "Please enter a valid Gmail address.");
+      AppSnackBar.showError(
+        context, 
+        message: LocaleData.invalidGmailError.getString(context)
+      );
       return;
     }
 
     if (password != confirmPassword) {
       Navigator.pop(context);
-      showErrorMessage(context, 'Passwords do not match.');
+      AppSnackBar.showError(
+        context, 
+        message: LocaleData.passwordsNotMatchError.getString(context)
+      );
       return;
     }
 
     if (!isPasswordStrong(password)) {
       Navigator.pop(context);
-      showErrorMessage(
+      AppSnackBar.showError(
         context,
-        'Password must be at least 12 characters long and include uppercase, lowercase, number, and symbol.',
+        message: LocaleData.weakPasswordError.getString(context)
       );
       return;
     }
 
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailController.text.trim(),
+      // Create user with email and password
+      UserCredential credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
         password: password,
       );
+
+      // Update the display name
+      await credential.user?.updateDisplayName(name);
 
       User? user = FirebaseAuth.instance.currentUser;
 
       if (user != null) {
-        var box = await Hive.openBox('userBox');
-        await box.put('uid', user.uid);
-        await box.put('email', user.email);
+        // Create UserModel
+        final userModel = UserModel(
+          id: user.uid,
+          name: name,
+          email: email,
+        );
 
-        var storedUid = box.get('uid');
-        var storedEmail = box.get('email');
-
-        if (storedUid == null || storedEmail == null) {
-          showErrorMessage(context, 'Failed to store user in Hive.');
-        }
+        // Save user to Firestore
+        await StorageManager().userCloudService.setCurrentUser(userModel);
       }
 
       if (mounted) Navigator.pop(context);
+    } on FirebaseAuthException catch (e) {
+      if (mounted) {
+        Navigator.pop(context);
+        String errorMessage = 'Registration failed';
+        
+        switch (e.code) {
+          case 'email-already-in-use':
+            errorMessage = 'This email is already in use.';
+            break;
+          case 'invalid-email':
+            errorMessage = 'Invalid email format.';
+            break;
+          case 'weak-password':
+            errorMessage = 'The password is too weak.';
+            break;
+          default:
+            errorMessage = 'Registration error: ${e.message}';
+        }
+        
+        AppSnackBar.showError(context, message: errorMessage);
+      }
     } catch (e) {
-      if (mounted) Navigator.pop(context);
-      showErrorMessage(context, 'Error: $e');
+      if (mounted) {
+        Navigator.pop(context);
+        AppSnackBar.showError(
+          context, 
+          message: 'Error: $e'
+        );
+      }
     }
-  }
-
-  void showErrorMessage(BuildContext context, String message) {
-    showDialog(
-      context: context,
-      builder: (context) => ErrorDialog(message: message),
-    );
   }
 
   @override
@@ -130,7 +173,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      'Create your Account',
+                      LocaleData.registerTitle.getString(context),
                       style: TextStyle(
                         color: AppColors.darkBlue,
                         fontSize: 20,
@@ -142,9 +185,18 @@ class _RegisterPageState extends State<RegisterPage> {
 
                 const SizedBox(height: 25),
 
+                // Name field
+                MyTextField(
+                  controller: nameController,
+                  hintText: 'Full Name',
+                  obscureText: false,
+                ),
+
+                const SizedBox(height: 10),
+
                 MyTextField(
                   controller: emailController,
-                  hintText: 'Email',
+                  hintText: LocaleData.emailHint.getString(context),
                   obscureText: false,
                 ),
 
@@ -152,14 +204,14 @@ class _RegisterPageState extends State<RegisterPage> {
 
                 MyTextField(
                   controller: passwordController,
-                  hintText: 'Password',
+                  hintText: LocaleData.passwordHint.getString(context),
                   obscureText: _obscurePassword,
                   onChanged: (value) {
                     final valid = isPasswordStrong(value);
                     setState(() {
                       _passwordHint = valid
-                          ? '✅ Strong password'
-                          : '❌ Use 12+ chars w/ upper, lower, number & symbol';
+                          ? LocaleData.passwordStrong.getString(context)
+                          : LocaleData.passwordWeak.getString(context);
                       _hintColor = valid ? Colors.green : Colors.red;
                     });
                   },
@@ -190,14 +242,14 @@ class _RegisterPageState extends State<RegisterPage> {
 
                 MyTextField(
                   controller: confirmedController,
-                  hintText: 'Confirm Password',
+                  hintText: LocaleData.confirmPasswordHint.getString(context),
                   obscureText: true,
                 ),
 
                 const SizedBox(height: 25),
 
                 MyButton(
-                  text: 'Sign Up',
+                  text: LocaleData.signUpButton.getString(context),
                   onTap: signUserUp,
                 ),
 
@@ -213,7 +265,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10.0),
                         child: Text(
-                          'Or continue with',
+                          LocaleData.continueWith.getString(context),
                           style: TextStyle(color: AppColors.blurGray),
                         ),
                       ),
@@ -241,12 +293,14 @@ class _RegisterPageState extends State<RegisterPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('Already a member?', style: TextStyle(color: AppColors.blurGray)),
+                    Text(
+                      LocaleData.alreadyMember.getString(context),
+                      style: TextStyle(color: AppColors.blurGray)),
                     const SizedBox(width: 4),
                     GestureDetector(
                       onTap: widget.onTap,
-                      child: const Text(
-                        'Log in now',
+                      child: Text(
+                        LocaleData.loginNow.getString(context),
                         style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -258,5 +312,14 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
       ),
     );
+  }
+  
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    confirmedController.dispose();
+    nameController.dispose(); // Dispose name controller
+    super.dispose();
   }
 }

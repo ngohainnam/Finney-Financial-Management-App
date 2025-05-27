@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:finney/assets/theme/app_color.dart';
-import 'package:intl/intl.dart';
+import 'package:finney/shared/theme/app_color.dart';
 import 'package:flutter_localization/flutter_localization.dart';
-import 'package:finney/localization/locales.dart';
-import 'package:finney/components/time_selector.dart';
+import 'package:finney/shared/localization/locales.dart';
+import 'package:finney/pages/7-insights/components/time_selector.dart';
 
 class BalanceCard extends StatelessWidget {
   final double balance;
@@ -21,112 +20,121 @@ class BalanceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormat = NumberFormat.currency(symbol: '\$');
-
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
       decoration: BoxDecoration(
         gradient: AppColors.ombreBlue,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            '${LocaleData.balance.getString(context)} (${timeRange.getLocalizedLabel(context)})',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 17,
-              fontWeight: FontWeight.w500,
+          // Header Row: Balance label and time range
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                LocaleData.balance.getString(context),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  timeRange.getLocalizedLabel(context),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          // Main Balance
+          Center(
+            child: Text(
+              '৳ ${balance.toStringAsFixed(2)}',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 34,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.2,
+              ),
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            currencyFormat.format(balance),
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 18),
+          // Income (one line)
           Row(
             children: [
-              _buildIncomeExpenseIndicator(
-                Icons.add_circle_outline,
-                LocaleData.income.getString(context),
-                currencyFormat.format(income),
-                Colors.greenAccent,
+              Icon(Icons.arrow_downward_rounded, color: Colors.greenAccent, size: 20),
+              const SizedBox(width: 6),
+              Text(
+                '${LocaleData.income.getString(context)}: ',
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-              const SizedBox(width: 40),
-              _buildIncomeExpenseIndicator(
-                Icons.remove_circle_outline,
-                LocaleData.expenses.getString(context),
-                currencyFormat.format(expenses),
-                Colors.redAccent,
+              Expanded(
+                child: Text(
+                  '৳ ${income.toStringAsFixed(2)}',
+                  style: const TextStyle(
+                    color: Colors.greenAccent,
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  textAlign: TextAlign.right,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          // Expense (one line)
+          Row(
+            children: [
+              Icon(Icons.arrow_upward_rounded, color: Colors.redAccent, size: 20),
+              const SizedBox(width: 6),
+              Text(
+                '${LocaleData.expenses.getString(context)}: ',
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  '৳ ${expenses.toStringAsFixed(2)}',
+                  style: const TextStyle(
+                    color: Colors.redAccent,
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  textAlign: TextAlign.right,
+                ),
               ),
             ],
           ),
         ],
       ),
     );
-  }
-
-  Widget _buildIncomeExpenseIndicator(
-    IconData icon,
-    String label,
-    String amount,
-    Color iconColor,
-  ) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: iconColor.withValues(alpha: 0.7),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(
-            icon,
-            color: Colors.white,
-            size: 30,
-          ),
-        ),
-        
-        const SizedBox(width: 10),
-
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.8), 
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-
-            const SizedBox(height: 4),
-
-            Text(
-              amount,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
+  }}

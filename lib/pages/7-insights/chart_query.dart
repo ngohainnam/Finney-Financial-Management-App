@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:finney/assets/theme/app_color.dart';
+import 'package:finney/shared/theme/app_color.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
-import 'package:finney/localization/locales.dart';
+import 'package:finney/shared/localization/locales.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 
 class ChartQuery extends StatefulWidget {

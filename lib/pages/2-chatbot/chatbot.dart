@@ -1,23 +1,23 @@
-import 'package:finney/assets/theme/app_color.dart';
+import 'package:finney/shared/theme/app_color.dart';
+import 'package:finney/core/storage/cloud/models/chat_message_model.dart';
+import 'package:finney/core/storage/cloud/service/chat_cloud_service.dart';
+import 'package:finney/core/storage/cloud/service/transaction_cloud_service.dart';
 import 'package:finney/pages/2-chatbot/presentation/chat_interface.dart';
 import 'package:finney/pages/2-chatbot/presentation/transaction_preview.dart';
 import 'package:finney/pages/2-chatbot/presentation/voicechat_interface.dart';
 import 'package:finney/pages/2-chatbot/services/llm_transactionparser.dart';
-import 'package:finney/pages/2-chatbot/services/local_storage_service.dart';
-import 'package:finney/pages/2-chatbot/services/cloud_storage_service.dart'; // Added cloud storage import
 import 'package:finney/pages/2-chatbot/utils/chat_constants.dart'; 
-import 'package:finney/pages/3-dashboard/transaction/transaction_services.dart'; 
+import 'package:finney/core/storage/storage_manager.dart';
+import 'package:finney/shared/widgets/common/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:image_picker/image_picker.dart';
-import 'services/chat_service.dart';
+import 'services/llm_service.dart';
 import 'presentation/welcome_screen.dart';
-import 'utils/chatbot_help.dart';
-import 'dart:async'; 
-import 'package:finney/localization/locales.dart';
+import 'dart:async';
+import 'package:finney/shared/localization/locales.dart';
 import 'package:flutter_localization/flutter_localization.dart';
-
 class Chatbot extends StatefulWidget {
   final String? initialQuestion;
   
@@ -31,10 +31,10 @@ class Chatbot extends StatefulWidget {
 }
 
 class _ChatbotState extends State<Chatbot> {
-  final ChatStorageService _localStorageService = ChatStorageService();
-  final FirebaseChatStorageService _cloudStorageService = FirebaseChatStorageService();
-  final TransactionService _transactionService = TransactionService();
-  late ChatService _chatService;
+  // Use core services from StorageManager
+  final ChatCloudService _chatCloudService = StorageManager().chatCloudService;
+  final TransactionCloudService _transactionService = StorageManager().transactionService;
+  late LlmService _llmService;
   final gemini = Gemini.instance;
   bool showWelcomeScreen = true;
   List<ChatMessage> messages = [];
@@ -65,6 +65,33 @@ class _ChatbotState extends State<Chatbot> {
     }
   }
 
+  // ADD THESE ADAPTER METHODS TO HANDLE TYPE CONVERSIONS
+
+  // Adapter method to save a message
+  Future<void> saveMessage(ChatMessage message, {required String role}) async {
+    final chatModel = ChatMessageModel(
+      text: message.text,
+      createdAt: message.createdAt,
+      userId: message.user.id,
+      userFirstName: message.user.firstName ?? '',
+      role: role,
+      mediaUrl: message.medias?.isNotEmpty == true ? message.medias!.first.url : null,
+    );
+    
+    await _chatCloudService.addMessage(chatModel);
+  }
+  
+  // Adapter method to convert ChatMessageModel to List<Content> for Gemini
+  List<Content> toGeminiContent(List<ChatMessageModel> messages) {
+    return messages.map((message) {
+      // Convert each message to Gemini Content format
+      return Content(
+        role: message.role,
+        parts: [TextPart(message.text)],
+      );
+    }).toList();
+  }
+  
   void _handleInitialQuestion(String question) {
     final chatMessage = ChatMessage(
       user: ChatConstants.currentUser,
@@ -78,8 +105,7 @@ class _ChatbotState extends State<Chatbot> {
   }
 
   Future<void> _initServices() async {
-    await _localStorageService.init();
-    _chatService = ChatService(
+    _llmService = LlmService(
       gemini: gemini,
       conversationHistory: conversationHistory,
     );
@@ -94,19 +120,35 @@ class _ChatbotState extends State<Chatbot> {
     });
     
     // Store the subscription so we can cancel it later
-    _messagesSubscription = _cloudStorageService.getMessages().listen(
+    _messagesSubscription = _chatCloudService.streamMessages().listen(
       (cloudMessages) {
         if (!mounted) return;
         
+        // Convert CloudMessages to ChatMessages
+        final convertedMessages = cloudMessages.map((cloudMsg) {
+          return ChatMessage(
+            text: cloudMsg.text,
+            user: ChatUser(
+              id: cloudMsg.userId,
+              firstName: cloudMsg.userFirstName,
+            ),
+            createdAt: cloudMsg.createdAt,
+            medias: cloudMsg.mediaUrl != null 
+              ? [ChatMedia(url: cloudMsg.mediaUrl!, fileName: '', type: MediaType.image)]
+              : null,
+            customProperties: {'role': cloudMsg.role},
+          );
+        }).toList();
+        
         setState(() {
-          messages = cloudMessages;
+          messages = convertedMessages;
           showWelcomeScreen = messages.isEmpty;
           _isLoadingMessages = false;
         });
         
         // Update conversation history for LLM context
-        conversationHistory = _extractConversationHistory(cloudMessages);
-        _chatService.updateConversationHistory(conversationHistory);
+        conversationHistory = toGeminiContent(cloudMessages);
+        _llmService.updateConversationHistory(conversationHistory);
       }, 
       onError: (error) {
         debugPrint('Error loading cloud messages: $error');
@@ -115,30 +157,17 @@ class _ChatbotState extends State<Chatbot> {
         
         setState(() {
           _isLoadingMessages = false;
-          // Fallback to local if cloud fails
-          messages = _localStorageService.loadMessages();
-          conversationHistory = _localStorageService.loadConversationHistory();
-          showWelcomeScreen = messages.isEmpty;
+          messages = [];
+          showWelcomeScreen = true;
         });
+        
+        // Show error using AppSnackBar
+        AppSnackBar.showError(
+          context,
+          message: LocaleData.errorLoadingMessages.getString(context),
+        );
       }
     );
-  }
-
-  // Helper method to convert chat messages to conversation history
-  List<Content> _extractConversationHistory(List<ChatMessage> chatMessages) {
-    List<Content> history = [];
-    
-    for (var message in chatMessages.reversed) { // Process from oldest to newest
-      String role = message.customProperties?['role'] ?? 
-                   (message.user.id == ChatConstants.geminiUser.id ? 'model' : 'user');
-      
-      history.add(Content(
-        role: role,
-        parts: [TextPart(message.text)],
-      ));
-    }
-    
-    return history;
   }
 
   void _sendMessage(ChatMessage chatMessage) async {
@@ -153,12 +182,11 @@ class _ChatbotState extends State<Chatbot> {
       _isAiTyping = true;  // Start the typing animation
     });
     
-    // Save to both storage services for redundancy
-    await _cloudStorageService.saveMessage(chatMessage, role: 'user');
-    await _localStorageService.saveMessage(chatMessage, role: 'user');
+    // Save to cloud storage service
+    await saveMessage(chatMessage, role: 'user');
 
     // The animation will show the AI is thinking
-    final response = await _chatService.sendMessage(chatMessage);
+    final response = await _llmService.sendMessage(chatMessage);
     
     if (TransactionParser.hasTransactionInfo(response)) {
       final transactionData = TransactionParser.extractTransactionFromMessage(response);
@@ -178,9 +206,8 @@ class _ChatbotState extends State<Chatbot> {
           messages = [message] + messages;
         });
         
-        // Save to both storage services
-        await _cloudStorageService.saveMessage(message, role: 'model');
-        await _localStorageService.saveMessage(message, role: 'model');
+        // Save to cloud storage service
+        await saveMessage(message, role: 'model');
         
         // Show the transaction preview dialog with simplified interface (no edit)
         if (mounted) {
@@ -188,31 +215,25 @@ class _ChatbotState extends State<Chatbot> {
             context: context, 
             transaction: transactionModel,
             onConfirm: (confirmedTransaction) async {
-              // Handle confirmation - save the transaction
-              await _transactionService.addTransaction(confirmedTransaction);
-              
-              if (mounted) {
-                // Show success message
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(LocaleData.transactionAddedSuccess.getString(context)),
-                    backgroundColor: Colors.green,
-                  ),
-                );
+              try {
+                // Handle confirmation - save the transaction using core service
+                await _transactionService.addTransaction(confirmedTransaction);
                 
-                // Add confirmation message to chat
-                final confirmMessage = ChatMessage(
-                  user: ChatConstants.geminiUser,
-                  createdAt: DateTime.now(),
-                  text: LocaleData.transactionAddedSuccess.getString(context),
-                );
-                
-                setState(() {
-                  messages = [confirmMessage] + messages;
-                });
-                
-                await _cloudStorageService.saveMessage(confirmMessage, role: 'model');
-                await _localStorageService.saveMessage(confirmMessage, role: 'model');
+                if (mounted) {
+                  // Show success message using AppSnackBar
+                  AppSnackBar.showSuccess(
+                    context,
+                    message: LocaleData.transactionAddedSuccess.getString(context),
+                  );
+                }
+              } catch (e) {
+                // Show error using AppSnackBar if transaction fails
+                if (mounted) {
+                  AppSnackBar.showError(
+                    context,
+                    message: LocaleData.transactionAddError.getString(context),
+                  );
+                }
               }
             },
           );
@@ -220,19 +241,11 @@ class _ChatbotState extends State<Chatbot> {
           // Handle cancellation
           if (confirmed == false) {
             if (mounted) {
-              // Add a cancellation message from the bot
-              final cancelMessage = ChatMessage(
-                user: ChatConstants.geminiUser,
-                createdAt: DateTime.now(),
-                text: LocaleData.transactionCanceled.getString(context),
+            // Show success message using AppSnackBar
+            AppSnackBar.showInfo(
+              context,
+              message: LocaleData.transactionCanceled.getString(context),
               );
-              
-              setState(() {
-                messages = [cancelMessage] + messages;
-              });
-              
-              await _cloudStorageService.saveMessage(cancelMessage, role: 'model');
-              await _localStorageService.saveMessage(cancelMessage, role: 'model');
             }
           }
         }
@@ -252,9 +265,8 @@ class _ChatbotState extends State<Chatbot> {
       messages = [message] + messages;
     });
     
-    // Save to both storage services
-    await _cloudStorageService.saveMessage(message, role: 'model');
-    await _localStorageService.saveMessage(message, role: 'model');
+    // Save to cloud storage service
+    await saveMessage(message, role: 'model');
   }
 
   void _handleTransactionConfirmation(ChatMessage userMessage) async {
@@ -264,8 +276,7 @@ class _ChatbotState extends State<Chatbot> {
     });
     
     // Save user confirmation message
-    await _cloudStorageService.saveMessage(userMessage, role: 'user');
-    await _localStorageService.saveMessage(userMessage, role: 'user');
+    await saveMessage(userMessage, role: 'user');
     
     
     if (_pendingTransaction != null) {
@@ -276,11 +287,10 @@ class _ChatbotState extends State<Chatbot> {
           await _transactionService.addTransaction(transactionModel);
 
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(LocaleData.transactionAddedSuccess.getString(context)),
-                backgroundColor: Colors.green,
-              ),
+            // Use AppSnackBar for success messages
+            AppSnackBar.showSuccess(
+              context,
+              message: LocaleData.transactionAddedSuccess.getString(context),
             );
           }
           
@@ -295,10 +305,17 @@ class _ChatbotState extends State<Chatbot> {
             messages = [message] + messages;
           });
           
-          await _cloudStorageService.saveMessage(message, role: 'model');
-          await _localStorageService.saveMessage(message, role: 'model');
+          await saveMessage(message, role: 'model');
           
         } catch (e) {
+          // Use AppSnackBar for error messages
+          if (mounted) {
+            AppSnackBar.showError(
+              context,
+              message: LocaleData.transactionAddError.getString(context),
+            );
+          }
+          
           final message = ChatMessage(
             user: ChatConstants.geminiUser,
             createdAt: DateTime.now(),
@@ -310,23 +327,8 @@ class _ChatbotState extends State<Chatbot> {
             messages = [message] + messages;
           });
           
-          await _cloudStorageService.saveMessage(message, role: 'model');
-          await _localStorageService.saveMessage(message, role: 'model');
+          await saveMessage(message, role: 'model');
         }
-      } else if (TransactionParser.isCancelingTransaction(userMessage.text)) {
-        final message = ChatMessage(
-          user: ChatConstants.geminiUser,
-          createdAt: DateTime.now(),
-          text: LocaleData.transactionCanceled.getString(context),
-        );
-        
-        setState(() {
-          _isAiTyping = false;
-          messages = [message] + messages;
-        });
-        
-        await _cloudStorageService.saveMessage(message, role: 'model');
-        await _localStorageService.saveMessage(message, role: 'model');
       } else {
         // If the user's response wasn't clear, show the popup
         final message = ChatMessage(
@@ -340,8 +342,7 @@ class _ChatbotState extends State<Chatbot> {
           messages = [message] + messages;
         });
         
-        await _cloudStorageService.saveMessage(message, role: 'model');
-        await _localStorageService.saveMessage(message, role: 'model');
+        await saveMessage(message, role: 'model');
         
         // Show the popup
         if (mounted) {
@@ -349,21 +350,36 @@ class _ChatbotState extends State<Chatbot> {
             context: context,
             transaction: transactionModel,
             onConfirm: (confirmedTransaction) async {
-              await _transactionService.addTransaction(confirmedTransaction);
-              
-              if (mounted) {
-                final confirmMessage = ChatMessage(
-                  user: ChatConstants.geminiUser,
-                  createdAt: DateTime.now(),
-                  text: LocaleData.transactionAddedSuccess.getString(context),
-                );
+              try {
+                await _transactionService.addTransaction(confirmedTransaction);
                 
-                setState(() {
-                  messages = [confirmMessage] + messages;
-                });
-                
-                await _cloudStorageService.saveMessage(confirmMessage, role: 'model');
-                await _localStorageService.saveMessage(confirmMessage, role: 'model');
+                if (mounted) {
+                  // Use AppSnackBar for success messages
+                  AppSnackBar.showSuccess(
+                    context,
+                    message: LocaleData.transactionAddedSuccess.getString(context),
+                  );
+                  
+                  final confirmMessage = ChatMessage(
+                    user: ChatConstants.geminiUser,
+                    createdAt: DateTime.now(),
+                    text: LocaleData.transactionAddedSuccess.getString(context),
+                  );
+                  
+                  setState(() {
+                    messages = [confirmMessage] + messages;
+                  });
+                  
+                  await saveMessage(confirmMessage, role: 'model');
+                }
+              } catch (e) {
+                // Use AppSnackBar for error messages
+                if (mounted) {
+                  AppSnackBar.showError(
+                    context,
+                    message: LocaleData.transactionAddError.getString(context),
+                  );
+                }
               }
             },
           );
@@ -382,14 +398,12 @@ class _ChatbotState extends State<Chatbot> {
         messages = [message] + messages;
       });
       
-      await _cloudStorageService.saveMessage(message, role: 'model');
-      await _localStorageService.saveMessage(message, role: 'model');
+      await saveMessage(message, role: 'model');
     }
     
     _awaitingTransactionConfirmation = false;
     _pendingTransaction = null;
   }
-
 
   void _sendMediaMessage() async {
     final picker = ImagePicker();
@@ -424,8 +438,7 @@ class _ChatbotState extends State<Chatbot> {
   }
 
   Future<void> clearChat() async {
-    await _cloudStorageService.clearChat();
-    await _localStorageService.clearChat(); 
+    await _chatCloudService.clearChat();
     
     setState(() {
       messages = [];
@@ -434,12 +447,19 @@ class _ChatbotState extends State<Chatbot> {
       _awaitingTransactionConfirmation = false;
       _pendingTransaction = null;
     });
+    
+    // Show confirmation using AppSnackBar
+    if (mounted) {
+      AppSnackBar.showInfo(
+        context,
+        message: LocaleData.chatCleared.getString(context),
+      );
+    }
   }
 
   @override
   void dispose() {
     _messagesSubscription?.cancel();
-    _localStorageService.dispose();
     super.dispose();
   }
 
@@ -454,7 +474,7 @@ class _ChatbotState extends State<Chatbot> {
         elevation: 0,
         title: Text(
           LocaleData.chatbotTitle.getString(context),
-          style: TextStyle(
+          style: const TextStyle(
             color: AppColors.primary,
             fontWeight: FontWeight.bold,
           ),
@@ -463,10 +483,6 @@ class _ChatbotState extends State<Chatbot> {
           IconButton(
             icon: const Icon(Icons.delete_outline),
             onPressed: clearChat,
-          ),
-          IconButton(
-            icon: const Icon(Icons.help_outline),
-            onPressed: () => ChatbotHelp.show(context),
           ),
         ],
       ),
@@ -500,22 +516,19 @@ class _ChatbotState extends State<Chatbot> {
           ),
           
           Positioned(
-            right: 16,
+            right: 17,
             bottom: 80,
             child: Material(
               elevation: 4.0,
-              shape: const CircleBorder(),
+              borderRadius: BorderRadius.circular(16),
               color: AppColors.darkBlue,
               child: InkWell(
                 onTap: _navigateToVoiceChat,
-                customBorder: const CircleBorder(),
+                borderRadius: BorderRadius.circular(16),
                 child: Container(
                   width: 56.0,
                   height: 56.0,
                   alignment: Alignment.center,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                  ),
                   child: const Icon(
                     Icons.mic,
                     color: Colors.white,

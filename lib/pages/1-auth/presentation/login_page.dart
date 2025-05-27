@@ -1,15 +1,17 @@
-import 'package:finney/assets/path/app_images.dart';
-import 'package:finney/assets/theme/app_color.dart';
-import 'package:finney/assets/widgets/common/error_message.dart';
-import 'package:finney/assets/widgets/common/my_button.dart';
-import 'package:finney/assets/widgets/common/my_textfield.dart';
-import 'package:finney/assets/widgets/common/square_tile.dart';
-import '../models/user_model.dart';
+import 'package:finney/shared/path/app_images.dart';
+import 'package:finney/shared/theme/app_color.dart';
+import 'package:finney/shared/widgets/common/snack_bar.dart';
+import 'package:finney/pages/1-auth/widgets/my_button.dart';
+import 'package:finney/pages/1-auth/widgets/my_textfield.dart';
+import 'package:finney/pages/1-auth/widgets/square_tile.dart';
+import 'package:finney/core/storage/storage_manager.dart';
+import '../../../core/storage/cloud/models/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import './google_sign_in.dart';
-import './forget_password.dart';
+import 'google_sign_in.dart';
+import 'forget_password.dart';
+import 'package:finney/shared/localization/locales.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 
 class LoginPage extends StatefulWidget {
   final Function()? onTap;
@@ -24,6 +26,7 @@ class _LoginPageState extends State<LoginPage> {
   final passwordController = TextEditingController();
 
 void signUserIn() async {
+  // Show loading indicator
   showDialog(
     context: context,
     builder: (context) {
@@ -35,62 +38,60 @@ void signUserIn() async {
     },
   );
 
-  User? user = FirebaseAuth.instance.currentUser;
+  try {
+    // Sign in with Firebase Auth
+    await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: emailController.text.trim(),
+      password: passwordController.text.trim(),
+    );
 
-  if (user != null) {
+    // Get current user after sign in
+    User? user = FirebaseAuth.instance.currentUser;
 
-    var box = Hive.box<UserModel>('userBox'); 
-    var storedUser = box.get('user');
-    
-    if (storedUser != null) {
-      Navigator.pop(context);  
-    } else {
-      showErrorMessage(context,'User details not found in Hive');
-      Navigator.pop(context); 
-      showErrorMessage(context, 'User details not found in local storage.');
-    }
-  } else {
-    try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
+    if (user != null) {
+      // Create user model
+      final userModel = UserModel(
+        id: user.uid,
+        email: user.email ?? '', 
+        name: user.displayName ?? 'Unknown',
       );
 
-      if (mounted) {
-        Navigator.pop(context);
-      }
-
-      user = FirebaseAuth.instance.currentUser;
-
-      if (user != null) {
-        var userModel = UserModel(
-          uid: user.uid,
-          email: user.email ?? '', 
-          name: user.displayName ?? 'Unknown',
-        );
-
-        // Open Hive box
-        var box = await Hive.openBox<UserModel>('userBox');  
-        await box.put('user', userModel);  
-      }
-
-    } on FirebaseAuthException {
-      if (mounted) {
-        Navigator.pop(context); 
-      }
-      showErrorMessage(context, 'Incorrect email/password.\n\nPlease check again');
+      // Save to Firestore using Storage Manager
+      await StorageManager().userCloudService.setCurrentUser(userModel);
     }
-  }
- }
 
-  void showErrorMessage(BuildContext context, String message) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return ErrorDialog(message: message); 
-      },
-    );
+    // Dismiss loading dialog if mounted
+    if (mounted) {
+      Navigator.pop(context);
+    }
+  } on FirebaseAuthException catch (e) {
+    // Dismiss loading dialog if mounted
+    if (mounted) {
+      Navigator.pop(context);
+    }
+    
+    // Show appropriate error message
+    String errorMessage = 'Incorrect email/password.\n\nPlease check again';
+    if (e.code == 'user-not-found') {
+      errorMessage = 'No user found with this email.';
+    } else if (e.code == 'wrong-password') {
+      errorMessage = 'Wrong password provided.';
+    } else if (e.code == 'invalid-email') {
+      errorMessage = 'The email address is not valid.';
+    } else if (e.code == 'user-disabled') {
+      errorMessage = 'This user account has been disabled.';
+    }
+    
+    AppSnackBar.showError(context, message: errorMessage);
+  } catch (e) {
+    // Handle other errors
+    if (mounted) {
+      Navigator.pop(context);
+    }
+    AppSnackBar.showError(context, message: 'An error occurred during sign in.');
   }
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,19 +103,14 @@ void signUserIn() async {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const SizedBox(height: 50),
-            
-                //logo
-                Image.asset(AppImages.appLogo),
-            
+                Image.asset(AppImages.appLogo),            
                 const SizedBox(height: 50),
-            
-                //login text
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
                   child: Align(
                     alignment: Alignment.centerLeft, 
                     child: Text(
-                      'Login to your Account',
+                      LocaleData.loginTitle.getString(context),
                       style: TextStyle(
                         color: AppColors.darkBlue,
                         fontSize: 20,
@@ -129,7 +125,7 @@ void signUserIn() async {
                 //email textfield
                 MyTextField(
                   controller: emailController,
-                  hintText: 'Email',
+                  hintText: LocaleData.emailHint.getString(context),
                   obscureText: false,
                 ),
             
@@ -138,7 +134,7 @@ void signUserIn() async {
                 //password textfield
                 MyTextField(
                   controller: passwordController,
-                  hintText: 'Password',
+                  hintText: LocaleData.passwordHint.getString(context),
                   obscureText: true,
                 ),
             
@@ -157,7 +153,7 @@ void signUserIn() async {
                         );
                       },
                       child: Text(
-                        'Forgot Password?',
+                        LocaleData.forgotPassword.getString(context),
                         style: TextStyle(
                           color: AppColors.primary,
                           fontWeight: FontWeight.w500,
@@ -171,7 +167,7 @@ void signUserIn() async {
             
                 //sign in button
                 MyButton(
-                  text: 'Sign In',
+                  text: LocaleData.signInButton.getString(context),
                   onTap: signUserIn,
                 ),
             
@@ -191,7 +187,7 @@ void signUserIn() async {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10.0),
                         child: Text(
-                          'Or continue with',
+                          LocaleData.continueWith.getString(context),
                           style: TextStyle(
                             color: AppColors.blurGray,
                           ),
@@ -230,14 +226,14 @@ void signUserIn() async {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Not a member?',
+                      LocaleData.notMember.getString(context),
                       style: TextStyle(color: AppColors.blurGray),
                     ),
                     const SizedBox(width: 4),
                     GestureDetector(
                       onTap: widget.onTap,
-                      child: const Text(
-                        'Register now',
+                      child: Text(
+                        LocaleData.registerNow.getString(context),
                         style: TextStyle(
                           color: AppColors.primary,
                           fontWeight: FontWeight.w500,

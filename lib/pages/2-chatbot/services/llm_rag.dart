@@ -1,9 +1,15 @@
-import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
-import 'package:finney/pages/3-dashboard/transaction/transaction_services.dart';
+import 'package:finney/core/storage/cloud/models/transaction_model.dart';
+import 'package:finney/core/storage/cloud/service/transaction_cloud_service.dart';
+import 'package:finney/core/storage/storage_manager.dart';
 import 'package:intl/intl.dart';
 
 class TransactionRAGService {
-  final TransactionService _transactionService = TransactionService();
+  late final TransactionCloudService _transactionService;
+  
+  // Constructor that initializes TransactionCloudService from StorageManager
+  TransactionRAGService() {
+    _transactionService = StorageManager().transactionService;
+  }
   
   /// Retrieves user transaction data and formats it for RAG context
   Future<String> getTransactionContext() async {

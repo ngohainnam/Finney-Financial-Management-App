@@ -1,9 +1,9 @@
-import 'package:finney/assets/theme/app_color.dart';
-import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
-import 'package:finney/pages/3-dashboard/utils/category.dart'; // Import CategoryUtils
+import 'package:finney/shared/theme/app_color.dart';
+import 'package:finney/core/storage/cloud/models/transaction_model.dart';
+import 'package:finney/shared/category.dart'; // Import CategoryUtils
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:finney/localization/locales.dart';
+import 'package:finney/shared/localization/locales.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 
 class TransactionPreviewPopup extends StatelessWidget {
@@ -113,13 +113,6 @@ class TransactionPreviewPopup extends StatelessWidget {
                             ),
                           ),
                         ],
-                      ),
-
-                      const SizedBox(height: 4),
-
-                      Text(
-                        DateFormat('h:mm a').format(transaction.date),
-                        style: TextStyle(color: AppColors.gray, fontSize: 12),
                       ),
                     ],
                   ),

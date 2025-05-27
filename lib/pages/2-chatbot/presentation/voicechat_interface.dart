@@ -1,9 +1,10 @@
-import 'package:finney/assets/theme/app_color.dart';
+import 'package:finney/shared/theme/app_color.dart';
+import 'package:finney/shared/widgets/common/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:finney/pages/2-chatbot/services/stt_service.dart';
 import 'package:finney/pages/2-chatbot/utils/robot_animation.dart'; 
-import 'package:finney/localization/locales.dart';
+import 'package:finney/shared/localization/locales.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 
 class VoiceChatInterface extends StatefulWidget {
@@ -37,8 +38,9 @@ class _VoiceChatInterfaceState extends State<VoiceChatInterface> {
   Future<void> _initializeSpeechService() async {
     bool available = await _sttService.initialize();
     if (!available && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(LocaleData.voiceSttNotAvailable.getString(context)),),
+      AppSnackBar.showError(
+        context,
+        message: LocaleData.voiceSttNotAvailable.getString(context),
       );
     }
   }
@@ -148,21 +150,21 @@ class _VoiceChatInterfaceState extends State<VoiceChatInterface> {
           Positioned(
             left: 0,
             right: 0,
-            bottom: 40,
+            bottom: 50,
             child: Center(
               child: GestureDetector(
                 onTap: _toggleListening,
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  width: _isListening ? 65 : 75,
-                  height: _isListening ? 65 : 75,
+                  width: _isListening ? 55 : 65,
+                  height: _isListening ? 55 : 65,
                   decoration: BoxDecoration(
                     color: _isProcessing 
                         ? Colors.orange 
                         : _isListening 
                             ? Colors.redAccent 
                             : AppColors.darkBlue,
-                    shape: BoxShape.circle,
+                    borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withValues(alpha: 0.2),

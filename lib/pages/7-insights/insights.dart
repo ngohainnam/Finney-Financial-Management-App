@@ -1,14 +1,16 @@
-import 'package:finney/assets/theme/app_color.dart';
-import 'package:finney/components/charts/bar_chart.dart';
-import 'package:finney/components/charts/chart_service.dart' as chart_service;
-import 'package:finney/components/charts/pie/pie_chart.dart';
-import 'package:finney/components/time_selector.dart';
+import 'package:finney/shared/theme/app_color.dart';
+import 'package:finney/pages/7-insights/components/charts/bar_chart.dart';
+import 'package:finney/pages/7-insights/components/charts/chart_service.dart' as chart_service;
+import 'package:finney/pages/7-insights/components/charts/pie/pie_chart.dart';
+import 'package:finney/pages/7-insights/components/time_selector.dart';
+import 'package:finney/core/storage/cloud/service/transaction_cloud_service.dart';
 import 'package:finney/pages/3-dashboard/dashboard.dart';
-import 'package:finney/pages/3-dashboard/models/transaction_model.dart';
-import 'package:finney/pages/3-dashboard/transaction/transaction_services.dart';
+import 'package:finney/core/storage/cloud/models/transaction_model.dart';
+import 'package:finney/core/storage/storage_manager.dart'; // Added for singleton access
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
-import 'package:finney/localization/locales.dart';
+import 'package:finney/shared/localization/locales.dart';
+import 'package:finney/shared/widgets/common/snack_bar.dart'; // Added for snackbars
 
 enum ChartViewType { expenses, income }
 
@@ -21,7 +23,7 @@ class Insights extends StatefulWidget {
 
 class _InsightsState extends State<Insights> with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final TransactionService _transactionService = TransactionService();
+  late final TransactionCloudService _transactionService; // Changed to late final
   final chart_service.ChartService _chartService = chart_service.ChartService();
   
   List<TransactionModel> _transactions = [];
@@ -40,6 +42,10 @@ class _InsightsState extends State<Insights> with SingleTickerProviderStateMixin
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    
+    // Get transaction service from StorageManager
+    _transactionService = StorageManager().transactionService;
+    
     _loadData();
   }
   
@@ -54,15 +60,40 @@ class _InsightsState extends State<Insights> with SingleTickerProviderStateMixin
       _isLoading = true;
     });
     
-    _transactionService.getTransactions().listen((transactions) {
+    try {
+      _transactionService.getTransactions().listen(
+        (transactions) {
+          if (mounted) {
+            setState(() {
+              _transactions = transactions;
+              _updateChartsForTimeRange();
+              _isLoading = false;
+            });
+          }
+        },
+        onError: (error) {
+          if (mounted) {
+            setState(() {
+              _isLoading = false;
+            });
+            AppSnackBar.showError(
+              context, 
+              message: 'Error loading transactions: ${error.toString()}',
+            );
+          }
+        }
+      );
+    } catch (e) {
       if (mounted) {
         setState(() {
-          _transactions = transactions;
-          _updateChartsForTimeRange();
           _isLoading = false;
         });
+        AppSnackBar.showError(
+          context, 
+          message: 'Error loading transactions: ${e.toString()}',
+        );
       }
-    });
+    }
   }
   
   void _onTimeRangeChanged(TimeRangeData newTimeRange) {
@@ -119,7 +150,7 @@ class _InsightsState extends State<Insights> with SingleTickerProviderStateMixin
     return Container(
       height: 40,
       decoration: BoxDecoration(
-        color: Colors.grey.withValues(alpha: 0.1),
+        color: Colors.grey.withValues(alpha: 0.1), 
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -195,7 +226,7 @@ class _InsightsState extends State<Insights> with SingleTickerProviderStateMixin
         backgroundColor: AppColors.lightBackground,
         title: Text(
           LocaleData.insights.getString(context),
-          style: TextStyle(
+          style: const TextStyle(
             color: AppColors.primary,
             fontWeight: FontWeight.bold,
           ),
@@ -205,13 +236,13 @@ class _InsightsState extends State<Insights> with SingleTickerProviderStateMixin
           labelColor: AppColors.primary,
           unselectedLabelColor: Colors.grey,
           indicatorColor: AppColors.primary,
-          tabs:  [
+          tabs: [
             Tab(
-              icon: Icon(Icons.bar_chart),
+              icon: const Icon(Icons.bar_chart),
               text: LocaleData.spendingAnalysis.getString(context),
             ),
             Tab(
-              icon: Icon(Icons.pie_chart),
+              icon: const Icon(Icons.pie_chart),
               text: LocaleData.categoryBreakdown.getString(context),
             ),
           ],

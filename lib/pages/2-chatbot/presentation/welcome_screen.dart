@@ -1,8 +1,8 @@
-import 'package:finney/localization/locales.dart';
+import 'package:finney/shared/localization/locales.dart';
 import 'package:finney/pages/2-chatbot/utils/robot_animation.dart';
 import 'package:flutter/material.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
-import 'package:finney/assets/theme/app_color.dart';
+import 'package:finney/shared/theme/app_color.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 
 class WelcomeScreen extends StatelessWidget {
