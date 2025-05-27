@@ -1,6 +1,7 @@
 import 'package:finney/shared/localization/locales.dart';
 import 'package:finney/pages/9-setting/language_selection.dart';
 import 'package:finney/pages/9-setting/widgets/dropdown_setting.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:finney/shared/theme/app_color.dart';
 import 'package:flutter_localization/flutter_localization.dart';
@@ -151,6 +152,7 @@ class _SettingState extends State<Setting> {
   Future<void> _signOut() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
+    await FirebaseAuth.instance.signOut(); 
     if (mounted) {
       Navigator.pushAndRemoveUntil(
         context,
