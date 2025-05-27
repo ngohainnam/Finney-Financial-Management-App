@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finney/core/storage/cloud/models/saving_goal_model.dart';
+import 'package:finney/core/storage/cloud/service/saving_goal_service.dart';
 import 'package:finney/shared/widgets/common/snack_bar.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/shared/localization/locales.dart';
@@ -28,6 +29,7 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
   final _targetAmountController = TextEditingController();
   final _descriptionController = TextEditingController();
   DateTime _selectedDate = DateTime.now().add(const Duration(days: 30));
+  final SavingGoalService _goalService = SavingGoalService();
 
   @override
   void initState() {
@@ -76,24 +78,19 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
         }
 
         final goal = SavingGoal(
-          id:
-              widget.existingGoal?.id ??
-              FirebaseFirestore.instance.collection('goals').doc().id,
+          id: widget.existingGoal?.id ??
+              FirebaseFirestore.instance.collection('users').doc().id,
           title: _titleController.text,
           targetAmount: amount,
           savedAmount: widget.existingGoal?.savedAmount ?? 0.0,
           targetDate: _selectedDate,
-          description:
-              _descriptionController.text.isNotEmpty
-                  ? _descriptionController.text
-                  : null,
+          description: _descriptionController.text.isNotEmpty
+              ? _descriptionController.text
+              : null,
           createdAt: widget.existingGoal?.createdAt ?? DateTime.now(),
         );
 
-        await FirebaseFirestore.instance
-            .collection('goals')
-            .doc(goal.id)
-            .set(goal.toMap());
+        await _goalService.saveGoal(goal);
 
         AppSnackBar.showSuccess(
           context,
@@ -121,9 +118,9 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          widget.existingGoal == null 
-            ? LocaleData.addSavingGoal.getString(context)
-            : LocaleData.editSavingGoal.getString(context),
+          widget.existingGoal == null
+              ? LocaleData.addSavingGoal.getString(context)
+              : LocaleData.editSavingGoal.getString(context),
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
         ),
         centerTitle: true,
@@ -155,7 +152,7 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                   Expanded(
                     child: TextFormField(
                       controller: _targetAmountController,
-                      keyboardType: TextInputType.numberWithOptions(
+                      keyboardType: const TextInputType.numberWithOptions(
                         decimal: true,
                       ),
                       style: const TextStyle(
@@ -167,7 +164,7 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.zero,
                         hintText: LocaleData.amountHint.getString(context),
-                        hintStyle: TextStyle(
+                        hintStyle: const TextStyle(
                           color: Color(0xFF4CAF50),
                           fontWeight: FontWeight.bold,
                           fontSize: 40,
@@ -195,7 +192,7 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
               // Goal Name Field
               Text(
                 LocaleData.savingGoalPurpose.getString(context),
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const SizedBox(height: 10),
               TextFormField(
@@ -210,18 +207,17 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                   ),
                   contentPadding: const EdgeInsets.all(15),
                 ),
-                validator:
-                    (value) =>
-                        value == null || value.isEmpty
-                            ? LocaleData.pleaseEnterSavingGoalName.getString(context)
-                            : null,
+                validator: (value) =>
+                    value == null || value.isEmpty
+                        ? LocaleData.pleaseEnterSavingGoalName.getString(context)
+                        : null,
               ),
               const SizedBox(height: 20),
 
               // Date Field
               Text(
                 LocaleData.targetDate.getString(context),
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const SizedBox(height: 10),
               InkWell(
@@ -258,7 +254,7 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
               // Description Field
               Text(
                 LocaleData.description.getString(context),
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const SizedBox(height: 10),
               TextField(
@@ -293,9 +289,9 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child:  Text(
+                  child: Text(
                     LocaleData.saveGoal.getString(context),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,

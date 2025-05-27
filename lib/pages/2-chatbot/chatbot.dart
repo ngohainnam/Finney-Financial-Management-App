@@ -15,7 +15,6 @@ import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:image_picker/image_picker.dart';
 import 'services/llm_service.dart';
 import 'presentation/welcome_screen.dart';
-import 'utils/chatbot_help.dart';
 import 'dart:async';
 import 'package:finney/shared/localization/locales.dart';
 import 'package:flutter_localization/flutter_localization.dart';
@@ -484,10 +483,6 @@ class _ChatbotState extends State<Chatbot> {
           IconButton(
             icon: const Icon(Icons.delete_outline),
             onPressed: clearChat,
-          ),
-          IconButton(
-            icon: const Icon(Icons.help_outline),
-            onPressed: () => ChatbotHelp.show(context),
           ),
         ],
       ),

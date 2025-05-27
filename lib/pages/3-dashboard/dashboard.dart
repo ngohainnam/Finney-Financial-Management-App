@@ -7,7 +7,6 @@ import 'package:finney/pages/2-chatbot/chatbot.dart';
 import 'package:finney/pages/2-chatbot/utils/robot_animation.dart';
 import 'package:finney/pages/3-dashboard/widgets/navigation_tiles.dart';
 import 'package:finney/pages/6-transaction/add_transaction/expense_or_income.dart';
-import 'package:finney/pages/3-dashboard/utils/dashboard_help.dart';
 import 'package:finney/pages/6-transaction/view_transaction/recent_transactions.dart';
 import 'package:flutter/material.dart';
 import 'package:finney/shared/theme/app_color.dart';
@@ -247,10 +246,6 @@ class DashboardState extends State<Dashboard> {
                 ),
                 automaticallyImplyLeading: true,
                 actions: [
-                  IconButton(
-                    icon: const Icon(Icons.help_outline),
-                    onPressed: () => DashboardHelp.show(context),
-                  ),
                 ],
               ),
               body: _isLoading
