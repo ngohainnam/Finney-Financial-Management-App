@@ -1,29 +1,50 @@
-import 'package:finney/pages/1-auth/presentation/pin_creation.dart';
-import 'package:finney/pages/1-auth/presentation/pin_entry.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_gemini/flutter_gemini.dart';
-import 'package:flutter_localization/flutter_localization.dart';
+import 'package:finney/shared/theme/app_color.dart';
+import 'package:finney/shared/localization/locales.dart';
 import 'package:finney/core/network/no_internet_screen.dart';
-import 'package:finney/core/storage/cloud/firebase_options.dart';
-import 'package:finney/core/storage/storage_manager.dart';
+import 'package:finney/pages/3-dashboard/dashboard.dart';
 import 'package:finney/pages/1-auth/auth_page.dart';
 import 'package:finney/pages/9-setting/language_selection.dart';
-import 'package:finney/shared/localization/locales.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:finney/shared/path/api_key.dart';
-import 'package:finney/shared/theme/app_color.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_gemini/flutter_gemini.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+import 'package:finney/shared/utils/notification_service.dart';
+import 'package:finney/core/storage/cloud/firebase_options.dart';
+import 'package:finney/core/storage/storage_manager.dart';
 import 'pages/1-auth/presentation/inactivity_handler.dart';
+import 'package:finney/pages/1-auth/presentation/pin_creation.dart';
+import 'package:finney/pages/1-auth/presentation/pin_entry.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await FlutterLocalization.instance.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await StorageManager().initialize();
   Gemini.init(apiKey: geminiApiKey);
+
+  // Timezone config
+  tz.initializeTimeZones();
+  tz.setLocalLocation(tz.getLocation('Australia/Melbourne'));
+
+  // Notification init
+  await NotificationService.init();
+
+  // Show daily notification if not already shown today
+  final prefs = await SharedPreferences.getInstance();
+  final today = DateTime.now().toIso8601String().substring(0, 10);
+  final lastShown = prefs.getString('startup_notification_last_date') ?? '';
+  if (lastShown != today) {
+    await NotificationService.showStartupReminder();
+    await prefs.setString('startup_notification_last_date', today);
+  }
+
   runApp(const MyApp());
 }
 
@@ -88,7 +109,7 @@ class _MyAppState extends State<MyApp> {
       );
     }
 
-    bool hasLanguage = _prefs.containsKey('language');
+    final hasLanguage = _prefs.containsKey('language');
 
     final app = MaterialApp(
       theme: ThemeData(
@@ -109,29 +130,27 @@ class _MyAppState extends State<MyApp> {
       home: !hasLanguage
           ? const LanguageSelectionPage()
           : StreamBuilder<User?>(
-              stream: FirebaseAuth.instance.authStateChanges(),
-              builder: (context, authSnapshot) {
-                if (authSnapshot.connectionState == ConnectionState.waiting) {
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, authSnapshot) {
+          if (authSnapshot.connectionState == ConnectionState.waiting) {
+            return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          }
+          if (authSnapshot.hasData) {
+            return FutureBuilder<Widget>(
+              future: _getInitialPage(authSnapshot.data!),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Scaffold(body: Center(child: CircularProgressIndicator()));
                 }
-                if (authSnapshot.hasData) {
-                  return FutureBuilder<Widget>(
-                    future: _getInitialPage(authSnapshot.data!),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Scaffold(body: Center(child: CircularProgressIndicator()));
-                      }
-                      return snapshot.data ?? const AuthPage();
-                    },
-                  );
-                }
-                return const AuthPage();
+                return snapshot.data ?? const AuthPage();
               },
-            ),
+            );
+          }
+          return const AuthPage();
+        },
+      ),
     );
 
-    return InternetConnectionHandler(
-      child: InactivityHandler(child: app),
-    );
+    return InternetConnectionHandler(child: InactivityHandler(child: app));
   }
 }

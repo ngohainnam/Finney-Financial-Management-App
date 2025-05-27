@@ -29,9 +29,7 @@ mixin LocaleData {
   static const String security = 'security';
   static const String setPin = 'setPin';
   static const String enterPin = 'enterPin';
-  static const String enterNewPin = 'enterNewPin';
   static const String confirmPin = 'confirmPin';
-  static const String confirmNewPin = 'confirmNewPin';
   static const String pinSaved = 'pinSaved';
   static const String invalidPin = 'invalidPin';
   static const String pinsDoNotMatch = 'pinsDoNotMatch';
@@ -487,6 +485,19 @@ mixin LocaleData {
   static const String noPinSet = 'noPinSet';
   static const String pinReset = 'pinReset';
   static const String lastPinAttempt = 'lastPinAttempt';
+  static const String confirmNewPin = 'confirmNewPin';
+  static const String enterNewPin = 'enterNewPin';
+  static const String budgetReminderTitle = 'budgetReminderTitle';
+  static const String thisWeeksSpending = 'thisWeeksSpending';
+  static const String stopSummary = 'stopSummary';
+  static const String playSummary = 'playSummary';
+  static const String setDailyReminder = 'setDailyReminder';
+  static const String reminderSetSuccess = 'reminderSetSuccess';
+  static const String reminderSetFailed = 'reminderSetFailed';
+  static const String editLimitTitle = 'editLimitTitle';
+  static const String editLimitHint = 'editLimitHint';
+  static const String editLimitCancel = 'editLimitCancel';
+  static const String editLimitSave = 'editLimitSave';
 
   static const Map<String, String> en = {
     appTitle: 'Finney',
@@ -513,9 +524,7 @@ mixin LocaleData {
     security: 'Security',
     setPin: 'Set PIN',
     enterPin: 'Enter 4-digit PIN',
-    enterNewPin: 'Enter New PIN',
     confirmPin: 'Confirm 4-digit PIN',
-    confirmNewPin: 'Confirm New PIN',
     pinSaved: 'PIN saved!',
     invalidPin: 'Please enter a 4-digit PIN',
     pinsDoNotMatch: 'Pins do not match',
@@ -905,6 +914,8 @@ mixin LocaleData {
     invalidGmailError: 'Please enter a valid Gmail address.',
     passwordsNotMatchError: 'Passwords do not match.',
     weakPasswordError: 'Password must be at least 12 characters long and include uppercase, lowercase, number, and symbol.',
+    enterNewPin: 'Enter New PIN',
+    confirmNewPin: 'Confirm New PIN',
     hiveStorageError: 'Failed to store user in local storage.',
     selectLanguage: 'Select Language',
     reminder: 'Reminder',
@@ -914,21 +925,20 @@ mixin LocaleData {
     greeting: 'Hi',
     languageUpdated : 'Language Updated',
     textSizeUpdated : 'Text Size Updated',
-    small : 'Small',
+    small: 'Small',
     medium : 'Medium',
     large : 'Large',
-    pinInvalid : 'PIN must be exactly 4 digits',
-    pinsDontMatch : 'PINs do not match',
-    tooManyAttempts : 'Too many attempts. PIN reset.',
-    createPin : 'Create PIN',
-    submit : 'Submit',
-    forgotPin: 'Forgot PIN?',
-    pinResetLogin: 'PIN reset. Please log in to create a new PIN.',
-    changePin: 'Change PIN',
-    nameRequired: 'Name is required',
-    noPinSet: 'No PIN set, please create one',
-    lastPinAttempt: 'Last attempt before account logout',
-    pinReset: 'PIN has been reset',
+    budgetReminderTitle: 'Budget Reminder',
+    thisWeeksSpending: "This Week's Spending",
+    stopSummary: 'Stop',
+    playSummary: '🗣 Speak My Budget',
+    setDailyReminder: 'Set Daily Reminder',
+    reminderSetSuccess: 'Reminder set for %s',
+    reminderSetFailed: 'Reminder setup failed: %s',
+    editLimitTitle: 'Update Limit',
+    editLimitHint: 'Enter new limit',
+    editLimitCancel: 'Cancel',
+    editLimitSave: 'Save',
   };
 
   static const Map<String, String> bd = {
@@ -956,9 +966,7 @@ mixin LocaleData {
     security: 'নিরাপত্তা',
     setPin: 'পিন সেট করুন',
     enterPin: '৪-সংখ্যার পিন লিখুন',
-    enterNewPin: 'নতুন পিন লিখুন',
     confirmPin: '৪-সংখ্যার পিন নিশ্চিত করুন',
-    confirmNewPin: 'নতুন পিন নিশ্চিত করুন',
     pinSaved: 'পিন সংরক্ষিত!',
     invalidPin: 'অনুগ্রহ করে ৪-সংখ্যার পিন লিখুন',
     pinsDoNotMatch: 'পিন মেলেনি',
@@ -1325,23 +1333,24 @@ mixin LocaleData {
     incomeCategorySummary: 'সর্বোচ্চ আয় হয়েছে %s শ্রেণী থেকে, যা %s (%s%%)।',
     searchHint: 'আমাকে আর্থিক প্রশ্ন জিজ্ঞাসা করুন...',
     greeting: 'হাই',
+    enterNewPin: 'নতুন পিন লিখুন',
+    confirmNewPin: 'নতুন পিন নিশ্চিত করুন',
     languageUpdated : 'ভাষা আপডেট হয়েছে',
     textSizeUpdated : 'টেক্সট সাইজ আপডেট হয়েছে',
     small: 'ছোট',
     medium : 'মাঝারি',
     large : 'বড়',
-    pinInvalid : 'পিন ঠিক ৪ সংখ্যার হতে হবে',
-    pinsDontMatch : 'পিন মেলেনি',
-    tooManyAttempts : 'অনেকবার চেষ্টা করা হয়েছে। পিন রিসেট।',
-    createPin : 'পিন তৈরি করুন',
-    submit : 'জমা দিন',
-    forgotPin: 'পিন ভুলে গেছেন?',
-    pinResetLogin: 'পিন রিসেট করা হয়েছে। নতুন পিন তৈরি করতে লগইন করুন।',
-    changePin: 'পিন পরিবর্তন করুন',
-    nameRequired: 'নাম আবশ্যক',
-    noPinSet: 'কোনো পিন সেট নেই, একটি তৈরি করুন',
-    lastPinAttempt: 'অ্যাকাউন্ট লগআউটের আগে শেষ প্রচেষ্টা',
-    pinReset: 'পিন রিসেট করা হয়েছে',
+    budgetReminderTitle: 'বাজেট রিমাইন্ডার',
+    thisWeeksSpending: 'এই সপ্তাহের খরচ',
+    stopSummary: 'বন্ধ করুন',
+    playSummary: '🗣 বাজেট শুনুন',
+    setDailyReminder: 'দৈনিক রিমাইন্ডার সেট করুন',
+    reminderSetSuccess: '%s সময়ের জন্য রিমাইন্ডার সেট হয়েছে',
+    reminderSetFailed: 'রিমাইন্ডার সেট করতে ব্যর্থ: %s',
+    editLimitTitle: 'সীমা আপডেট করুন',
+    editLimitHint: 'নতুন সীমা লিখুন',
+    editLimitCancel: 'বাতিল করুন',
+    editLimitSave: 'সংরক্ষণ করুন',
   };
 }
 

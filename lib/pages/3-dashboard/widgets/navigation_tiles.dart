@@ -1,11 +1,11 @@
 import 'package:finney/shared/localization/locales.dart';
 import 'package:finney/pages/2-chatbot/chatbot.dart';
-import 'package:finney/pages/3-dashboard/budget_reminder_page.dart';
 import 'package:finney/pages/4-saving/saving_goal_page.dart';
 import 'package:finney/pages/7-insights/insights.dart';
 import 'package:finney/pages/5-learn/learn.dart';
 import 'package:finney/pages/8-report/report.dart';
 import 'package:finney/pages/9-setting/setting.dart';
+import 'package:finney/pages/10-reminders/budget_reminder_page.dart';
 import 'package:flutter/material.dart';
 import 'package:finney/shared/theme/app_color.dart';
 import 'package:flutter_localization/flutter_localization.dart';
