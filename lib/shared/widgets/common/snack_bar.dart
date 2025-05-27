@@ -70,4 +70,13 @@ class AppSnackBar {
       duration: duration,
     );
   }
+  static void showWarning(BuildContext context, {required String message}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.orange,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
 }

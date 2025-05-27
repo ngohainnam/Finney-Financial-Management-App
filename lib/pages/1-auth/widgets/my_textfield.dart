@@ -1,5 +1,6 @@
 import 'package:finney/shared/theme/app_color.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class MyTextField extends StatelessWidget {
   final TextEditingController controller;
@@ -7,12 +8,18 @@ class MyTextField extends StatelessWidget {
   final bool obscureText;
   final Function(String)? onChanged;
   final Widget? suffixIcon;
+  final TextInputType? keyboardType;
+  final int? maxLength;
+  final List<TextInputFormatter>? inputFormatters;
 
   const MyTextField({
     super.key,
     required this.controller,
     required this.hintText,
     required this.obscureText,
+    this.keyboardType,
+    this.maxLength,
+    this.inputFormatters,
     this.onChanged,
     this.suffixIcon,
   });
