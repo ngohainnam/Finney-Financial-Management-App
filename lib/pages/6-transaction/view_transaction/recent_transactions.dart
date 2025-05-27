@@ -9,7 +9,7 @@ import 'package:finney/shared/localization/locales.dart';
 
 class RecentTransactions extends StatefulWidget {
   final List<TransactionModel> transactions;
-  final Function(TransactionModel)? onDeleteTransaction;
+  final Function(dynamic)? onDeleteTransaction; // Accepts single or list
   final TimeRangeData timeRange;
   final Function(TimeRangeData) onTimeRangeChanged;
 
@@ -57,8 +57,8 @@ class _RecentTransactionsState extends State<RecentTransactions> {
         title: Text(LocaleData.deleteTransactions.getString(context)),
         content: Text(
           LocaleData.confirmDeleteTransactions
-            .getString(context)
-            .replaceFirst('%d', _selectedTransactions.length.toString()),
+              .getString(context)
+              .replaceFirst('%d', _selectedTransactions.length.toString()),
         ),
         actions: [
           TextButton(
@@ -67,8 +67,11 @@ class _RecentTransactionsState extends State<RecentTransactions> {
           ),
           TextButton(
             onPressed: () {
-              for (var transaction in _selectedTransactions) {
-                widget.onDeleteTransaction?.call(transaction);
+              // Call the callback with a list for multiple, or single for one
+              if (_selectedTransactions.length == 1) {
+                widget.onDeleteTransaction?.call(_selectedTransactions.first);
+              } else {
+                widget.onDeleteTransaction?.call(_selectedTransactions.toList());
               }
               _selectedTransactions.clear();
               _toggleDeleteMode();
@@ -100,9 +103,9 @@ class _RecentTransactionsState extends State<RecentTransactions> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                _isDeleteMode 
-                  ? LocaleData.selectItemsToDelete.getString(context)
-                  : LocaleData.transactions.getString(context),
+                _isDeleteMode
+                    ? LocaleData.selectItemsToDelete.getString(context)
+                    : LocaleData.transactions.getString(context),
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,

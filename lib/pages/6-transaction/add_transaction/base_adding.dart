@@ -1,10 +1,11 @@
 import 'package:finney/core/storage/cloud/service/transaction_cloud_service.dart';
 import 'package:finney/shared/category.dart';
 import 'package:finney/pages/9-setting/currency_formatter.dart';
+import 'package:finney/shared/widgets/common/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:finney/core/storage/cloud/models/transaction_model.dart';
-import 'package:finney/core/storage/storage_manager.dart'; // Added for singleton access
+import 'package:finney/core/storage/storage_manager.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/shared/localization/locales.dart';
 
@@ -39,17 +40,14 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
   @override
   void initState() {
     super.initState();
-    // Get transaction service from StorageManager
     _transactionService = StorageManager().transactionService;
-    
+
     if (widget.existingTransaction != null) {
-      // if the transaction exists
       _selectedCategory = widget.existingTransaction!.category;
       _selectedDate = widget.existingTransaction!.date;
       _amountController.text = CurrencyFormatter.formatWithoutSymbol(widget.existingTransaction!.amount.abs());
       _descriptionController.text = widget.existingTransaction!.description ?? '';
     } else {
-      // if it is a new transaction
       if (categories.isNotEmpty) {
         _selectedCategory = categories[0].name;
       }
@@ -65,12 +63,10 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
   }
 
   Future<void> _saveTransaction() async {
-    // Clear any previous errors
     setState(() {
       _errorMessage = null;
     });
 
-    // Validate amount
     if (_amountController.text.isEmpty || _amountController.text == '0') {
       setState(() {
         _errorMessage = LocaleData.pleaseEnterValidAmount.getString(context);
@@ -116,20 +112,25 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
         description: _descriptionController.text.trim(),
       );
 
-      // Optimistic UI update - call callback first
-      if (widget.onTransactionAdded != null) {
+      // Only call callback for editing, not for new transaction
+      if (widget.existingTransaction != null && widget.onTransactionAdded != null) {
         widget.onTransactionAdded!(transaction);
       }
 
-      // Save to storage (handles both local and cloud)
       if (widget.existingTransaction != null) {
         await _transactionService.updateTransaction(transaction);
       } else {
         await _transactionService.addTransaction(transaction);
       }
 
-      // Simply navigate back without showing a snackbar
       if (mounted) {
+        // Show success snackbar
+        AppSnackBar.showSuccess(
+          context,
+          message: widget.existingTransaction != null
+              ? LocaleData.transactionUpdated.getString(context)
+              : LocaleData.transactionAddedSuccess.getString(context),
+        );
         Navigator.pop(context);
       }
     } catch (e) {
@@ -166,7 +167,6 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Error message (if any)
           if (_errorMessage != null)
             Container(
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -190,8 +190,6 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
                 ],
               ),
             ),
-
-          // Amount section
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: TextField(
@@ -219,25 +217,19 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
                 ),
               ),
               onChanged: (value) {
-                // Clear any error when user starts typing
                 if (_errorMessage != null) {
                   setState(() {
                     _errorMessage = null;
                   });
                 }
-                
-                // Simple number input without formatting
                 if (value.isEmpty) {
                   _amountController.text = '';
                   return;
                 }
-                
-                // Only allow numbers and one decimal point
                 String cleanValue = value.replaceAll(RegExp(r'[^\d.]'), '');
                 if (cleanValue.split('.').length > 2) {
                   cleanValue = cleanValue.substring(0, cleanValue.lastIndexOf('.'));
                 }
-                
                 if (cleanValue != value) {
                   _amountController.text = cleanValue;
                   _amountController.selection = TextSelection.fromPosition(
@@ -247,15 +239,12 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
               },
             ),
           ),
-
-          // Rest of the UI remains unchanged
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Category section
                   Text(
                     LocaleData.category.getString(context),
                     style: const TextStyle(
@@ -264,8 +253,6 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
                     ),
                   ),
                   const SizedBox(height: 10),
-
-                  // Categories grid
                   GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -279,7 +266,6 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
                     itemBuilder: (context, index) {
                       final category = categories[index];
                       final isSelected = _selectedCategory == category.name;
-
                       return _buildCategoryItem(
                         category.name,
                         category.icon,
@@ -288,10 +274,7 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
                       );
                     },
                   ),
-
                   const SizedBox(height: 20),
-
-                  // Date selector
                   Text(
                     LocaleData.date.getString(context),
                     style: const TextStyle(
@@ -300,7 +283,6 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
                     ),
                   ),
                   const SizedBox(height: 10),
-
                   InkWell(
                     onTap: () => _selectDate(context),
                     child: Container(
@@ -330,10 +312,7 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 20),
-
-                  // Description field
                   Text(
                     LocaleData.description.getString(context),
                     style: const TextStyle(
@@ -342,7 +321,6 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
                     ),
                   ),
                   const SizedBox(height: 10),
-
                   TextField(
                     controller: _descriptionController,
                     decoration: InputDecoration(
@@ -368,23 +346,22 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
       ),
       floatingActionButton: _isSaving
           ? const Padding(
-        padding: EdgeInsets.all(16.0),
-        child: CircularProgressIndicator(),
-      )
+              padding: EdgeInsets.all(16.0),
+              child: CircularProgressIndicator(),
+            )
           : Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: FloatingActionButton(
-          onPressed: _saveTransaction,
-          backgroundColor: amountColor,
-          elevation: 4,
-          child: const Icon(Icons.check, color: Colors.white),
-        ),
-      ),
+              padding: const EdgeInsets.all(16.0),
+              child: FloatingActionButton(
+                onPressed: _saveTransaction,
+                backgroundColor: amountColor,
+                elevation: 4,
+                child: const Icon(Icons.check, color: Colors.white),
+              ),
+            ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
-  // The remaining methods remain unchanged
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -405,7 +382,6 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
       onTap: () {
         setState(() {
           _selectedCategory = name;
-          // Clear any errors when selecting a category
           if (_errorMessage == LocaleData.pleaseSelectCategory.getString(context)) {
             _errorMessage = null;
           }
@@ -446,7 +422,7 @@ class CategoryData {
   final IconData icon;
   final Color color;
 
-  CategoryData(this.name) :
-        icon = CategoryUtils.getIconForCategory(name),
+  CategoryData(this.name)
+      : icon = CategoryUtils.getIconForCategory(name),
         color = CategoryUtils.getColorForCategory(name);
 }

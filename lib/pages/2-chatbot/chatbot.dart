@@ -15,7 +15,6 @@ import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:image_picker/image_picker.dart';
 import 'services/llm_service.dart';
 import 'presentation/welcome_screen.dart';
-import 'utils/chatbot_help.dart';
 import 'dart:async';
 import 'package:finney/shared/localization/locales.dart';
 import 'package:flutter_localization/flutter_localization.dart';
@@ -226,19 +225,6 @@ class _ChatbotState extends State<Chatbot> {
                     context,
                     message: LocaleData.transactionAddedSuccess.getString(context),
                   );
-                  
-                  // Add confirmation message to chat
-                  final confirmMessage = ChatMessage(
-                    user: ChatConstants.geminiUser,
-                    createdAt: DateTime.now(),
-                    text: LocaleData.transactionAddedSuccess.getString(context),
-                  );
-                  
-                  setState(() {
-                    messages = [confirmMessage] + messages;
-                  });
-                  
-                  await saveMessage(confirmMessage, role: 'model');
                 }
               } catch (e) {
                 // Show error using AppSnackBar if transaction fails
@@ -255,18 +241,11 @@ class _ChatbotState extends State<Chatbot> {
           // Handle cancellation
           if (confirmed == false) {
             if (mounted) {
-              // Add a cancellation message from the bot
-              final cancelMessage = ChatMessage(
-                user: ChatConstants.geminiUser,
-                createdAt: DateTime.now(),
-                text: LocaleData.transactionCanceled.getString(context),
+            // Show success message using AppSnackBar
+            AppSnackBar.showInfo(
+              context,
+              message: LocaleData.transactionCanceled.getString(context),
               );
-              
-              setState(() {
-                messages = [cancelMessage] + messages;
-              });
-              
-              await saveMessage(cancelMessage, role: 'model');
             }
           }
         }
@@ -350,19 +329,6 @@ class _ChatbotState extends State<Chatbot> {
           
           await saveMessage(message, role: 'model');
         }
-      } else if (TransactionParser.isCancelingTransaction(userMessage.text)) {
-        final message = ChatMessage(
-          user: ChatConstants.geminiUser,
-          createdAt: DateTime.now(),
-          text: LocaleData.transactionCanceled.getString(context),
-        );
-        
-        setState(() {
-          _isAiTyping = false;
-          messages = [message] + messages;
-        });
-        
-        await saveMessage(message, role: 'model');
       } else {
         // If the user's response wasn't clear, show the popup
         final message = ChatMessage(
@@ -517,10 +483,6 @@ class _ChatbotState extends State<Chatbot> {
           IconButton(
             icon: const Icon(Icons.delete_outline),
             onPressed: clearChat,
-          ),
-          IconButton(
-            icon: const Icon(Icons.help_outline),
-            onPressed: () => ChatbotHelp.show(context),
           ),
         ],
       ),

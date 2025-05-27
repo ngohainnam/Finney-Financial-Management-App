@@ -6,16 +6,16 @@ import 'package:finney/pages/3-dashboard/widgets/goal_card.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/shared/localization/locales.dart';
 import 'package:finney/shared/theme/app_color.dart';
-import 'package:finney/shared/widgets/common/snack_bar.dart'; 
+import 'package:finney/shared/widgets/common/snack_bar.dart';
 
 class SavingGoalPage extends StatefulWidget {
   const SavingGoalPage({super.key});
 
   @override
-  SavingGoalPageState createState() => SavingGoalPageState();
+  State<SavingGoalPage> createState() => _SavingGoalPageState();
 }
 
-class SavingGoalPageState extends State<SavingGoalPage> {
+class _SavingGoalPageState extends State<SavingGoalPage> {
   final SavingGoalService _goalService = SavingGoalService();
 
   @override
@@ -23,33 +23,9 @@ class SavingGoalPageState extends State<SavingGoalPage> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              LocaleData.mySavingGoals.getString(context),
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            ElevatedButton.icon(
-              onPressed: _navigateToAddGoal,
-              icon: const Icon(Icons.add_circle_outline, size: 20),
-              label: Text(
-                LocaleData.newGoal.getString(context),
-                style: const TextStyle(fontSize: 14)),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green, 
-                foregroundColor: Colors.white,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(17.5),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-              ),
-            ),
-          ],
+        title: Text(
+          LocaleData.mySavingGoals.getString(context),
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         centerTitle: false,
         leading: IconButton(
@@ -60,6 +36,26 @@ class SavingGoalPageState extends State<SavingGoalPage> {
           IconButton(
             icon: const Icon(Icons.help_outline_rounded, size: 28),
             onPressed: _showSavingsInfo,
+          ),
+          ElevatedButton.icon(
+            onPressed: _navigateToAddGoal,
+            icon: const Icon(Icons.add_circle_outline, size: 20),
+            label: Text(
+              LocaleData.newGoal.getString(context),
+              style: const TextStyle(fontSize: 14),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(17.5),
+              ),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 8,
+              ),
+            ),
           ),
         ],
       ),
@@ -121,7 +117,6 @@ class SavingGoalPageState extends State<SavingGoalPage> {
 
           return Column(
             children: [
-              // Progress Card
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Card(
@@ -135,26 +130,22 @@ class SavingGoalPageState extends State<SavingGoalPage> {
                   ),
                 ),
               ),
-
-              // Goals List
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: _refreshGoals,
-                  color: AppColors.primary, 
+                  color: AppColors.primary,
                   child: ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     itemCount: goals.length,
-                    itemBuilder:
-                        (context, index) => Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: GoalCard(
-                            goal: goals[index],
-                            onTap: () => _navigateToEditGoal(goals[index]),
-                            onAddSavings:
-                                (amount) => _addToSavings(goals[index], amount),
-                            onDelete: () => _deleteGoal(goals[index]),
-                          ),
-                        ),
+                    itemBuilder: (context, index) => Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: GoalCard(
+                        goal: goals[index],
+                        onTap: () => _navigateToEditGoal(goals[index]),
+                        onAddSavings: (amount) => _addToSavings(goals[index], amount),
+                        onDelete: () => _deleteGoal(goals[index]),
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -193,7 +184,7 @@ class SavingGoalPageState extends State<SavingGoalPage> {
           value: progress.toDouble(),
           minHeight: 12,
           backgroundColor: Colors.grey[200],
-          valueColor: AlwaysStoppedAnimation<Color>(Colors.green), 
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
           borderRadius: BorderRadius.circular(6),
         ),
         const SizedBox(height: 12),
@@ -241,6 +232,7 @@ class SavingGoalPageState extends State<SavingGoalPage> {
       MaterialPageRoute(
         builder: (_) => AddEditGoalPage(
           onGoalSaved: (SavingGoal goal) {
+            setState(() {});
             AppSnackBar.showSuccess(
               context,
               message: LocaleData.goalCreated.getString(context).replaceFirst('%s', goal.title),
@@ -248,7 +240,7 @@ class SavingGoalPageState extends State<SavingGoalPage> {
           },
         ),
       ),
-    ); 
+    );
   }
 
   void _navigateToEditGoal(SavingGoal goal) {
@@ -258,12 +250,14 @@ class SavingGoalPageState extends State<SavingGoalPage> {
         builder: (_) => AddEditGoalPage(
           existingGoal: goal,
           onGoalSaved: (SavingGoal updatedGoal) {
+            setState(() {});
             AppSnackBar.showSuccess(
               context,
               message: LocaleData.goalUpdated.getString(context).replaceFirst('%s', updatedGoal.title),
             );
           },
           onGoalDeleted: () {
+            setState(() {});
             AppSnackBar.showError(
               context,
               message: LocaleData.goalWasDeleted.getString(context),
@@ -276,8 +270,8 @@ class SavingGoalPageState extends State<SavingGoalPage> {
 
   Future<void> _addToSavings(SavingGoal goal, double amount) async {
     final success = await _goalService.addToSavings(goal.id, amount, context);
-    
     if (success) {
+      setState(() {});
       AppSnackBar.showSuccess(
         context,
         message: LocaleData.addedToSavings.getString(context)
@@ -296,7 +290,7 @@ class SavingGoalPageState extends State<SavingGoalPage> {
         ),
         title: Row(
           children: [
-            Icon(Icons.warning_amber_rounded, color: Colors.redAccent), 
+            Icon(Icons.warning_amber_rounded, color: Colors.redAccent),
             const SizedBox(width: 12),
             Text(LocaleData.deleteGoalQuestion.getString(context)),
           ],
@@ -311,7 +305,7 @@ class SavingGoalPageState extends State<SavingGoalPage> {
             child: Text(LocaleData.cancel.getString(context)),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent), 
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
             onPressed: () => Navigator.pop(context, true),
             child: Text(
               LocaleData.delete.getString(context),
@@ -325,6 +319,7 @@ class SavingGoalPageState extends State<SavingGoalPage> {
     if (confirmed == true) {
       try {
         await _goalService.deleteGoal(goal.id);
+        setState(() {});
         AppSnackBar.showSuccess(
           context,
           message: LocaleData.goalDeleted.getString(context).replaceFirst('%s', goal.title),
@@ -341,74 +336,73 @@ class SavingGoalPageState extends State<SavingGoalPage> {
   void _showSavingsInfo() {
     showDialog(
       context: context,
-      builder:
-          (context) => Dialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
                 children: [
-                  Row(
-                    children: [
-                      Icon(Icons.savings_rounded, size: 32, color: AppColors.categoryFood), // Changed from _infoColor to categoryFood
-                      const SizedBox(width: 12),
-                      Text(
-                        LocaleData.aboutSavingGoals.getString(context),
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.categoryFood, // Changed from _infoColor to categoryFood
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  _buildInfoTip(
-                    Icons.track_changes_rounded,
-                    LocaleData.trackProgress.getString(context),
-                    LocaleData.trackProgressDescription.getString(context),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildInfoTip(
-                    Icons.attach_money_rounded,
-                    LocaleData.addMoneyAnytime.getString(context),
-                    LocaleData.addMoneyAnytimeDescription.getString(context),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildInfoTip(
-                    Icons.calendar_today_rounded,
-                    LocaleData.setTargetDates.getString(context),
-                    LocaleData.setTargetDatesDescription.getString(context),
-                  ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary, 
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text(
-                        "Got It",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
+                  Icon(Icons.savings_rounded, size: 32, color: AppColors.categoryFood),
+                  const SizedBox(width: 12),
+                  Text(
+                    LocaleData.aboutSavingGoals.getString(context),
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.categoryFood,
                     ),
                   ),
                 ],
               ),
-            ),
+              const SizedBox(height: 24),
+              _buildInfoTip(
+                Icons.track_changes_rounded,
+                LocaleData.trackProgress.getString(context),
+                LocaleData.trackProgressDescription.getString(context),
+              ),
+              const SizedBox(height: 16),
+              _buildInfoTip(
+                Icons.attach_money_rounded,
+                LocaleData.addMoneyAnytime.getString(context),
+                LocaleData.addMoneyAnytimeDescription.getString(context),
+              ),
+              const SizedBox(height: 16),
+              _buildInfoTip(
+                Icons.calendar_today_rounded,
+                LocaleData.setTargetDates.getString(context),
+                LocaleData.setTargetDatesDescription.getString(context),
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text(
+                    "Got It",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
+        ),
+      ),
     );
   }
 
@@ -416,7 +410,7 @@ class SavingGoalPageState extends State<SavingGoalPage> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 24, color: AppColors.primary), 
+        Icon(icon, size: 24, color: AppColors.primary),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
