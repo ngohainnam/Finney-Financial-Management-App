@@ -66,7 +66,7 @@ class _MyAppState extends State<MyApp> {
     localization.init(
       mapLocales: [
         MapLocale('en', LocaleData.en),
-        MapLocale('bn', LocaleData.bd),
+        MapLocale('bn', LocaleData.bn),
       ],
       initLanguageCode: _languageCode,
     );

@@ -252,7 +252,7 @@ class _CategoryPieChartState extends State<CategoryPieChart> {
       summary = sprintf(
         FlutterLocalization.instance.currentLocale!.languageCode == 'en' 
             ? LocaleData.en['expenseCategorySummary']! 
-            : LocaleData.bd['expenseCategorySummary']!,
+            : LocaleData.bn['expenseCategorySummary']!,
         [
           topCategoryName,
           topCategoryAmount,
@@ -263,7 +263,7 @@ class _CategoryPieChartState extends State<CategoryPieChart> {
       summary = sprintf(
         FlutterLocalization.instance.currentLocale!.languageCode == 'en' 
             ? LocaleData.en['incomeCategorySummary']! 
-            : LocaleData.bd['incomeCategorySummary']!,
+            : LocaleData.bn['incomeCategorySummary']!,
         [
           topCategoryName,
           topCategoryAmount,

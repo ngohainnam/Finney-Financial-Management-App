@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-import 'learn_progress.dart';
+import 'package:finney/pages/5-learn/financial_learn/learn_progress.dart';
+import 'package:finney/shared/localization/locales.dart';
+import 'package:flutter_localization/flutter_localization.dart' hide getString;
 
 class SavingMoneyEasy extends StatefulWidget {
   const SavingMoneyEasy({super.key});
@@ -13,61 +15,59 @@ class SavingMoneyEasy extends StatefulWidget {
 class _SavingMoneyEasyState extends State<SavingMoneyEasy> {
   final String lessonKey = 'saving_money_easy';
 
-  final List<Map<String, String>> steps = [
-    {
-      'title': 'Making Saving a Habit',
-      'description':
-          'It’s smart to save money regularly and turn it into a habit. The best way is to plan your savings before you spend.',
-      'videoId': 'RUz9yjgnGi8',
-    },
-    {
-      'title': 'Why Saving Is Important',
-      'description':
-          'Saving money for emergencies is super important. If you keep some money aside as soon as you get paid, your future will feel more secure.',
-      'videoId': 'QNu4u0XsIoM',
-    },
-  ];
-
-  final Color contentColor = Color(0xFFE1D5F0);
-
   late List<YoutubePlayerController> _controllers;
   late List<bool> _completed;
+  late List<Map<String, String>> _steps;
+
+  final Color contentColor = Color(0xFFE1D5F0);
 
   @override
   void initState() {
     super.initState();
+    _steps = [];
+    _completed = [];
+    _controllers = [];
+  }
 
-    // Initialize with default values
-    _completed = List.generate(steps.length, (_) => false);
-    
-    // Load completion status asynchronously
-    _loadCompletionStatus();
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
 
-    _controllers = steps.map((step) {
+    _steps = [
+      {
+        'title': LocaleData.savingMoneyVideo1Title.getString(context),
+        'description': LocaleData.savingMoneyVideo1Subtitle.getString(context),
+        'videoId': 'RUz9yjgnGi8',
+      },
+      {
+        'title': LocaleData.savingMoneyVideo2Title.getString(context),
+        'description': LocaleData.savingMoneyVideo2Subtitle.getString(context),
+        'videoId': 'QNu4u0XsIoM',
+      },
+    ];
+
+    _completed = List.generate(_steps.length, (_) => false);
+
+    _controllers = _steps.map((step) {
       return YoutubePlayerController(
         initialVideoId: step['videoId']!,
         flags: const YoutubePlayerFlags(autoPlay: false),
       );
     }).toList();
+
+    _loadCompletionStatus();
+    setState(() {}); // optional UI refresh
   }
 
   Future<void> _loadCompletionStatus() async {
-    for (int i = 0; i < steps.length; i++) {
-      final isCompleted = await LearnProgress.isVideoCompleted(lessonKey, i);
+    for (int i = 0; i < _steps.length; i++) {
+      final done = await LearnProgress.isVideoCompleted(lessonKey, i);
       if (mounted) {
         setState(() {
-          _completed[i] = isCompleted;
+          _completed[i] = done;
         });
       }
     }
-  }
-
-  @override
-  void dispose() {
-    for (final controller in _controllers) {
-      controller.dispose();
-    }
-    super.dispose();
   }
 
   void _markStepCompleted(int index) async {
@@ -78,24 +78,35 @@ class _SavingMoneyEasyState extends State<SavingMoneyEasy> {
   }
 
   @override
+  void dispose() {
+    for (final controller in _controllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FB),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text(
-          'Saving Money Easy',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blueAccent),
+        title: Text(
+          LocaleData.savingMoneyEasy.getString(context),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.blueAccent,
+          ),
         ),
         iconTheme: const IconThemeData(color: Colors.blueAccent),
       ),
       body: ListView.separated(
         padding: const EdgeInsets.all(16),
         separatorBuilder: (_, __) => const SizedBox(height: 24),
-        itemCount: steps.length,
+        itemCount: _steps.length,
         itemBuilder: (context, index) {
-          final step = steps[index];
+          final step = _steps[index];
           return Container(
             decoration: BoxDecoration(
               color: contentColor,
@@ -125,10 +136,7 @@ class _SavingMoneyEasyState extends State<SavingMoneyEasy> {
                 const SizedBox(height: 8),
                 Text(
                   step['description']!,
-                  style: const TextStyle(
-                    color: Colors.black54,
-                    fontSize: 14,
-                  ),
+                  style: const TextStyle(color: Colors.black54, fontSize: 14),
                 ),
                 const SizedBox(height: 12),
                 Align(
@@ -138,7 +146,11 @@ class _SavingMoneyEasyState extends State<SavingMoneyEasy> {
                         ? null
                         : () => _markStepCompleted(index),
                     icon: const Icon(LucideIcons.check),
-                    label: Text(_completed[index] ? 'Completed' : 'Mark as Done'),
+                    label: Text(
+                      _completed[index]
+                          ? LocaleData.completed.getString(context)
+                          : LocaleData.tourMarkDone.getString(context),
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _completed[index]
                           ? Colors.green[300]

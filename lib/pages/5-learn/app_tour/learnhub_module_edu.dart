@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:finney/pages/5-learn/financial_learn/learn_progress.dart';
+import 'package:flutter_localization/flutter_localization.dart' hide getString;
+import 'package:finney/shared/localization/locales.dart';
 
 class LearnhubModuleEduPage extends StatefulWidget {
   const LearnhubModuleEduPage({super.key});
@@ -25,13 +27,10 @@ class _LearnhubModuleEduPageState extends State<LearnhubModuleEduPage> {
     );
     _loadCompletionStatus();
   }
-
-  Future<void> _loadCompletionStatus() async {
-    final isCompleted = await LearnProgress.isVideoCompleted(lessonKey, 0);
+  void _loadCompletionStatus() async {
+    final isDone = await LearnProgress.isVideoCompleted(lessonKey, 0);
     if (mounted) {
-      setState(() {
-        _completed = isCompleted;
-      });
+      setState(() => _completed = isDone);
     }
   }
 
@@ -53,7 +52,10 @@ class _LearnhubModuleEduPageState extends State<LearnhubModuleEduPage> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text('LearnHub Module', style: TextStyle(color: Colors.blueAccent)),
+        title: Text(
+          LocaleData.tourLearnhubTitle.getString(context),
+          style: TextStyle(color: Colors.blueAccent),
+        ),
         iconTheme: const IconThemeData(color: Colors.blueAccent),
       ),
       body: ListView(
@@ -63,7 +65,9 @@ class _LearnhubModuleEduPageState extends State<LearnhubModuleEduPage> {
             decoration: BoxDecoration(
               color: cardColor,
               borderRadius: BorderRadius.circular(20),
-              boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 5)],
+              boxShadow: const [
+                BoxShadow(color: Colors.black12, blurRadius: 5),
+              ],
             ),
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -71,13 +75,13 @@ class _LearnhubModuleEduPageState extends State<LearnhubModuleEduPage> {
               children: [
                 YoutubePlayer(controller: _controller),
                 const SizedBox(height: 12),
-                const Text(
-                  'Learning Modules',
+                Text(
+                  LocaleData.tourLearnhubTitle.getString(context),
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Get an overview of the main LearnHub content and how to navigate through lessons.',
+                Text(
+                  LocaleData.tourLearnhubDesc.getString(context),
                   style: TextStyle(color: Colors.black54),
                 ),
                 const SizedBox(height: 12),
@@ -86,9 +90,14 @@ class _LearnhubModuleEduPageState extends State<LearnhubModuleEduPage> {
                   child: ElevatedButton.icon(
                     onPressed: _completed ? null : _markAsDone,
                     icon: const Icon(Icons.check),
-                    label: Text(_completed ? 'Completed' : 'Mark as Done'),
+                    label: Text(
+                      _completed
+                          ? LocaleData.completed.getString(context)
+                          : LocaleData.tourMarkDone.getString(context),
+                    ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: _completed ? Colors.green[300] : Colors.blueAccent,
+                      backgroundColor:
+                      _completed ? Colors.green[300] : Colors.blueAccent,
                     ),
                   ),
                 ),

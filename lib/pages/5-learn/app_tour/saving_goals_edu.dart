@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:finney/pages/5-learn/financial_learn/learn_progress.dart';
+import 'package:flutter_localization/flutter_localization.dart' hide getString;
+import 'package:finney/shared/localization/locales.dart';
 
 class SavingGoalsEduPage extends StatefulWidget {
-  const SavingGoalsEduPage({super.key});
+  const SavingGoalsEduPage({Key? key}) : super(key: key);
 
   @override
   State<SavingGoalsEduPage> createState() => _SavingGoalsEduPageState();
@@ -11,11 +13,9 @@ class SavingGoalsEduPage extends StatefulWidget {
 
 class _SavingGoalsEduPageState extends State<SavingGoalsEduPage> {
   final String lessonKey = 'saving_goals_edu';
-  final Color cardColor = Color(0xFFC5CAE9); 
+  final Color cardColor = Color(0xFFC5CAE9);
 
-  final String title = 'Setting Up Saving Goals';
-  final String description =
-      'Learn how to set, track, and achieve your personal savings goals using the app’s built-in features.';
+  final String videoId = '_OACmawAagI';
 
   late YoutubePlayerController _controller;
   bool _completed = false;
@@ -24,18 +24,16 @@ class _SavingGoalsEduPageState extends State<SavingGoalsEduPage> {
   void initState() {
     super.initState();
     _controller = YoutubePlayerController(
-      initialVideoId: 'dQw4w9WgXcQ',
+      initialVideoId: videoId,
       flags: const YoutubePlayerFlags(autoPlay: false),
     );
     _loadCompletionStatus();
   }
 
-  Future<void> _loadCompletionStatus() async {
-    final isCompleted = await LearnProgress.isVideoCompleted(lessonKey, 0);
+  void _loadCompletionStatus() async {
+    final isDone = await LearnProgress.isVideoCompleted(lessonKey, 0);
     if (mounted) {
-      setState(() {
-        _completed = isCompleted;
-      });
+      setState(() => _completed = isDone);
     }
   }
 
@@ -57,7 +55,10 @@ class _SavingGoalsEduPageState extends State<SavingGoalsEduPage> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text('Saving Goals', style: TextStyle(color: Colors.blueAccent)),
+        title: Text(
+          LocaleData.savingGoals.getString(context),
+          style: const TextStyle(color: Colors.blueAccent),
+        ),
         iconTheme: const IconThemeData(color: Colors.blueAccent),
       ),
       body: ListView(
@@ -67,7 +68,9 @@ class _SavingGoalsEduPageState extends State<SavingGoalsEduPage> {
             decoration: BoxDecoration(
               color: cardColor,
               borderRadius: BorderRadius.circular(20),
-              boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 5)],
+              boxShadow: const [
+                BoxShadow(color: Colors.black12, blurRadius: 5),
+              ],
             ),
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -75,18 +78,32 @@ class _SavingGoalsEduPageState extends State<SavingGoalsEduPage> {
               children: [
                 YoutubePlayer(controller: _controller),
                 const SizedBox(height: 12),
-                Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                Text(
+                  LocaleData.savingGoalheading.getString(context),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
                 const SizedBox(height: 8),
-                Text(description, style: const TextStyle(fontSize: 14, color: Colors.black54)),
+                Text(
+                  LocaleData.savingGoalSubtitled.getString(context),
+                  style: const TextStyle(fontSize: 14, color: Colors.black54),
+                ),
                 const SizedBox(height: 12),
                 Align(
                   alignment: Alignment.centerRight,
                   child: ElevatedButton.icon(
                     onPressed: _completed ? null : _markAsDone,
                     icon: const Icon(Icons.check),
-                    label: Text(_completed ? 'Completed' : 'Mark as Done'),
+                    label: Text(
+                      _completed
+                          ? LocaleData.completed.getString(context)
+                          : LocaleData.tourMarkDone.getString(context),
+                    ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: _completed ? Colors.green[300] : Colors.blueAccent,
+                      backgroundColor:
+                      _completed ? Colors.green[300] : Colors.blueAccent,
                     ),
                   ),
                 ),

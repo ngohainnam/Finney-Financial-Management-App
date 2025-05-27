@@ -88,6 +88,16 @@ mixin LocaleData {
   static const String resourceSafetyVideo2 = 'resourceSafetyVideo2';
   static const String resourceSafetyArticle1 = 'resourceSafetyArticle1';
   static const String resourceSafetyArticle2 = 'resourceSafetyArticle2';
+
+  static const String transactionDeleted = 'transactionDeleted';
+  static const String failedToDeleteTransaction = 'failedToDeleteTransaction';
+  static const String searchHint = 'searchHint';
+  static const String errorLoadingMessages = 'errorLoadingMessages';
+  static const String chatCleared = 'chatCleared';
+  static const String features = 'features';
+  static const String prediction = 'prediction';
+  static const String reminder = 'reminder';
+
   // Chatbot page keys
   static const String chatbotTitle = 'chatbotTitle';
   static const String chatbotHelp = 'chatbotHelp';
@@ -380,6 +390,8 @@ mixin LocaleData {
   static const String refresh = 'refresh';
   static const String clearAllResults = 'clearAllResults';
 
+  static const String question = 'question';
+
 
   // Dashboard page keys
   static const String failedToLoadDashboardData = 'failedToLoadDashboardData';
@@ -394,8 +406,8 @@ mixin LocaleData {
   static const String moneyTools = 'moneyTools';
   static const String insights = 'insights';
   static const String goals = 'goals';
-  static const String learnFinanceDescription = 'learnFinanceDescription';
-  static const String financeAcademy = 'financeAcademy';
+  static const String learnFinanceDescription = 'LearnHubDescription';
+  static const String financeAcademy = 'LearnHub';
 
   // Robot animation
   static const String thinking = 'thinking';
@@ -779,7 +791,7 @@ mixin LocaleData {
   static const String quizAverage = 'quizAverage';
   static const String quizLastAttempt = 'quizLastAttempt';
   static const String learningReset = 'learningReset';
-  static const String learningHub = 'learningHub';
+  static const String learningHub = 'learnHub';
   static const String ongoing = 'ongoing';
   static const String completed = 'completed';
   static const String noResultsFound = 'noResultsFound';
@@ -894,6 +906,9 @@ mixin LocaleData {
   static const String greatJob = "🏆 Great Job!";
   static const String goodEffort = "👍 Good Effort";
   static const String tryAgain = "🔄 Try Again";
+  static const String next = 'next';
+  static const String finish = 'finish';
+
   //**************************************************************************** */
   static const Map<String, String> en = {
     greatJob: "🏆 Great Job!",
@@ -1066,7 +1081,8 @@ mixin LocaleData {
     goals: 'Goals',
     thinking: 'Thinking...',
     balance: 'Balance',
-    'financeAcademy': 'Finance Academy',
+    'financeAcademy': 'LearnHub',
+    'LearnHubDescription': 'Learn about money through videos, quizzes, and tips.',
     income: 'Income',
     expenses: 'Expenses',
     expense: 'Expense',
@@ -1622,7 +1638,7 @@ mixin LocaleData {
     quizQ28A4: 'Spending faster',
     quizQ29: 'Which section in the Finney app helps improve financial skills?',
     quizQ29A1: 'Settings',
-    quizQ29A2: 'Learn Academy',
+    quizQ29A2: 'LearnHub',
     quizQ29A3: 'Notifications',
     quizQ29A4: 'Profile',
     quizQ30: 'If expenses are greater than income, what happens?',
@@ -1632,13 +1648,16 @@ mixin LocaleData {
     quizQ30A4: 'Salary doubles',
     reviewAnswers: 'Review Answers',
     backToQuiz: 'Back to Quiz',
+    'next': 'Next',
+    'finish': 'Finish',
+
     dashboard: 'Dashboard',
     expenseTracking: 'Expense Tracking',
     report: 'Report',
     savingGoals: 'Saving Goals',
     quiz: 'Quiz',
     learningReset: 'Learning progress reset.',
-    learningHub: 'Learning Hub',
+    learningHub: 'LearnHub',
     ongoing: 'Ongoing',
     completed: 'Completed',
     noResultsFound: 'No results found.',
@@ -1695,6 +1714,17 @@ mixin LocaleData {
     'clearAllResults': 'Clear All Results',
     'learnFinanceDescription': 'Learn the basics of finance through videos and quizzes.',
 
+
+    'transactionDeleted': 'Transaction deleted successfully',
+    'failedToDeleteTransaction': 'Failed to delete transaction',
+    'searchHint': 'Search...',
+    'errorLoadingMessages': 'Error loading messages',
+    'chatCleared': 'Chat has been cleared',
+    'features': 'Features',
+    'prediction': 'Prediction',
+    'reminder': 'Reminder',
+
+    'question': 'Question',
   };
 
   static const Map<String, String> bn = {
@@ -1749,7 +1779,7 @@ mixin LocaleData {
     "আপনি যতই আয় করুন না কেন — ঠিকভাবে ম্যানেজ, বাড়ানো, ইনভেস্ট আর নিরাপদ রাখলে ভবিষ্যৎ হবে সুরক্ষিত।",
     spendingVideo1Title: "টাকা ম্যানেজ, বাড়ান, ইনভেস্ট আর সুরক্ষা দিন",
     apptourDashSubtitle: "প্রধান ওভারভিউ অন্বেষণ করুন",
-    searchTextfiedText: "বিষয়বস্তু অনুসন্ধান করুন..",
+    searchTextfiedText: "অনুসন্ধান করুন..",
     expenseTrackingSubtite: "আপনার দৈনিক খরচ ট্র্যাক করুন",
     savingGoalheading: "সেভিং গোল সেটআপ",
     savingGoalSubheading: "গোল সেট করুন এবং অর্জন করুন",
@@ -1824,7 +1854,7 @@ mixin LocaleData {
     savingBudgetingPoint2: 'জরুরি তহবিল তৈরি করুন (3-6 মাসের খরচ)',
     savingBudgetingPoint3: 'আপনার সঞ্চয় স্বয়ংক্রিয় করুন',
     savingBudgetingPoint4: 'মাসিক বাজেট পর্যালোচনা এবং সমন্বয় করুন',
-    investingFundamentalsPoint1: 'ঝুঁকি এবং রিটার্ন বুঝুন',
+    investingFundamentalsPoint1: 'রিস্ক এবং রিটার্ন বুঝুন',
     investingFundamentalsPoint2: 'আপনার বিনিয়োগ বৈচিত্র্যময় করুন',
     investingFundamentalsPoint3:
     'স্টক, বন্ড এবং মিউচুয়াল ফান্ড সম্পর্কে জানুন',
@@ -1876,8 +1906,8 @@ mixin LocaleData {
     thinking: 'চিন্তা করছে...',
     balance: 'হিসাব নিকাশ ',
     income: 'আয়',
-    'financeAcademy': 'ফিন্যান্স একাডেমি',
-
+    'financeAcademy': 'লার্নহাব',
+    'LearnHubDescription': 'ভিডিও, কুইজ আর টিপস দিয়ে টাকার বিষয় শেখা যাবে।',
     expenses: 'খরচ',
     expense: 'খরচ',
     saving: 'সঞ্চয়',
@@ -2222,7 +2252,7 @@ mixin LocaleData {
     learnReset: 'লার্নিং অগ্রগতি রিসেট হয়েছে।',
     learnNoResults: 'কোনও ফলাফল পাওয়া যায়নি।',
     learningReset: 'লার্নিং অগ্রগতি রিসেট হয়েছে।',
-    learningHub: 'লার্নিং হাব',
+    learningHub: 'লার্নহাব',
     ongoing: 'চলমান',
     completed: 'সম্পন্ন',
     noResultsFound: 'কোনও ফলাফল পাওয়া যায়নি।',
@@ -2346,7 +2376,7 @@ mixin LocaleData {
     quizQ14A4: '১০%',
     quizQ15: '"টাকা প্রোটেক্ট" বলতে কী বোঝায়?',
     quizQ15A1: 'গ্যাজেটে খরচ',
-    quizQ15A2: 'সব ঝুঁকি এড়ানো',
+    quizQ15A2: 'সব রিস্ক এড়ানো',
     quizQ15A3: 'বীমা ও জরুরি ফান্ড ব্যবহার',
     quizQ15A4: 'সোনা কেনা',
     quizQ16: 'একটি আর্থিক লক্ষ্য স্থির করার প্রথম ধাপ কী?',
@@ -2425,6 +2455,9 @@ mixin LocaleData {
     quizQ30A2: 'সঞ্চয় বাড়ে',
     quizQ30A3: 'সম্পদ বাড়ে',
     quizQ30A4: 'বেতন দ্বিগুণ হয়',
+    'next': 'পরবর্তী',
+    'finish': 'শেষ করুন',
+
     reviewAnswers: 'উত্তরগুলো পর্যালোচনা করুন',
     backToQuiz: 'কুইজে ফিরে যান',
     dashboard: 'ড্যাশবোর্ড',
@@ -2478,6 +2511,18 @@ mixin LocaleData {
     coachSeeResult: 'ফলাফল দেখুন',
     coachNext: 'পরবর্তী',
     coachSavingPlan: 'আপনার সঞ্চয় পরিকল্পনা',
+
+
+    'transactionDeleted': 'লেনদেন মুছে ফেলা হয়েছে',
+    'failedToDeleteTransaction': 'লেনদেন মুছতে ব্যর্থ হয়েছে',
+    'searchHint': 'অনুসন্ধান করুন...',
+    'errorLoadingMessages': 'মেসেজ লোড করতে সমস্যা হয়েছে',
+    'chatCleared': 'চ্যাট পরিষ্কার করা হয়েছে',
+    'features': 'ফিচারসমূহ',
+    'prediction': 'প্রেডিকশন',
+    'reminder': 'রিমাইন্ডার',
+
+    'question': 'প্রশ্ন',
   };
 }
 

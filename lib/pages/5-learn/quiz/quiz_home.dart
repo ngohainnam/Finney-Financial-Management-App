@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'quiz.dart';
 import 'quiz_results_page.dart';
+import 'quiz_result_model.dart';
 import '../../../core/storage/storage_manager.dart';
 import 'package:intl/intl.dart';
+import 'package:finney/pages/5-learn/string_extension.dart';
+import 'package:finney/shared/localization/locales.dart';
 
 class QuizHomePage extends StatelessWidget {
   const QuizHomePage({super.key});
@@ -11,7 +14,7 @@ class QuizHomePage extends StatelessWidget {
     try {
       // Get the cloud service from StorageManager
       final learningService = StorageManager().learningService;
-      
+
       // Fetch the summary from cloud service
       return await learningService.getQuizSummary();
     } catch (e) {
@@ -81,9 +84,9 @@ class QuizHomePage extends StatelessWidget {
                             Text(
                               summary['last'] != null
                                   ? DateFormat('MMM d, h:mm a').format(
-                                      summary['last'] is String 
-                                          ? DateTime.parse(summary['last']) 
-                                          : summary['last'])
+                                  summary['last'] is String
+                                      ? DateTime.parse(summary['last'])
+                                      : summary['last'])
                                   : "-",
                               style: const TextStyle(fontSize: 16),
                             ),

@@ -191,7 +191,7 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> {
       summary = sprintf(
         FlutterLocalization.instance.currentLocale!.languageCode == 'en' 
             ? LocaleData.en['expenseSummary']! 
-            : LocaleData.bd['expenseSummary']!,
+            : LocaleData.bn['expenseSummary']!,
         [
           currencyFormat.format(total),
           currencyFormat.format(average),
@@ -205,7 +205,7 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> {
       summary = sprintf(
         FlutterLocalization.instance.currentLocale!.languageCode == 'en' 
             ? LocaleData.en['incomeSummary']! 
-            : LocaleData.bd['incomeSummary']!,
+            : LocaleData.bn['incomeSummary']!,
         [
           currencyFormat.format(total),
           currencyFormat.format(average),

@@ -1,62 +1,108 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart' hide getString;
+import 'package:finney/shared/localization/locales.dart';
 
 class SavingsCoach extends StatefulWidget {
   const SavingsCoach({super.key});
 
   @override
-  SavingsCoachState createState() => SavingsCoachState();
+  _SavingsCoachState createState() => _SavingsCoachState();
 }
 
-class SavingsCoachState extends State<SavingsCoach> {
+class _SavingsCoachState extends State<SavingsCoach> {
   int currentStep = 0;
   String selectedOption = '';
   TextEditingController otherController = TextEditingController();
   List<String> userAnswers = [];
 
-  final List<Map<String, dynamic>> questions = [
+  List<Map<String, dynamic>> get questions => [
     {
-      'question': "How good are you with managing your money? Boss level or still figuring it out?",
-      'options': ['Money boss', 'Doing okay', 'Needs work'],
+      'question': LocaleData.coachQ1.getString(context),
+      'options': [
+        LocaleData.coachOptMoneyBoss.getString(context),
+        LocaleData.coachOptDoingOkay.getString(context),
+        LocaleData.coachOptNeedsWork.getString(context),
+      ],
     },
     {
-      'question': "How much money do you usually save each month?",
-      'options': ['\$0-\$200', '\$200-\$500', '\$500+'],
+      'question': LocaleData.coachQ2.getString(context),
+      'options': [
+        LocaleData.coachOpt0_200.getString(context),
+        LocaleData.coachOpt200_500.getString(context),
+        LocaleData.coachOpt500plus.getString(context),
+      ],
     },
     {
-      'question': "How much do you usually spend each month?",
-      'options': ['\$0-\$1000', '\$1000-\$2000', '\$2000+'],
+      'question': LocaleData.coachQ3.getString(context),
+      'options': [
+        LocaleData.coachOpt0_1000.getString(context),
+        LocaleData.coachOpt1000_2000.getString(context),
+        LocaleData.coachOpt2000plus.getString(context),
+      ],
     },
     {
-      'question': "In a perfect world, how much would you love to save monthly?",
-      'options': ['\$100', '\$500', '\$1000+'],
+      'question': LocaleData.coachQ4.getString(context),
+      'options': [
+        LocaleData.coachOpt100.getString(context),
+        LocaleData.coachOpt500.getString(context),
+        LocaleData.coachOpt1000plus.getString(context),
+      ],
     },
     {
-      'question': "Can you easily tell needs apart from wants?",
-      'options': ['Always', 'Sometimes', 'Not really'],
+      'question': LocaleData.coachQ5.getString(context),
+      'options': [
+        LocaleData.coachOptAlways.getString(context),
+        LocaleData.coachOptSometimes.getString(context),
+        LocaleData.coachOptNotReally.getString(context),
+      ],
     },
     {
-      'question': "What category eats up most of your money?",
-      'options': ['Food', 'Shopping', 'Entertainment'],
+      'question': LocaleData.coachQ6.getString(context),
+      'options': [
+        LocaleData.coachOptFood.getString(context),
+        LocaleData.coachOptShopping.getString(context),
+        LocaleData.coachOptEntertainment.getString(context),
+      ],
     },
     {
-      'question': "Do you track where your money goes?",
-      'options': ['Always', 'Sometimes', 'Never'],
+      'question': LocaleData.coachQ7.getString(context),
+      'options': [
+        LocaleData.coachOptAlways.getString(context),
+        LocaleData.coachOptSometimes.getString(context),
+        LocaleData.coachOptNever.getString(context),
+      ],
     },
     {
-      'question': "Are you willing to adjust your spending habits?",
-      'options': ['Yes', 'Maybe', 'No'],
+      'question': LocaleData.coachQ8.getString(context),
+      'options': [
+        LocaleData.coachOptYes.getString(context),
+        LocaleData.coachOptMaybe.getString(context),
+        LocaleData.coachOptNo.getString(context),
+      ],
     },
     {
-      'question': "Do you often spend money without planning?",
-      'options': ['Yes', 'Sometimes', 'Rarely'],
+      'question': LocaleData.coachQ9.getString(context),
+      'options': [
+        LocaleData.coachOptYes.getString(context),
+        LocaleData.coachOptSometimes.getString(context),
+        LocaleData.coachOptRarely.getString(context),
+      ],
     },
     {
-      'question': "When you get extra cash, do you save it or spend it?",
-      'options': ['Save it', 'Spend it', 'A bit of both'],
+      'question': LocaleData.coachQ10.getString(context),
+      'options': [
+        LocaleData.coachOptSaveIt.getString(context),
+        LocaleData.coachOptSpendIt.getString(context),
+        LocaleData.coachOptBoth.getString(context),
+      ],
     },
     {
-      'question': "Would you rather save for a big goal or enjoy small treats now?",
-      'options': ['Save for big goal', 'Enjoy small treats', 'Not sure'],
+      'question': LocaleData.coachQ11.getString(context),
+      'options': [
+        LocaleData.coachOptSaveBig.getString(context),
+        LocaleData.coachOptTreats.getString(context),
+        LocaleData.coachOptNotSure.getString(context),
+      ],
     },
   ];
 
@@ -65,7 +111,10 @@ class SavingsCoachState extends State<SavingsCoach> {
   }
 
   void nextStep() {
-    String answer = selectedOption.isNotEmpty ? selectedOption : otherController.text.trim();
+    String answer =
+    selectedOption.isNotEmpty
+        ? selectedOption
+        : otherController.text.trim();
     userAnswers.add(answer);
 
     if (currentStep < questions.length - 1) {
@@ -77,7 +126,9 @@ class SavingsCoachState extends State<SavingsCoach> {
     } else {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => ResultScreen(userAnswers: userAnswers)),
+        MaterialPageRoute(
+          builder: (_) => ResultScreen(userAnswers: userAnswers),
+        ),
       );
     }
   }
@@ -113,31 +164,36 @@ class SavingsCoachState extends State<SavingsCoach> {
   Widget buildOptions(List<String> options) {
     return Column(
       children: [
-        ...options.map((option) => GestureDetector(
-              onTap: () {
-                setState(() {
-                  selectedOption = option;
-                  otherController.clear();
-                });
-              },
-              child: Container(
-                width: double.infinity,
-                margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-                decoration: BoxDecoration(
-                  color: selectedOption == option ? Colors.blueAccent.withValues(alpha: 0.2) : Colors.white,
-                  border: Border.all(color: Colors.black12),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Text(option, style: const TextStyle(fontSize: 16)),
+        ...options.map(
+              (option) => GestureDetector(
+            onTap: () {
+              setState(() {
+                selectedOption = option;
+                otherController.clear();
+              });
+            },
+            child: Container(
+              width: double.infinity,
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+              decoration: BoxDecoration(
+                color:
+                selectedOption == option
+                    ? Colors.blueAccent.withOpacity(0.2)
+                    : Colors.white,
+                border: Border.all(color: Colors.black12),
+                borderRadius: BorderRadius.circular(16),
               ),
-            )),
+              child: Text(option, style: const TextStyle(fontSize: 16)),
+            ),
+          ),
+        ),
         const SizedBox(height: 12),
         TextField(
           controller: otherController,
           onChanged: (_) => setState(() {}),
           decoration: InputDecoration(
-            hintText: "Other (please specify)",
+            hintText: LocaleData.coachOtherHint.getString(context),
             filled: true,
             fillColor: Colors.white,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
@@ -156,7 +212,10 @@ class SavingsCoachState extends State<SavingsCoach> {
       appBar: AppBar(
         backgroundColor: const Color(0xFFDFF8EB),
         elevation: 0,
-        title: const Text('Savings Coach', style: TextStyle(color: Colors.black)),
+        title: Text(
+          LocaleData.savingsCoach.getString(context),
+          style: TextStyle(color: Colors.black),
+        ),
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.black),
       ),
@@ -190,9 +249,15 @@ class SavingsCoachState extends State<SavingsCoach> {
                   backgroundColor: Colors.blueAccent,
                   foregroundColor: Colors.white,
                   minimumSize: const Size(double.infinity, 50),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
-                child: Text(currentStep == questions.length - 1 ? "See Result" : "Next"),
+                child: Text(
+                  currentStep == questions.length - 1
+                      ? LocaleData.coachSeeResult.getString(context)
+                      : LocaleData.coachNext.getString(context),
+                ),
               ),
             ),
           ],
@@ -202,49 +267,57 @@ class SavingsCoachState extends State<SavingsCoach> {
   }
 }
 
-class ResultScreen extends StatelessWidget {
+class ResultScreen extends StatefulWidget {
   final List<String> userAnswers;
 
   const ResultScreen({super.key, required this.userAnswers});
 
+  @override
+  State<ResultScreen> createState() => _ResultScreenState();
+}
+
+class _ResultScreenState extends State<ResultScreen> {
   String generateAdvice() {
-    String savingRange = userAnswers[1];
-    String spendingRange = userAnswers[2];
-    //String dreamSave = userAnswers[3];
-    String bigSpendArea = userAnswers[5];
-    String tracksExpenses = userAnswers[6];
-    String willingToAdjust = userAnswers[7];
+    String savingRange = widget.userAnswers[1];
+    String spendingRange = widget.userAnswers[2];
+    String bigSpendArea = widget.userAnswers[5];
+    String tracksExpenses = widget.userAnswers[6];
+    String willingToAdjust = widget.userAnswers[7];
 
     String advice = "";
 
     if (savingRange == "\$0-\$200") {
-      advice += "Looks like you are saving small right now. ";
+      advice += LocaleData.coachSavingSmall.getString(context);
     } else if (savingRange == "\$200-\$500") {
-      advice += "You're on your way with decent savings! ";
+      advice += LocaleData.coachOnYourWay.getString(context);
     } else {
-      advice += "Great saving habit! ";
+      advice += LocaleData.coachPraiseGreat.getString(context);
     }
 
     if (spendingRange == "\$2000+") {
-      advice += "But your spending is high. Try cutting at least \$150 from your $bigSpendArea.\n";
+      advice += LocaleData.coachSpendingHigh
+          .getString(context)
+          .replaceFirst('%s', bigSpendArea);
     } else if (spendingRange == "\$1000-\$2000") {
-      advice += "There is still room to trim about \$100 from $bigSpendArea.\n";
+      advice += LocaleData.coachSpendingMedium
+          .getString(context)
+          .replaceFirst('%s', bigSpendArea);
     } else {
-      advice += "Spending looks healthy. Keep it up!\n";
+      advice += LocaleData.coachSpendingHealthy.getString(context);
     }
 
-    if (tracksExpenses == "Never") {
-      advice += "Start tracking where your money goes. It will surprise you!\n";
-    } else if (tracksExpenses == "Sometimes") {
-      advice += "Tracking a little more seriously could reveal hidden leaks.\n";
+    if (tracksExpenses == LocaleData.never.getString(context)) {
+      advice += LocaleData.coachTrackStart.getString(context);
+    } else if (tracksExpenses == LocaleData.sometimes.getString(context)) {
+      advice += LocaleData.coachTrackMore.getString(context);
     }
 
-    if (willingToAdjust == "No") {
-      advice += "Even tiny changes like skipping one takeaway meal a week can save \$100+ a month.\n";
-    } else if (willingToAdjust == "Maybe") {
-      advice += "Try testing small adjustments. You might love the results!\n";
+    if (willingToAdjust == LocaleData.no.getString(context)) {
+      advice += LocaleData.coachAdjustNo.getString(context);
+    } else if (willingToAdjust == LocaleData.maybe.getString(context)) {
+      advice += LocaleData.coachAdjustMaybe.getString(context);
     } else {
-      advice += "You are ready to smash your savings goals. Time to go all in!\n";
+      advice += LocaleData.coachAdjustYes.getString(context);
     }
 
     return advice;
@@ -259,7 +332,10 @@ class ResultScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color(0xFFDFF8EB),
         elevation: 0,
-        title: const Text('Your Saving Plan', style: TextStyle(color: Colors.black)),
+        title: Text(
+          LocaleData.coachSavingPlan.getString(context),
+          style: TextStyle(color: Colors.black),
+        ),
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.black),
       ),
@@ -276,9 +352,12 @@ class ResultScreen extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  "Your Personalized Advice",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                Text(
+                  LocaleData.coachAdviceTitle.getString(context),
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24),
@@ -298,9 +377,11 @@ class ResultScreen extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                   ),
-                  child: const Text("Restart Savings Coach"),
+                  child: Text(LocaleData.coachRestart.getString(context)),
                 ),
               ],
             ),

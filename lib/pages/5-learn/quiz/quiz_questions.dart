@@ -1,3 +1,9 @@
+
+import 'package:finney/shared/localization/locales.dart';
+import 'package:flutter/material.dart';
+import 'package:finney/pages/5-learn/string_extension.dart';
+
+
 class QuizQuestion {
   final String question;
   final List<String> options;
@@ -10,155 +16,305 @@ class QuizQuestion {
   });
 }
 
-final List<QuizQuestion> quizQuestions = [
+List<QuizQuestion> quizQuestions(BuildContext context) => [
   QuizQuestion(
-    question: 'What is the purpose of the Finney app?',
-    options: ['Gaming', 'Social networking', 'Financial literacy', 'Online shopping'],
+    question: LocaleData.quizQ1.getString(context),
+    options: [
+      LocaleData.quizQ1A1.getString(context),
+      LocaleData.quizQ1A2.getString(context),
+      LocaleData.quizQ1A3.getString(context),
+      LocaleData.quizQ1A4.getString(context),
+    ],
     correctAnswerIndex: 2,
   ),
   QuizQuestion(
-    question: 'Which screen helps track expenses?',
-    options: ['Dashboard', 'Chatbot', 'Learn', 'Settings'],
+    question: LocaleData.quizQ2.getString(context),
+    options: [
+      LocaleData.quizQ2A1.getString(context),
+      LocaleData.quizQ2A2.getString(context),
+      LocaleData.quizQ2A3.getString(context),
+      LocaleData.quizQ2A4.getString(context),
+    ],
     correctAnswerIndex: 0,
   ),
   QuizQuestion(
-    question: 'What is a budget used for?',
-    options: ['Tracking spending', 'Entertainment', 'Investing in crypto', 'Buying groceries'],
+    question: LocaleData.quizQ3.getString(context),
+    options: [
+      LocaleData.quizQ3A1.getString(context),
+      LocaleData.quizQ3A2.getString(context),
+      LocaleData.quizQ3A3.getString(context),
+      LocaleData.quizQ3A4.getString(context),
+    ],
     correctAnswerIndex: 0,
   ),
   QuizQuestion(
-    question: 'Which category would rent typically go under?',
-    options: ['Savings', 'Needs', 'Wants', 'Luxury'],
+    question: LocaleData.quizQ4.getString(context),
+    options: [
+      LocaleData.quizQ4A1.getString(context),
+      LocaleData.quizQ4A2.getString(context),
+      LocaleData.quizQ4A3.getString(context),
+      LocaleData.quizQ4A4.getString(context),
+    ],
     correctAnswerIndex: 1,
   ),
   QuizQuestion(
-    question: 'What is one smart spending tip?',
-    options: ['Buy unnecessary items', 'Track every dollar', 'Avoid discounts', 'Spend impulsively'],
+    question: LocaleData.quizQ5.getString(context),
+    options: [
+      LocaleData.quizQ5A1.getString(context),
+      LocaleData.quizQ5A2.getString(context),
+      LocaleData.quizQ5A3.getString(context),
+      LocaleData.quizQ5A4.getString(context),
+    ],
     correctAnswerIndex: 1,
   ),
   QuizQuestion(
-    question: 'Why should you wait 24 hours before buying something unplanned?',
-    options: ['Shops may close', 'Helps avoid impulse spending', 'Prices might drop', 'You might get paid'],
+    question: LocaleData.quizQ6.getString(context),
+    options: [
+      LocaleData.quizQ6A1.getString(context),
+      LocaleData.quizQ6A2.getString(context),
+      LocaleData.quizQ6A3.getString(context),
+      LocaleData.quizQ6A4.getString(context),
+    ],
     correctAnswerIndex: 1,
   ),
   QuizQuestion(
-    question: 'What is a “want” in budgeting terms?',
-    options: ['Essential food', 'Rent', 'Medical expenses', 'Designer sneakers'],
+    question: LocaleData.quizQ7.getString(context),
+    options: [
+      LocaleData.quizQ7A1.getString(context),
+      LocaleData.quizQ7A2.getString(context),
+      LocaleData.quizQ7A3.getString(context),
+      LocaleData.quizQ7A4.getString(context),
+    ],
     correctAnswerIndex: 3,
   ),
   QuizQuestion(
-    question: 'Which of the following helps increase income?',
-    options: ['Skipping meals', 'Skill development', 'Spending more', 'Taking loans'],
+    question: LocaleData.quizQ8.getString(context),
+    options: [
+      LocaleData.quizQ8A1.getString(context),
+      LocaleData.quizQ8A2.getString(context),
+      LocaleData.quizQ8A3.getString(context),
+      LocaleData.quizQ8A4.getString(context),
+    ],
     correctAnswerIndex: 1,
   ),
   QuizQuestion(
-    question: 'What is the 50-30-20 rule commonly used for?',
-    options: ['Meal planning', 'Work hours', 'Budgeting', 'Exercise routine'],
+    question: LocaleData.quizQ9.getString(context),
+    options: [
+      LocaleData.quizQ9A1.getString(context),
+      LocaleData.quizQ9A2.getString(context),
+      LocaleData.quizQ9A3.getString(context),
+      LocaleData.quizQ9A4.getString(context),
+    ],
     correctAnswerIndex: 2,
   ),
   QuizQuestion(
-    question: 'What should you do before spending money?',
-    options: ['Check trends', 'Post on social media', 'Make a budget plan', 'Borrow from friends'],
+    question: LocaleData.quizQ10.getString(context),
+    options: [
+      LocaleData.quizQ10A1.getString(context),
+      LocaleData.quizQ10A2.getString(context),
+      LocaleData.quizQ10A3.getString(context),
+      LocaleData.quizQ10A4.getString(context),
+    ],
     correctAnswerIndex: 2,
   ),
   QuizQuestion(
-    question: 'Where is it safest to invest first, according to the Finney app videos?',
-    options: ['Crypto', 'Land', 'Forex', 'NFTs'],
+    question: LocaleData.quizQ11.getString(context),
+    options: [
+      LocaleData.quizQ11A1.getString(context),
+      LocaleData.quizQ11A2.getString(context),
+      LocaleData.quizQ11A3.getString(context),
+      LocaleData.quizQ11A4.getString(context),
+    ],
     correctAnswerIndex: 1,
   ),
   QuizQuestion(
-    question: 'What’s a benefit of cooking at home?',
-    options: ['More plastic waste', 'Higher delivery cost', 'Saves money and improves health', 'Takes more time'],
+    question: LocaleData.quizQ12.getString(context),
+    options: [
+      LocaleData.quizQ12A1.getString(context),
+      LocaleData.quizQ12A2.getString(context),
+      LocaleData.quizQ12A3.getString(context),
+      LocaleData.quizQ12A4.getString(context),
+    ],
     correctAnswerIndex: 2,
   ),
   QuizQuestion(
-    question: 'Why is saving early in the month smart?',
-    options: ['To avoid shopping', 'So you don’t have to budget', 'To build financial discipline', 'To pay fines early'],
+    question: LocaleData.quizQ13.getString(context),
+    options: [
+      LocaleData.quizQ13A1.getString(context),
+      LocaleData.quizQ13A2.getString(context),
+      LocaleData.quizQ13A3.getString(context),
+      LocaleData.quizQ13A4.getString(context),
+    ],
     correctAnswerIndex: 2,
   ),
   QuizQuestion(
-    question: 'How much should ideally go into personal development according to budgeting tips?',
-    options: ['55%', '15%', '30%', '10%'],
+    question: LocaleData.quizQ14.getString(context),
+    options: [
+      LocaleData.quizQ14A1.getString(context),
+      LocaleData.quizQ14A2.getString(context),
+      LocaleData.quizQ14A3.getString(context),
+      LocaleData.quizQ14A4.getString(context),
+    ],
     correctAnswerIndex: 3,
   ),
   QuizQuestion(
-    question: 'What does “protecting your money” usually refer to?',
-    options: ['Spending on gadgets', 'Avoiding all risks', 'Using insurance and emergency funds', 'Buying gold'],
+    question: LocaleData.quizQ15.getString(context),
+    options: [
+      LocaleData.quizQ15A1.getString(context),
+      LocaleData.quizQ15A2.getString(context),
+      LocaleData.quizQ15A3.getString(context),
+      LocaleData.quizQ15A4.getString(context),
+    ],
     correctAnswerIndex: 2,
   ),
   QuizQuestion(
-    question: 'What is the first step in setting a financial goal?',
-    options: ['Spend freely', 'Set a savings target', 'Shop online', 'Borrow money'],
+    question: LocaleData.quizQ16.getString(context),
+    options: [
+      LocaleData.quizQ16A1.getString(context),
+      LocaleData.quizQ16A2.getString(context),
+      LocaleData.quizQ16A3.getString(context),
+      LocaleData.quizQ16A4.getString(context),
+    ],
     correctAnswerIndex: 1,
   ),
   QuizQuestion(
-    question: 'Which feature provides instant financial help in the Finney app?',
-    options: ['Settings', 'QnA Chatbot', 'Expense Tracker', 'Profile'],
+    question: LocaleData.quizQ17.getString(context),
+    options: [
+      LocaleData.quizQ17A1.getString(context),
+      LocaleData.quizQ17A2.getString(context),
+      LocaleData.quizQ17A3.getString(context),
+      LocaleData.quizQ17A4.getString(context),
+    ],
     correctAnswerIndex: 1,
   ),
   QuizQuestion(
-    question: 'An emergency fund is mainly used for?',
-    options: ['Vacations', 'Unexpected expenses', 'Entertainment', 'Shopping'],
+    question: LocaleData.quizQ18.getString(context),
+    options: [
+      LocaleData.quizQ18A1.getString(context),
+      LocaleData.quizQ18A2.getString(context),
+      LocaleData.quizQ18A3.getString(context),
+      LocaleData.quizQ18A4.getString(context),
+    ],
     correctAnswerIndex: 1,
   ),
   QuizQuestion(
-    question: 'Which is a good saving habit?',
-    options: ['Impulse buying', 'Tracking expenses', 'Ignoring bills', 'Overspending'],
+    question: LocaleData.quizQ19.getString(context),
+    options: [
+      LocaleData.quizQ19A1.getString(context),
+      LocaleData.quizQ19A2.getString(context),
+      LocaleData.quizQ19A3.getString(context),
+      LocaleData.quizQ19A4.getString(context),
+    ],
     correctAnswerIndex: 1,
   ),
   QuizQuestion(
-    question: 'If you earn 20000 and spend 18000, your savings are?',
-    options: ['5000', '3000', '2000', '1000'],
+    question: LocaleData.quizQ20.getString(context),
+    options: [
+      LocaleData.quizQ20A1.getString(context),
+      LocaleData.quizQ20A2.getString(context),
+      LocaleData.quizQ20A3.getString(context),
+      LocaleData.quizQ20A4.getString(context),
+    ],
     correctAnswerIndex: 2,
   ),
   QuizQuestion(
-    question: 'What usually causes financial stress?',
-    options: ['Overspending', 'Saving regularly', 'Following a budget', 'Having insurance'],
+    question: LocaleData.quizQ21.getString(context),
+    options: [
+      LocaleData.quizQ21A1.getString(context),
+      LocaleData.quizQ21A2.getString(context),
+      LocaleData.quizQ21A3.getString(context),
+      LocaleData.quizQ21A4.getString(context),
+    ],
     correctAnswerIndex: 0,
   ),
   QuizQuestion(
-    question: 'When should you ideally save money?',
-    options: ['End of the month', 'After income', 'After expenses', 'When borrowing'],
+    question: LocaleData.quizQ22.getString(context),
+    options: [
+      LocaleData.quizQ22A1.getString(context),
+      LocaleData.quizQ22A2.getString(context),
+      LocaleData.quizQ22A3.getString(context),
+      LocaleData.quizQ22A4.getString(context),
+    ],
     correctAnswerIndex: 1,
   ),
   QuizQuestion(
-    question: 'Budgeting helps in?',
-    options: ['Spending more', 'Managing money better', 'Losing savings', 'Gambling'],
+    question: LocaleData.quizQ23.getString(context),
+    options: [
+      LocaleData.quizQ23A1.getString(context),
+      LocaleData.quizQ23A2.getString(context),
+      LocaleData.quizQ23A3.getString(context),
+      LocaleData.quizQ23A4.getString(context),
+    ],
     correctAnswerIndex: 1,
   ),
   QuizQuestion(
-    question: 'Which is a “need” expense?',
-    options: ['Netflix subscription', 'Groceries', 'Luxury car', 'Designer watch'],
+    question: LocaleData.quizQ24.getString(context),
+    options: [
+      LocaleData.quizQ24A1.getString(context),
+      LocaleData.quizQ24A2.getString(context),
+      LocaleData.quizQ24A3.getString(context),
+      LocaleData.quizQ24A4.getString(context),
+    ],
     correctAnswerIndex: 1,
   ),
   QuizQuestion(
-    question: 'Before investing, you should always check?',
-    options: ['Popularity', 'Risk and return', 'Number of likes', 'Brand name'],
+    question: LocaleData.quizQ25.getString(context),
+    options: [
+      LocaleData.quizQ25A1.getString(context),
+      LocaleData.quizQ25A2.getString(context),
+      LocaleData.quizQ25A3.getString(context),
+      LocaleData.quizQ25A4.getString(context),
+    ],
     correctAnswerIndex: 1,
   ),
   QuizQuestion(
-    question: 'How to reduce impulse buying?',
-    options: ['Use credit cards', 'Use shopping lists', 'Follow ads', 'Shop when emotional'],
+    question: LocaleData.quizQ26.getString(context),
+    options: [
+      LocaleData.quizQ26A1.getString(context),
+      LocaleData.quizQ26A2.getString(context),
+      LocaleData.quizQ26A3.getString(context),
+      LocaleData.quizQ26A4.getString(context),
+    ],
     correctAnswerIndex: 1,
   ),
   QuizQuestion(
-    question: 'A good financial goal is?',
-    options: ['Vague and distant', 'Specific and measurable', 'Expensive and fast', 'Lucky and random'],
+    question: LocaleData.quizQ27.getString(context),
+    options: [
+      LocaleData.quizQ27A1.getString(context),
+      LocaleData.quizQ27A2.getString(context),
+      LocaleData.quizQ27A3.getString(context),
+      LocaleData.quizQ27A4.getString(context),
+    ],
     correctAnswerIndex: 1,
   ),
   QuizQuestion(
-    question: 'Saving money mainly helps with?',
-    options: ['Showing off', 'Building security', 'Buying unnecessary items', 'Spending faster'],
+    question: LocaleData.quizQ28.getString(context),
+    options: [
+      LocaleData.quizQ28A1.getString(context),
+      LocaleData.quizQ28A2.getString(context),
+      LocaleData.quizQ28A3.getString(context),
+      LocaleData.quizQ28A4.getString(context),
+    ],
     correctAnswerIndex: 1,
   ),
   QuizQuestion(
-    question: 'Which section in the Finney app helps improve financial skills?',
-    options: ['Settings', 'Learn Academy', 'Notifications', 'Profile'],
+    question: LocaleData.quizQ29.getString(context),
+    options: [
+      LocaleData.quizQ29A1.getString(context),
+      LocaleData.quizQ29A2.getString(context),
+      LocaleData.quizQ29A3.getString(context),
+      LocaleData.quizQ29A4.getString(context),
+    ],
     correctAnswerIndex: 1,
   ),
   QuizQuestion(
-    question: 'If expenses are greater than income, what happens?',
-    options: ['Debt increases', 'Savings increase', 'Net worth grows', 'Salary doubles'],
+    question: LocaleData.quizQ30.getString(context),
+    options: [
+      LocaleData.quizQ30A1.getString(context),
+      LocaleData.quizQ30A2.getString(context),
+      LocaleData.quizQ30A3.getString(context),
+      LocaleData.quizQ30A4.getString(context),
+    ],
     correctAnswerIndex: 0,
   ),
 ];
