@@ -26,8 +26,7 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
   String _selectedCategory = '';
   DateTime _selectedDate = DateTime.now();
   bool _isSaving = false;
-  String? _errorMessage;
-  late final TransactionCloudService _transactionService;
+  late final TransactionCloudService _transactionService; // Changed to late final
 
   TextEditingController get amountController => _amountController;
 
@@ -65,38 +64,25 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
   }
 
   Future<void> _saveTransaction() async {
-    // Clear any previous errors
-    setState(() {
-      _errorMessage = null;
-    });
-
     // Validate amount
     if (_amountController.text.isEmpty || _amountController.text == '0') {
-      setState(() {
-        _errorMessage = LocaleData.pleaseEnterValidAmount.getString(context);
-      });
+      _showErrorSnackBar(LocaleData.pleaseEnterValidAmount.getString(context));
       return;
     }
 
     try {
       double amount = CurrencyFormatter.parse(_amountController.text);
       if (amount <= 0) {
-        setState(() {
-          _errorMessage = LocaleData.pleaseEnterPositiveAmount.getString(context);
-        });
+        _showErrorSnackBar(LocaleData.pleaseEnterPositiveAmount.getString(context));
         return;
       }
     } catch (e) {
-      setState(() {
-        _errorMessage = LocaleData.pleaseEnterValidNumber.getString(context);
-      });
+      _showErrorSnackBar(LocaleData.pleaseEnterValidNumber.getString(context));
       return;
     }
 
     if (_selectedCategory.isEmpty) {
-      setState(() {
-        _errorMessage = LocaleData.pleaseSelectCategory.getString(context);
-      });
+      _showErrorSnackBar(LocaleData.pleaseSelectCategory.getString(context));
       return;
     }
 
@@ -128,8 +114,16 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
         await _transactionService.addTransaction(transaction);
       }
 
-      // Simply navigate back without showing a snackbar
+      // Show success message and pop screen
       if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(widget.existingTransaction != null
+                ? LocaleData.transactionUpdated.getString(context)
+                : LocaleData.transactionSaved.getString(context)),
+            backgroundColor: Colors.green,
+          ),
+        );
         Navigator.pop(context);
       }
     } catch (e) {
@@ -137,10 +131,20 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
       if (mounted) {
         setState(() {
           _isSaving = false;
-          _errorMessage = LocaleData.failedToSaveTransaction.getString(context);
         });
+        _showErrorSnackBar(LocaleData.failedToSaveTransaction.getString(context));
       }
     }
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.redAccent,
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   @override
@@ -166,31 +170,6 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Error message (if any)
-          if (_errorMessage != null)
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              color: Colors.red.shade50,
-              child: Row(
-                children: [
-                  const Icon(Icons.error_outline, color: Colors.red, size: 18),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      _errorMessage!,
-                      style: TextStyle(color: Colors.red[700], fontSize: 14),
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close, size: 16, color: Colors.red),
-                    onPressed: () => setState(() => _errorMessage = null),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
-                ],
-              ),
-            ),
-
           // Amount section
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -219,13 +198,6 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
                 ),
               ),
               onChanged: (value) {
-                // Clear any error when user starts typing
-                if (_errorMessage != null) {
-                  setState(() {
-                    _errorMessage = null;
-                  });
-                }
-                
                 // Simple number input without formatting
                 if (value.isEmpty) {
                   _amountController.text = '';
@@ -248,7 +220,6 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
             ),
           ),
 
-          // Rest of the UI remains unchanged
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
@@ -384,7 +355,6 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
     );
   }
 
-  // The remaining methods remain unchanged
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -405,10 +375,6 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
       onTap: () {
         setState(() {
           _selectedCategory = name;
-          // Clear any errors when selecting a category
-          if (_errorMessage == LocaleData.pleaseSelectCategory.getString(context)) {
-            _errorMessage = null;
-          }
         });
       },
       child: Column(
