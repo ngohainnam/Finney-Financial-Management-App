@@ -25,7 +25,7 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
   String? _speakingCategory;
 
 
-  Map<String, Map<String, dynamic>> _categoryData = {};
+  final Map<String, Map<String, dynamic>> _categoryData = {};
   List<String> categoryOrder = [
     'Shopping', 'Food', 'Entertainment', 'Transport', 'Health', 'Utilities', 'Others'
   ];
@@ -71,7 +71,7 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
       double amount = (data['amount'] ?? 0).toDouble();
       String cat = data['category'] ?? 'Others';
 
-      print("TXN [$id]: $cat | $amount");
+      debugPrint("TXN [$id]: $cat | $amount");
 
       if (amount < 0) { // Only include expenses
         categorySpent[cat] = (categorySpent[cat] ?? 0) + amount.abs();
@@ -356,7 +356,7 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
                   boxShadow: _speakingCategory == category
                       ? [
                     BoxShadow(
-                      color: Colors.lightBlue.withOpacity(0.5),
+                      color: Colors.lightBlue.withValues(alpha: 0.5),
                       blurRadius: 12,
                       spreadRadius: 2,
                     )
@@ -395,7 +395,7 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
                 ),
               ),
             );
-          }).toList(),
+          }),
           SizedBox(height: 30),
           ElevatedButton.icon(
             icon: Icon(_isSpeaking ? Icons.stop : Icons.volume_up),

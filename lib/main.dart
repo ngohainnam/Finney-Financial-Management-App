@@ -1,7 +1,6 @@
 import 'package:finney/shared/theme/app_color.dart';
 import 'package:finney/shared/localization/locales.dart';
 import 'package:finney/core/network/no_internet_screen.dart';
-import 'package:finney/pages/3-dashboard/dashboard.dart';
 import 'package:finney/pages/1-auth/auth_page.dart';
 import 'package:finney/pages/9-setting/language_selection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
