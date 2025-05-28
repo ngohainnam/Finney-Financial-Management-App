@@ -17,7 +17,6 @@ import 'package:finney/pages/5-learn/quiz/quiz.dart';
 import 'package:finney/pages/5-learn/quiz/quiz_results_page.dart';
 import 'package:finney/pages/5-learn/financial_learn/savings_coach.dart';
 import 'package:flutter_localization/flutter_localization.dart';
-import 'package:flutter_localization/flutter_localization.dart' hide getString;
 
 class Learn extends StatefulWidget {
   const Learn({super.key});

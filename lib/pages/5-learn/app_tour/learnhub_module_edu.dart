@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:finney/pages/5-learn/financial_learn/learn_progress.dart';
-import 'package:flutter_localization/flutter_localization.dart' hide getString;
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/shared/localization/locales.dart';
 
 class LearnhubModuleEduPage extends StatefulWidget {

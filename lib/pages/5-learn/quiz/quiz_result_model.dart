@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'package:finney/shared/localization/locales.dart';
-
 class QuizResult {
   final int score;
   final int totalQuestions;

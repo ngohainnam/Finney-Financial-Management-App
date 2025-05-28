@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'quiz_questions.dart';
 import 'quiz_result.dart';
-import 'quiz_result_model.dart';
 import 'package:finney/shared/localization/locales.dart';
 import 'package:finney/pages/5-learn/string_extension.dart';
 

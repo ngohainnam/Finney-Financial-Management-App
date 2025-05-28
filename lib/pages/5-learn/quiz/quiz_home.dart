@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'quiz.dart';
 import 'quiz_results_page.dart';
-import 'quiz_result_model.dart';
 import '../../../core/storage/storage_manager.dart';
 import 'package:intl/intl.dart';
-import 'package:finney/pages/5-learn/string_extension.dart';
-import 'package:finney/shared/localization/locales.dart';
 
 class QuizHomePage extends StatelessWidget {
   const QuizHomePage({super.key});

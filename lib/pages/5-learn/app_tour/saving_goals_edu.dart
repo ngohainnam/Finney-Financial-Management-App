@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:finney/pages/5-learn/financial_learn/learn_progress.dart';
-import 'package:flutter_localization/flutter_localization.dart' hide getString;
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/shared/localization/locales.dart';
 
 class SavingGoalsEduPage extends StatefulWidget {
-  const SavingGoalsEduPage({Key? key}) : super(key: key);
+  const SavingGoalsEduPage({super.key});
 
   @override
   State<SavingGoalsEduPage> createState() => _SavingGoalsEduPageState();

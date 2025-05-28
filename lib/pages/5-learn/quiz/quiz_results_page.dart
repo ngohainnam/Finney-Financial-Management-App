@@ -1,9 +1,6 @@
 import 'package:finney/shared/localization/locales.dart';
 import 'package:finney/pages/5-learn/string_extension.dart';
-
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-
 import '../../../core/storage/storage_manager.dart';
 import '../../../core/storage/cloud/models/learning_model.dart';
 

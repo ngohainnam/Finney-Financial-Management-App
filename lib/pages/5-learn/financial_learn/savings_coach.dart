@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localization/flutter_localization.dart' hide getString;
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/shared/localization/locales.dart';
 
 class SavingsCoach extends StatefulWidget {
   const SavingsCoach({super.key});
 
   @override
-  _SavingsCoachState createState() => _SavingsCoachState();
+  SavingsCoachState createState() => SavingsCoachState();
 }
 
-class _SavingsCoachState extends State<SavingsCoach> {
+class SavingsCoachState extends State<SavingsCoach> {
   int currentStep = 0;
   String selectedOption = '';
   TextEditingController otherController = TextEditingController();
@@ -179,7 +179,7 @@ class _SavingsCoachState extends State<SavingsCoach> {
               decoration: BoxDecoration(
                 color:
                 selectedOption == option
-                    ? Colors.blueAccent.withOpacity(0.2)
+                    ? Colors.blueAccent.withValues(alpha: 0.2)
                     : Colors.white,
                 border: Border.all(color: Colors.black12),
                 borderRadius: BorderRadius.circular(16),
