@@ -2006,7 +2006,7 @@ mixin LocaleData {
     savedAmount: 'সঞ্চিত: %s',
     targetAmount: 'লক্ষ্য: %s',
     percentCompleted: '%s% সম্পন্ন',
-    targetDate: 'লক্ষ্য তারিখ: %s',
+    targetDate: 'লক্ষ্য তারিখ:',
     daysLeft: '%d দিন বাকি',
     daysOverdue: '%d দিন অতিবাহিত',
     addSavings: 'সঞ্চয় যোগ করুন',
