@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:finney/pages/5-learn/financial_learn/learn_progress.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:finney/shared/localization/locales.dart';
 
 class ChatbotEduPage extends StatefulWidget {
   const ChatbotEduPage({super.key});
@@ -20,18 +22,16 @@ class _ChatbotEduPageState extends State<ChatbotEduPage> {
   void initState() {
     super.initState();
     _controller = YoutubePlayerController(
-      initialVideoId: 'dQw4w9WgXcQ',
+      initialVideoId: '7F17urdKZM8',
       flags: const YoutubePlayerFlags(autoPlay: false),
     );
     _loadCompletionStatus();
   }
 
-  Future<void> _loadCompletionStatus() async {
-    final isCompleted = await LearnProgress.isVideoCompleted(lessonKey, 0);
+  void _loadCompletionStatus() async {
+    final isDone = await LearnProgress.isVideoCompleted(lessonKey, 0);
     if (mounted) {
-      setState(() {
-        _completed = isCompleted;
-      });
+      setState(() => _completed = isDone);
     }
   }
 
@@ -53,7 +53,10 @@ class _ChatbotEduPageState extends State<ChatbotEduPage> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text('Chatbot', style: TextStyle(color: Colors.blueAccent)),
+        title: Text(
+          LocaleData.tourChatbotTitle.getString(context),
+          style: const TextStyle(color: Colors.blueAccent),
+        ),
         iconTheme: const IconThemeData(color: Colors.blueAccent),
       ),
       body: ListView(
@@ -63,7 +66,13 @@ class _ChatbotEduPageState extends State<ChatbotEduPage> {
             decoration: BoxDecoration(
               color: cardColor,
               borderRadius: BorderRadius.circular(20),
-              boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 5, offset: Offset(0, 3))],
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 5,
+                  offset: Offset(0, 3),
+                ),
+              ],
             ),
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -71,14 +80,18 @@ class _ChatbotEduPageState extends State<ChatbotEduPage> {
               children: [
                 YoutubePlayer(controller: _controller),
                 const SizedBox(height: 12),
-                const Text(
-                  'AI Chat Assistant',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87),
+                Text(
+                  LocaleData.tourChatbotTitle.getString(context),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.black87,
+                  ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Understand how the chatbot helps answer your finance questions and guides you through the app.',
-                  style: TextStyle(color: Colors.black54),
+                Text(
+                  LocaleData.tourChatbotDesc.getString(context),
+                  style: const TextStyle(color: Colors.black54),
                 ),
                 const SizedBox(height: 12),
                 Align(
@@ -86,9 +99,14 @@ class _ChatbotEduPageState extends State<ChatbotEduPage> {
                   child: ElevatedButton.icon(
                     onPressed: _completed ? null : _markAsDone,
                     icon: const Icon(Icons.check),
-                    label: Text(_completed ? 'Completed' : 'Mark as Done'),
+                    label: Text(
+                      _completed
+                          ? LocaleData.completed.getString(context)
+                          : LocaleData.tourMarkDone.getString(context),
+                    ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: _completed ? Colors.green[300] : Colors.blueAccent,
+                      backgroundColor:
+                      _completed ? Colors.green[300] : Colors.blueAccent,
                     ),
                   ),
                 ),

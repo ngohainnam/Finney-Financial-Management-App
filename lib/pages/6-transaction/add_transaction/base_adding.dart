@@ -28,7 +28,7 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
   DateTime _selectedDate = DateTime.now();
   bool _isSaving = false;
   String? _errorMessage;
-  late final TransactionCloudService _transactionService;
+  late final TransactionCloudService _transactionService; // Changed to late final
 
   TextEditingController get amountController => _amountController;
 
@@ -68,31 +68,23 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
     });
 
     if (_amountController.text.isEmpty || _amountController.text == '0') {
-      setState(() {
-        _errorMessage = LocaleData.pleaseEnterValidAmount.getString(context);
-      });
+      _showErrorSnackBar(LocaleData.pleaseEnterValidAmount.getString(context));
       return;
     }
 
     try {
       double amount = CurrencyFormatter.parse(_amountController.text);
       if (amount <= 0) {
-        setState(() {
-          _errorMessage = LocaleData.pleaseEnterPositiveAmount.getString(context);
-        });
+        _showErrorSnackBar(LocaleData.pleaseEnterPositiveAmount.getString(context));
         return;
       }
     } catch (e) {
-      setState(() {
-        _errorMessage = LocaleData.pleaseEnterValidNumber.getString(context);
-      });
+      _showErrorSnackBar(LocaleData.pleaseEnterValidNumber.getString(context));
       return;
     }
 
     if (_selectedCategory.isEmpty) {
-      setState(() {
-        _errorMessage = LocaleData.pleaseSelectCategory.getString(context);
-      });
+      _showErrorSnackBar(LocaleData.pleaseSelectCategory.getString(context));
       return;
     }
 
@@ -138,10 +130,20 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
       if (mounted) {
         setState(() {
           _isSaving = false;
-          _errorMessage = LocaleData.failedToSaveTransaction.getString(context);
         });
+        _showErrorSnackBar(LocaleData.failedToSaveTransaction.getString(context));
       }
     }
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.redAccent,
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   @override

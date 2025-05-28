@@ -29,39 +29,42 @@ class _LearnState extends State<Learn> {
   final TextEditingController _searchController = TextEditingController();
   String _selectedTab = 'Lessons';
 
-  final List<Map<String, dynamic>> _lessons = [
+  // Map to store progress and status for each lesson
+  final Map<String, Map<String, dynamic>> _lessonProgress = {};
+
+  List<Map<String, dynamic>> get _lessons => [
     {
-      'title': 'Smart Spending Tips',
+      'title': LocaleData.smartSpendingTips.getString(context),
       'icon': LucideIcons.badgeDollarSign,
       'color': const Color(0xFFB3E5FC),
-      'subtitle': 'Spend smarter, live better',
+      'subtitle': LocaleData.smartSpendingTipsSubtitle.getString(context),
       'lessonKey': 'smart_spending_tips',
       'totalVideos': 2,
       'page': const SmartSpendingTips(),
     },
     {
-      'title': 'Simple Budgeting',
+      'title': LocaleData.simpleBudgetingTitle.getString(context),
       'icon': LucideIcons.layoutDashboard,
       'color': const Color(0xFFD1C4E9),
-      'subtitle': 'Plan with ease',
+      'subtitle': LocaleData.simpleBudgetingSubtitle.getString(context),
       'lessonKey': 'simple_budgeting',
       'totalVideos': 2,
       'page': const SimpleBudgeting(),
     },
     {
-      'title': 'Saving Money Easy',
+      'title': LocaleData.savingMoneyEasy.getString(context),
       'icon': LucideIcons.piggyBank,
       'color': const Color(0xFFE1D5F0),
-      'subtitle': 'Build your future',
+      'subtitle': LocaleData.savingMoneyEasySubtitle.getString(context),
       'lessonKey': 'saving_money_easy',
       'totalVideos': 2,
       'page': const SavingMoneyEasy(),
     },
     {
-      'title': 'Savings Coach',
+      'title': LocaleData.savingsCoach.getString(context),
       'icon': LucideIcons.coins,
       'color': const Color(0xFFDFF8EB),
-      'subtitle': 'Cut costs, not dreams',
+      'subtitle': LocaleData.savingsCoachSubtitle.getString(context),
       'lessonKey': 'savings_coach',
       'totalVideos': 0,
       'status': 'activity',
@@ -69,135 +72,165 @@ class _LearnState extends State<Learn> {
     },
   ];
 
-  final List<Map<String, dynamic>> _appTourLessons = [
+  List<Map<String, dynamic>> get _appTourLessons => [
     {
-      'title': 'Dashboard',
+      'title': LocaleData.dashboard.getString(context),
       'icon': LucideIcons.layoutDashboard,
       'color': const Color(0xFFBBDEFB),
-      'subtitle': 'Explore the main overview',
+      'subtitle': LocaleData.apptourDashSubtitle.getString(context),
       'lessonKey': 'dashboard_edu',
       'totalVideos': 1,
       'page': const DashboardEduPage(),
     },
     {
-      'title': 'Expense Tracking',
+      'title': LocaleData.expenseTracking.getString(context),
       'icon': LucideIcons.fileSpreadsheet,
       'color': const Color(0xFFB2EBF2),
-      'subtitle': 'Track your daily spending',
+      'subtitle': LocaleData.expenseTrackingSubtite.getString(context),
       'lessonKey': 'expense_tracking_edu',
       'totalVideos': 1,
       'page': const ExpenseTrackingEduPage(),
     },
     {
-      'title': 'Saving Goals',
+      'title': LocaleData.savingGoals.getString(context),
       'icon': LucideIcons.flag,
       'color': const Color(0xFFC5CAE9),
-      'subtitle': 'Set and smash goals',
+      'subtitle': LocaleData.savingGoalSubheading.getString(context),
       'lessonKey': 'saving_goals_edu',
       'totalVideos': 1,
       'page': const SavingGoalsEduPage(),
     },
     {
-      'title': 'Budget Reminder',
+      'title': LocaleData.tourBudgetTitle.getString(context),
       'icon': LucideIcons.bell,
       'color': const Color(0xFFDCEDC8),
-      'subtitle': 'Stay within budget',
+      'subtitle': LocaleData.tourBudgetSubTitle.getString(context),
       'lessonKey': 'budget_reminder_edu',
       'totalVideos': 1,
       'page': const BudgetReminderEduPage(),
     },
     {
-      'title': 'Chatbot',
+      'title': LocaleData.tourChatbotTitle.getString(context),
       'icon': LucideIcons.messageSquare,
       'color': const Color(0xFFFFCDD2),
-      'subtitle': 'Your friendly guide',
+      'subtitle': LocaleData.tourCahtBotSubtite.getString(context),
       'lessonKey': 'chatbot_edu',
       'totalVideos': 1,
       'page': const ChatbotEduPage(),
     },
     {
-      'title': 'Report',
+      'title': LocaleData.tourReportTitle.getString(context),
       'icon': LucideIcons.barChart,
       'color': const Color(0xFFC8E6C9),
-      'subtitle': 'See the full picture',
+      'subtitle': LocaleData.tourReportSubtite.getString(context),
       'lessonKey': 'report_edu',
       'totalVideos': 1,
       'page': const ReportEduPage(),
     },
     {
-      'title': 'LearnHub',
+      'title': LocaleData.learnHub.getString(context),
       'icon': LucideIcons.bookOpenCheck,
       'color': const Color(0xFFB3E5FC),
-      'subtitle': 'Central learning area',
+      'subtitle': LocaleData.learnHubSubtitle.getString(context),
       'lessonKey': 'learnhub_module_edu',
       'totalVideos': 1,
       'page': const LearnhubModuleEduPage(),
     },
     {
-      'title': 'Settings',
+      'title': LocaleData.settings.getString(context),
       'icon': LucideIcons.settings,
       'color': const Color(0xFFB39DDB),
-      'subtitle': 'Adjust preferences',
+      'subtitle': LocaleData.settingSubHeading.getString(context),
       'lessonKey': 'settings_edu',
       'totalVideos': 1,
       'page': const SettingsEduPage(),
     },
   ];
 
-  final List<Map<String, dynamic>> _quizItems = [
+  List<Map<String, dynamic>> get _quizItems => [
     {
-      'title': 'Take the Quiz',
+      'title': LocaleData.taketheQuiz.getString(context),
       'icon': LucideIcons.bookOpen,
       'color': const Color(0xFFE1BEE7),
-      'subtitle': 'Test your knowledge',
+      'subtitle': LocaleData.taketheQuizSubtitle.getString(context),
       'lessonKey': 'quiz_section',
       'totalVideos': 0,
       'page': const QuizPage(),
     },
     {
-      'title': 'View Quiz Results',
+      'title': LocaleData.viewQuizResult.getString(context),
       'icon': LucideIcons.barChart,
       'color': const Color(0xFFE0F7FA),
-      'subtitle': 'See your scores',
+      'subtitle': LocaleData.quizResultSubtitle.getString(context),
       'lessonKey': 'quiz_results',
       'totalVideos': 0,
       'page': const QuizResultsPage(),
     },
   ];
+
   @override
   void initState() {
     super.initState();
-    _updateLessonStatuses();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _updateLessonStatuses();
+    });
   }
 
-  // Change this method to be async
   Future<void> _updateLessonStatuses() async {
     for (var lesson in [..._lessons, ..._appTourLessons]) {
-      if (lesson['status'] == 'activity') {
-        lesson['progress'] = 0.0;
+      final String key = lesson['lessonKey'];
+
+      // Initialize progress map for this lesson if needed
+      _lessonProgress[key] ??= {'progress': 0.0, 'status': 'all'};
+
+      // Handle activity status (no videos)
+      if (lesson['status'] == 'activity' || lesson['totalVideos'] == 0) {
+        _lessonProgress[key]!['progress'] = 0.0;
+        _lessonProgress[key]!['status'] = lesson['status'] ?? 'all';
         continue;
       }
-      
+
       final int total = lesson['totalVideos'];
-      if (total == 0) {
-        lesson['progress'] = 0.0;
-        lesson['status'] = 'all';
-        continue;
-      }
-      
-      // Await the Future results
-      final int completed = await LearnProgress.getCompletedCount(lesson['lessonKey'], total);
-      final bool isDone = await LearnProgress.isLessonCompleted(lesson['lessonKey'], total);
-      
-      // Now we can use the actual values in calculations and comparisons
-      lesson['progress'] = completed / total;
-      lesson['status'] = isDone ? 'completed' : (completed > 0 ? 'ongoing' : 'all');
+      final completed = await LearnProgress.getCompletedCount(key, total);
+      final isDone = await LearnProgress.isLessonCompleted(key, total);
+
+      _lessonProgress[key]!['progress'] = completed / total;
+      _lessonProgress[key]!['status'] =
+      isDone ? 'completed' : (completed > 0 ? 'ongoing' : 'all');
     }
-    
-    // If the widget is still mounted, update the UI
+
     if (mounted) {
       setState(() {});
     }
+  }
+
+  Future<void> _resetAllProgress() async {
+    await LearnProgress.resetAll(
+      [..._lessons, ..._appTourLessons]
+          .where((e) => e['totalVideos'] > 0)
+          .map((e) => e['lessonKey'] as String)
+          .toList(),
+    );
+
+    // Clear our progress map
+    _lessonProgress.clear();
+
+    await _updateLessonStatuses();
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(LocaleData.learningReset.getString(context))),
+      );
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Update lesson statuses whenever dependencies (like locale) change
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _updateLessonStatuses();
+    });
   }
 
   @override
@@ -207,43 +240,70 @@ class _LearnState extends State<Learn> {
     final isLessonsTab = _selectedTab == 'Lessons';
     final isProgressTab = _selectedTab == 'Progress';
 
+    // Get the base lesson lists
     final allItems = [..._lessons, ..._appTourLessons];
-    final ongoingLessons = allItems.where((e) => e['status'] == 'ongoing').toList();
-    final completedLessons = allItems.where((e) => e['status'] == 'completed').toList();
+
+    // Enhance with progress data from our tracking map
+    final allItemsWithProgress = allItems.map((lesson) {
+      final key = lesson['lessonKey'];
+      final progress = _lessonProgress.containsKey(key)
+          ? _lessonProgress[key]!
+          : {'progress': 0.0, 'status': 'all'};
+      return {
+        ...lesson,
+        'progress': progress['progress'],
+        'status': progress['status'],
+      };
+    }).toList();
+
+    // Filter by status
+    final ongoingLessons =
+    allItemsWithProgress.where((e) => e['status'] == 'ongoing').toList();
+    final completedLessons =
+    allItemsWithProgress.where((e) => e['status'] == 'completed').toList();
 
     final searchText = _searchController.text.toLowerCase();
 
     final filteredList = searchText.isNotEmpty
-        ? [
-            ..._lessons,
-            ..._appTourLessons,
-            ..._quizItems,
-          ].where((item) =>
-              item['title'].toLowerCase().contains(searchText)).toList()
+        ? [...allItemsWithProgress, ..._quizItems]
+        .where((item) => item['title'].toLowerCase().contains(searchText))
+        .toList()
         : isQuizTab
-            ? _quizItems
-            : isAppTourTab
-                ? _appTourLessons
-                : isLessonsTab
-                    ? _lessons
-                    : [];
+        ? _quizItems
+        : isAppTourTab
+        ? allItemsWithProgress
+        .where((e) => _appTourLessons.any(
+          (a) => a['lessonKey'] == e['lessonKey'],
+    ))
+        .toList()
+        : isLessonsTab
+        ? allItemsWithProgress
+        .where((e) => _lessons.any((l) => l['lessonKey'] == e['lessonKey']))
+        .toList()
+        : [];
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FB),
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 1,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         title: Text(
-          LocaleData.financialLearning.getString(context),
-          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+          LocaleData.learningHub.getString(context),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
+            color: Colors.blueAccent,
+          ),
         ),
-        // Change from automaticallyImplyLeading: false to true
-        automaticallyImplyLeading: true,
-        // Add leading icon button for back arrow
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+        automaticallyImplyLeading: false,
+        actions: [
+          if (_selectedTab == 'Lessons' || _selectedTab == 'App Tour')
+            IconButton(
+              icon: const Icon(Icons.refresh, color: Colors.blueAccent),
+              onPressed: _resetAllProgress,
+              tooltip: 'Reset Progress',
+            ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
@@ -263,40 +323,70 @@ class _LearnState extends State<Learn> {
             Expanded(
               child: isProgressTab
                   ? ListView(
-                      padding: const EdgeInsets.only(bottom: 24),
-                      children: [
-                        const Text("Ongoing", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                        const SizedBox(height: 12),
-                        ...ongoingLessons
-                            .map((item) => Padding(
-                                  padding: const EdgeInsets.only(bottom: 16),
-                                  child: _buildCardItem(item),
-                                )),
-                        const SizedBox(height: 24),
-                        const Text("Completed", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                        const SizedBox(height: 12),
-                        ...completedLessons
-                            .map((item) => Padding(
-                                  padding: const EdgeInsets.only(bottom: 16),
-                                  child: _buildCardItem(item),
-                                )),
-                      ],
-                    )
-
+                padding: const EdgeInsets.only(bottom: 24),
+                children: [
+                  Text(
+                    LocaleData.ongoing.getString(context),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  ...ongoingLessons.map(
+                        (item) => Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: _buildCardItem(item),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    LocaleData.completed.getString(context),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  ...completedLessons.map(
+                        (item) => Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: _buildCardItem(item),
+                    ),
+                  ),
+                ],
+              )
                   : filteredList.isEmpty
-                      ? const Center(child: Text('No results found.'))
-                      : ListView.separated(
-                          itemCount: filteredList.length,
-                          separatorBuilder: (_, __) => const SizedBox(height: 16),
-                          itemBuilder: (context, index) => _buildCardItem(filteredList[index]),
-                        ),
+                  ? Center(
+                child: Text(
+                  LocaleData.noResultsFound.getString(context),
+                ),
+              )
+                  : ListView.separated(
+                itemCount: filteredList.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 16),
+                itemBuilder: (context, index) => _buildCardItem(filteredList[index]),
+              ),
             ),
           ],
         ),
       ),
     );
   }
+
   Widget _buildTab(String label) {
+    String localizedLabel;
+    if (label == 'Lessons') {
+      localizedLabel = LocaleData.lessons.getString(context);
+    } else if (label == 'App Tour') {
+      localizedLabel = LocaleData.appTour.getString(context);
+    } else if (label == 'Progress') {
+      localizedLabel = LocaleData.progress.getString(context);
+    } else if (label == 'Quiz') {
+      localizedLabel = LocaleData.quiz.getString(context);
+    } else {
+      localizedLabel = label;
+    }
     final isActive = _selectedTab == label;
     return Padding(
       padding: const EdgeInsets.only(right: 12),
@@ -309,7 +399,7 @@ class _LearnState extends State<Learn> {
             borderRadius: BorderRadius.circular(20),
           ),
           child: Text(
-            label,
+            localizedLabel,
             style: TextStyle(
               color: isActive ? Colors.white : Colors.grey,
               fontWeight: FontWeight.w600,
@@ -331,9 +421,9 @@ class _LearnState extends State<Learn> {
       child: TextField(
         controller: _searchController,
         onChanged: (_) => setState(() {}),
-        decoration: const InputDecoration(
+        decoration: InputDecoration(
           icon: Icon(Icons.search),
-          hintText: 'Search for topics...',
+          hintText: LocaleData.searchTextfiedText.getString(context),
           border: InputBorder.none,
         ),
       ),
@@ -347,8 +437,9 @@ class _LearnState extends State<Learn> {
           context,
           MaterialPageRoute(builder: (_) => item['page']),
         );
-      
-        await _updateLessonStatuses();
+        if (mounted) {
+          await _updateLessonStatuses();
+        }
       },
       child: _buildLessonCard(
         title: item['title'],
@@ -394,7 +485,10 @@ class _LearnState extends State<Learn> {
                     padding: const EdgeInsets.only(top: 4.0),
                     child: Text(
                       subtitle,
-                      style: const TextStyle(fontSize: 12, color: Colors.black54),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.black54,
+                      ),
                     ),
                   ),
                 if (progress > 0.0)
@@ -403,7 +497,9 @@ class _LearnState extends State<Learn> {
                     child: LinearProgressIndicator(
                       value: progress,
                       backgroundColor: Colors.white54,
-                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.green),
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                        Colors.green,
+                      ),
                     ),
                   ),
               ],

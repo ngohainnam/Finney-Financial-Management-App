@@ -4,6 +4,8 @@ import '../../../core/storage/cloud/models/learning_model.dart';
 import 'quiz.dart';
 import 'quiz_questions.dart';
 import 'quiz_review_page.dart';
+import 'package:finney/shared/localization/locales.dart';
+import 'package:finney/pages/5-learn/string_extension.dart';
 
 class QuizResultPage extends StatefulWidget {
   final int score;
@@ -23,41 +25,43 @@ class QuizResultPage extends StatefulWidget {
 
 class _QuizResultPageState extends State<QuizResultPage> {
   late double percent;
-  late String feedbackMessage;
+  String feedbackMessage = '';
   int? highestScore;
 
   @override
   void initState() {
     super.initState();
     percent = widget.score / widget.total;
-    feedbackMessage = _getFeedback(percent);
     _saveQuizResult();
     _loadHighestScore();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    feedbackMessage = _getFeedback(percent);
+  }
+
   String _getFeedback(double percent) {
     if (percent >= 0.87) {
-      return "🎉 Excellent! You're a money master!";
+      return LocaleData.feedbackMessageExcellent.getString(context);
     } else if (percent >= 0.67) {
-      return "👍 Great job! You're on the right path.";
+      return LocaleData.feedbackMessageGood.getString(context);
     } else if (percent >= 0.4) {
-      return "🧠 Not bad! A little more learning will go a long way.";
+      return LocaleData.feedbackMessageNotBad.getString(context);
     } else {
-      return "📘 Keep going! Review the Learn section and try again.";
+      return LocaleData.feedbackMessageKeepGoing.getString(context);
     }
   }
 
   Future<void> _saveQuizResult() async {
     try {
-      // Create a new quiz result
       final quizResult = QuizResult(
-        id: '', 
+        id: '',
         score: widget.score,
         totalQuestions: widget.total,
         timestamp: DateTime.now(),
       );
-
-      // Save to Firebase
       await StorageManager().learningService.saveQuizResult(quizResult);
     } catch (e) {
       debugPrint('Error saving quiz result: $e');
@@ -66,14 +70,10 @@ class _QuizResultPageState extends State<QuizResultPage> {
 
   Future<void> _loadHighestScore() async {
     try {
-      // Get all quiz results from Firebase
       final results = await StorageManager().learningService.getAllQuizResults();
-      
       if (results.isNotEmpty) {
-        // Find the highest score
-        final highest = results.fold<int>(0, (prev, result) => 
-          result.score > prev ? result.score : prev);
-        
+        final highest = results.fold<int>(0, (prev, result) =>
+        result.score > prev ? result.score : prev);
         setState(() {
           highestScore = highest;
         });
@@ -85,12 +85,13 @@ class _QuizResultPageState extends State<QuizResultPage> {
 
   @override
   Widget build(BuildContext context) {
-    final displayPercent = (percent * 100).toStringAsFixed(1);
+    final displayPercent = (percent * 100).toStringAsFixed(1).toBn(context);
+    final progressPercent = (percent * 100).toInt().toBn(context);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FB),
       appBar: AppBar(
-        title: const Text("Quiz Completed"),
+        title: Text(LocaleData.quizCompleted.getString(context)),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 1,
@@ -101,7 +102,6 @@ class _QuizResultPageState extends State<QuizResultPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Circular Progress
               Stack(
                 alignment: Alignment.center,
                 children: [
@@ -112,11 +112,13 @@ class _QuizResultPageState extends State<QuizResultPage> {
                       value: percent,
                       strokeWidth: 12,
                       backgroundColor: Colors.grey.shade200,
-                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.blueAccent),
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                        Colors.blueAccent,
+                      ),
                     ),
                   ),
                   Text(
-                    "${(percent * 100).toInt()}%",
+                    "$progressPercent%",
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -127,30 +129,35 @@ class _QuizResultPageState extends State<QuizResultPage> {
               const SizedBox(height: 20),
 
               Text(
-                "Score: ${widget.score} / ${widget.total}",
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                "${LocaleData.score.getString(context)}: ${widget.score.toBn(context)} / ${widget.total.toBn(context)}",
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               const SizedBox(height: 8),
               Text(
-                "Accuracy: $displayPercent%",
+                "${LocaleData.accuracy.getString(context)}: $displayPercent%",
                 style: const TextStyle(fontSize: 16, color: Colors.black54),
               ),
               const SizedBox(height: 12),
 
-              // Highest Score Badge
               if (highestScore != null)
                 Text(
-                  "🏅 Highest Score: $highestScore",
+                  "${LocaleData.highScore.getString(context)}: ${highestScore!.toBn(context)}",
                   style: TextStyle(
                     fontSize: 16,
-                    color: highestScore == widget.score ? Colors.green : Colors.black87,
-                    fontWeight: highestScore == widget.score ? FontWeight.bold : FontWeight.normal,
+                    color: highestScore == widget.score
+                        ? Colors.green
+                        : Colors.black87,
+                    fontWeight: highestScore == widget.score
+                        ? FontWeight.bold
+                        : FontWeight.normal,
                   ),
                 ),
 
               const SizedBox(height: 20),
 
-              // Feedback Message
               Text(
                 feedbackMessage,
                 textAlign: TextAlign.center,
@@ -160,9 +167,9 @@ class _QuizResultPageState extends State<QuizResultPage> {
 
               ElevatedButton(
                 onPressed: () {
-                  Navigator.pop(context); // Go back
+                  Navigator.pop(context);
                 },
-                child: const Text("Back to Quiz"),
+                child: Text(LocaleData.backToQuiz.getString(context)),
               ),
               const SizedBox(height: 12),
 
@@ -173,29 +180,28 @@ class _QuizResultPageState extends State<QuizResultPage> {
                     MaterialPageRoute(builder: (_) => const QuizPage()),
                   );
                 },
-                child: const Text(
-                  "Restart Quiz",
-                  style: TextStyle(color: Colors.blueAccent),
+                child: Text(
+                  LocaleData.restartQuiz.getString(context),
+                  style: const TextStyle(color: Colors.blueAccent),
                 ),
               ),
 
               const SizedBox(height: 12),
 
-              // Review Answers Button
               TextButton.icon(
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (_) => QuizReviewPage(
-                        questions: quizQuestions,
+                        questions: quizQuestions(context),
                         userAnswers: widget.userAnswers,
                       ),
                     ),
                   );
                 },
                 icon: const Icon(Icons.visibility),
-                label: const Text("Review Your Answers"),
+                label: Text(LocaleData.reviewAnswers.getString(context)),
               ),
             ],
           ),
