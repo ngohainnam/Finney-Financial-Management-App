@@ -277,7 +277,7 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> with SingleTickerProv
       ),
       leftTitles: AxisTitles(
         sideTitles: SideTitles(
-          showTitles: true,
+          showTitles: false,
           getTitlesWidget: (value, meta) {
             if (value == 0) return const SizedBox();
             return SideTitleWidget(
@@ -303,7 +303,7 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> with SingleTickerProv
 
   FlGridData _buildGridData() {
     return FlGridData(
-      show: true,
+      show: false,
       drawVerticalLine: false,
       horizontalInterval: _calculateYAxisInterval(_currentPageData),
       getDrawingHorizontalLine: (value) {
