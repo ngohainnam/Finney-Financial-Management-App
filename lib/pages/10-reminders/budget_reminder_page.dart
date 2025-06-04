@@ -27,7 +27,13 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
 
   final Map<String, Map<String, dynamic>> _categoryData = {};
   List<String> categoryOrder = [
-    'Shopping', 'Food', 'Entertainment', 'Transport', 'Health', 'Utilities', 'Others'
+    'Shopping',
+    'Food',
+    'Entertainment',
+    'Transport',
+    'Health',
+    'Utilities',
+    'Others'
   ];
 
   final Map<String, IconData> _categoryIcons = {
@@ -35,7 +41,7 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
     'Food': Icons.restaurant,
     'Entertainment': Icons.movie,
     'Transport': Icons.directions_car,
-    'Health':  Icons.medical_services,
+    'Health': Icons.medical_services,
     'Utilities': Icons.call,
     'Others': Icons.category,
   };
@@ -59,8 +65,12 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
   }
 
   Future<void> _loadBudgetData() async {
-    final budgetRef = FirebaseFirestore.instance.collection('users').doc(uid).collection('budgets');
-    final transactionRef = FirebaseFirestore.instance.collection('users').doc(uid).collection('transactions');
+    final budgetRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('budgets');
+    final transactionRef = FirebaseFirestore.instance.collection('users').doc(
+        uid).collection('transactions');
 
     Map<String, double> categorySpent = {};
     final txnSnapshot = await transactionRef.get();
@@ -77,8 +87,6 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
         categorySpent[cat] = (categorySpent[cat] ?? 0) + amount.abs();
       }
     }
-
-
 
 
     final budgetSnapshot = await budgetRef.get();
@@ -103,52 +111,64 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
 
     await showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: Text(
-            Localizations.localeOf(context).languageCode == 'bn'
-                ? "${getLocalizedCategoryName(category, context)}-এর সীমা পরিবর্তন করুন"
-                : "Edit limit for ${getLocalizedCategoryName(category, context)}"
-        ),
-        content: TextField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          decoration: InputDecoration(
-              hintText: Localizations.localeOf(context).languageCode == 'bn'
-                  ? "নতুন সীমা লিখুন"
-                  : "Enter new limit"
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-                Localizations.localeOf(context).languageCode == 'bn'
-                    ? "বাতিল করুন"
-                    : "Cancel"
+      builder: (_) =>
+          AlertDialog(
+            title: Text(
+                Localizations
+                    .localeOf(context)
+                    .languageCode == 'bn'
+                    ? "${getLocalizedCategoryName(
+                    category, context)}-এর সীমা পরিবর্তন করুন"
+                    : "Edit limit for ${getLocalizedCategoryName(
+                    category, context)}"
             ),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              double? newLimit = double.tryParse(controller.text);
-              if (newLimit != null) {
-                await FirebaseFirestore.instance
-                    .collection('users')
-                    .doc(uid)
-                    .collection('budgets')
-                    .doc(category)
-                    .set({'limit': newLimit, 'category': category}, SetOptions(merge: true));
-                _loadBudgetData();
-                Navigator.pop(context);
-              }
-            },
-            child: Text(
-                Localizations.localeOf(context).languageCode == 'bn'
-                    ? "সংরক্ষণ করুন"
-                    : "Save"
+            content: TextField(
+              controller: controller,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                  hintText: Localizations
+                      .localeOf(context)
+                      .languageCode == 'bn'
+                      ? "নতুন সীমা লিখুন"
+                      : "Enter new limit"
+              ),
             ),
-          )
-        ],
-      ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(
+                    Localizations
+                        .localeOf(context)
+                        .languageCode == 'bn'
+                        ? "বাতিল করুন"
+                        : "Cancel"
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  double? newLimit = double.tryParse(controller.text);
+                  if (newLimit != null) {
+                    await FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(uid)
+                        .collection('budgets')
+                        .doc(category)
+                        .set({'limit': newLimit, 'category': category},
+                        SetOptions(merge: true));
+                    _loadBudgetData();
+                    Navigator.pop(context);
+                  }
+                },
+                child: Text(
+                    Localizations
+                        .localeOf(context)
+                        .languageCode == 'bn'
+                        ? "সংরক্ষণ করুন"
+                        : "Save"
+                ),
+              )
+            ],
+          ),
     );
   }
 
@@ -168,13 +188,18 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
 
     if (number < 20) return units[number]!;
     if (number < 100) {
-      return tens[number - number % 10]! + (number % 10 != 0 ? ' ${units[number % 10]}' : '');
+      return tens[number - number % 10]! +
+          (number % 10 != 0 ? ' ${units[number % 10]}' : '');
     }
     if (number < 1000) {
-      return '${units[number ~/ 100]} hundred${number % 100 != 0 ? ' ${numberToWords(number % 100)}' : ''}';
+      return '${units[number ~/ 100]} hundred${number % 100 != 0
+          ? ' ${numberToWords(number % 100)}'
+          : ''}';
     }
     if (number < 1000000) {
-      return '${numberToWords(number ~/ 1000)} thousand${number % 1000 != 0 ? ' ${numberToWords(number % 1000)}' : ''}';
+      return '${numberToWords(number ~/ 1000)} thousand${number % 1000 != 0
+          ? ' ${numberToWords(number % 1000)}'
+          : ''}';
     }
     return number.toString(); // fallback
   }
@@ -192,7 +217,9 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
 
     setState(() => _isSpeaking = true);
 
-    final isBengali = Localizations.localeOf(context).languageCode == 'bn';
+    final isBengali = Localizations
+        .localeOf(context)
+        .languageCode == 'bn';
 
     for (var category in categoryOrder) {
       if (!_isSpeaking) break;
@@ -202,7 +229,8 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
 
       setState(() => _speakingCategory = category);
 
-      final categoryName = isBengali ? getLocalizedCategoryName(category, context) : category;
+      final categoryName = isBengali ? getLocalizedCategoryName(
+          category, context) : category;
       final int spent = data['spent'].toInt();
       final int limit = data['limit'].toInt();
 
@@ -224,14 +252,15 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
   }
 
 
-
   String _bn(int value) {
     const digits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
     return value.toString().split('').map((d) => digits[int.parse(d)]).join();
   }
 
   Future<void> _pickReminderTime() async {
-    final isBengali = Localizations.localeOf(context).languageCode == 'bn';
+    final isBengali = Localizations
+        .localeOf(context)
+        .languageCode == 'bn';
 
     TimeOfDay? picked = await showTimePicker(
       context: context,
@@ -255,7 +284,8 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
               ),
             ),
             child: MediaQuery(
-              data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: false),
+              data: MediaQuery.of(context).copyWith(
+                  alwaysUse24HourFormat: false),
               child: child!,
             ),
           ),
@@ -264,18 +294,19 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
     );
 
 
-
     if (picked == null) return;
 
     final now = tz.TZDateTime.now(tz.local);
-    final scheduledTime = tz.TZDateTime(tz.local, now.year, now.month, now.day, picked.hour, picked.minute);
-    final scheduleFor = scheduledTime.isBefore(now) ? scheduledTime.add(Duration(days: 1)) : scheduledTime;
+    final scheduledTime = tz.TZDateTime(
+        tz.local, now.year, now.month, now.day, picked.hour, picked.minute);
+    final scheduleFor = scheduledTime.isBefore(now) ? scheduledTime.add(
+        Duration(days: 1)) : scheduledTime;
 
     try {
       await NotificationService.scheduleDailyReminder(
         scheduledTime: scheduleFor,
         title: '🔔 Reminder: 💰 বাজেট লিমিট পার হচ্ছে না তো?',
-        body: 'আপনি আজকের খরচ দেখেছেন কি?',
+        body: 'এখনই চেক করুন।',
         id: 1,
       );
 
@@ -288,8 +319,13 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
       }
 
       final hour12 = (picked.hour % 12 == 0) ? 12 : picked.hour % 12;
-      final timePeriod = (picked.hour < 12) ? "সকাল" : (picked.hour < 16) ? "দুপুর" : (picked.hour < 19) ? "বিকেল" : (picked.hour < 21) ? "সন্ধ্যা" : "রাত";
-      final speakText = "আপনার বাজেট রিমাইন্ডার সেট করা হয়েছে $timePeriod ${_bn(hour12)} টা ${_bn(picked.minute)} মিনিটে।";
+      final timePeriod = (picked.hour < 12) ? "সকাল" : (picked.hour < 16)
+          ? "দুপুর"
+          : (picked.hour < 19) ? "বিকেল" : (picked.hour < 21)
+          ? "সন্ধ্যা"
+          : "রাত";
+      final speakText = "আপনার বাজেট রিমাইন্ডার সেট করা হয়েছে $timePeriod ${_bn(
+          hour12)} টা ${_bn(picked.minute)} মিনিটে।";
       await _flutterTts.speak(speakText);
 
       if (context.mounted) {
@@ -330,87 +366,246 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(LocaleData.budgetReminderTitle.getString(context))),
+      backgroundColor: AppColors.lightBackground,
+      appBar: AppBar(
+        backgroundColor: AppColors.lightBackground,
+        elevation: 0,
+        titleSpacing: 0,
+        title: Text(
+          LocaleData.budgetReminderTitle.getString(context),
+          style: TextStyle(
+            color: AppColors.primary,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        iconTheme: IconThemeData(color: Colors.black),
+      ),
       body: ListView(
         padding: EdgeInsets.all(16),
         children: [
-          Text(LocaleData.thisWeeksSpending.getString(context), style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(
+            LocaleData.thisWeeksSpending.getString(context),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
           SizedBox(height: 12),
+
+          Container(
+            padding: EdgeInsets.all(16),
+            margin: EdgeInsets.only(bottom: 8),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  LocaleData.totalSpent.getString(context),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.black54,
+                  ),
+                ),
+                SizedBox(height: 4),
+                Text(
+                      () {
+                    double totalSpent = _categoryData.values
+                        .map((e) => (e['spent'] ?? 0.0) as double)
+                        .fold(0.0, (a, b) => a + b);
+                    double totalLimit = _categoryData.values
+                        .map((e) => (e['limit'] ?? 0.0) as double)
+                        .fold(0.0, (a, b) => a + b);
+                    return "৳${totalSpent.toInt()} / ৳${totalLimit.toInt()}";
+                  }(),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          SizedBox(height: 12),
+
           ...categoryOrder.map((category) {
             final data = _categoryData[category] ?? {'spent': 0.0, 'limit': 1.0};
             double spent = data['spent'];
             double limit = data['limit'];
             double percent = (spent / (limit == 0 ? 1 : limit)).clamp(0.0, 1.0);
-            return GestureDetector(
-              onTap: () => _editLimit(category),
-              child: AnimatedContainer(
-                duration: Duration(milliseconds: 500),
-                curve: Curves.easeInOut,
-                margin: EdgeInsets.only(bottom: 14),
-                padding: EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: _speakingCategory == category
-                      ? Colors.lightBlue.shade100
-                      : AppColors.softGray,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: _speakingCategory == category
-                      ? [
-                    BoxShadow(
-                      color: Colors.lightBlue.withValues(alpha: 0.5),
-                      blurRadius: 12,
-                      spreadRadius: 2,
-                    )
-                  ]
-                      : [],
-                ),
 
-                child: Row(
-                  children: [
-                    Icon(_categoryIcons[category], color: _categoryColors[category], size: 28),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
+            Color statusColor = percent < 0.7
+                ? Colors.green
+                : (percent < 1 ? Colors.orange : Colors.redAccent);
+
+            return Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => _editLimit(category),
+                borderRadius: BorderRadius.circular(16),
+                child: Container(
+                  margin: EdgeInsets.only(bottom: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.white, // Always white, no blue/orange background
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 5,
+                        offset: Offset(0, 3),
+                      )
+                    ],
+                  ),
+
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 6,
+                        height: 90,
+                        decoration: BoxDecoration(
+                          color: _categoryColors[category],
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(16),
+                            bottomLeft: Radius.circular(16),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(getLocalizedCategoryName(category, context), style: TextStyle(fontWeight: FontWeight.bold)),
-                              if (percent >= 1)
-                                Icon(Icons.warning, size: 18, color: Colors.redAccent),
+                              TweenAnimationBuilder<double>(
+                                tween: Tween<double>(
+                                  begin: 1.0,
+                                  end: _speakingCategory == category ? 1.3 : 1.0,
+                                ),
+                                duration: Duration(milliseconds: 500),
+                                curve: Curves.elasticOut,
+                                builder: (context, scale, child) {
+                                  return Transform.scale(
+                                    scale: scale,
+                                    child: AnimatedContainer(
+                                      duration: Duration(milliseconds: 500),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: _categoryColors[category]!.withOpacity(0.1),
+                                        boxShadow: _speakingCategory == category
+                                            ? [
+                                          BoxShadow(
+                                            color: _categoryColors[category]!.withOpacity(0.5),
+                                            blurRadius: 12,
+                                            spreadRadius: 2,
+                                          )
+                                        ]
+                                            : [],
+                                      ),
+                                      child: child,
+                                    ),
+                                  );
+                                },
+                                child: Icon(
+                                  _categoryIcons[category],
+                                  color: _categoryColors[category],
+                                  size: 24,
+                                ),
+                              ),
+                              SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            getLocalizedCategoryName(category, context),
+                                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                              fontWeight: FontWeight.w600,
+                                              color: AppColors.primary,
+                                            ),
+                                          ),
+                                        ),
+                                        if (percent >= 1)
+                                          Icon(Icons.warning, size: 18, color: Colors.redAccent),
+                                      ],
+                                    ),
+                                    SizedBox(height: 6),
+                                    TweenAnimationBuilder(
+                                      duration: Duration(milliseconds: 600),
+                                      tween: Tween<double>(begin: 0, end: percent),
+                                      builder: (context, double value, _) => LinearProgressIndicator(
+                                        value: value,
+                                        minHeight: 6,
+                                        color: percent >= 1 ? Colors.redAccent : AppColors.primary,
+                                        backgroundColor: Colors.grey[300],
+                                      ),
+                                    ),
+                                    SizedBox(height: 6),
+                                    Text(
+                                      "৳${spent.toInt()} / ৳${limit.toInt()}",
+                                      style: TextStyle(
+                                          fontSize: 13,
+                                          color: statusColor,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
-                          SizedBox(height: 6),
-                          LinearProgressIndicator(
-                            value: percent,
-                            minHeight: 6,
-                            color: _categoryColors[category],
-                            backgroundColor: Colors.grey[300],
-                          ),
-                          SizedBox(height: 6),
-                          Text("৳${spent.toInt()} / ৳${limit.toInt()}", style: TextStyle(fontSize: 13)),
-                        ],
-                      ),
-                    )
-                  ],
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               ),
             );
           }),
           SizedBox(height: 30),
           ElevatedButton.icon(
-            icon: Icon(_isSpeaking ? Icons.stop : Icons.volume_up),
-            label: Text(_isSpeaking ? LocaleData.stopSummary.getString(context) : LocaleData.playSummary.getString(context)),
+            icon: Icon(
+              _isSpeaking ? Icons.stop : Icons.volume_up,
+              color: Colors.white,
+            ),
+            label: Text(
+              _isSpeaking
+                  ? LocaleData.stopSummary.getString(context)
+                  : LocaleData.playSummary.getString(context),
+              style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
             onPressed: _speakSummary,
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.deepPurple, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(
+              elevation: 3,
+              backgroundColor: AppColors.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              padding: EdgeInsets.symmetric(vertical: 14),
+            ),
           ),
           SizedBox(height: 12),
           ElevatedButton.icon(
-            icon: Icon(Icons.alarm),
-            label: Text(LocaleData.setDailyReminder.getString(context)),
+            icon: Icon(Icons.alarm, color: Colors.white),
+            label: Text(
+              LocaleData.setDailyReminder.getString(context),
+              style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
             onPressed: _pickReminderTime,
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(
+              elevation: 3,
+              backgroundColor: AppColors.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              padding: EdgeInsets.symmetric(vertical: 14),
+            ),
           ),
-
+          SizedBox(height: 24),
         ],
       ),
     );

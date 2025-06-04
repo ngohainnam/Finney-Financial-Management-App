@@ -819,6 +819,7 @@ mixin LocaleData {
   static const String editLimitHint = 'editLimitHint';
   static const String editLimitCancel = 'editLimitCancel';
   static const String editLimitSave = 'editLimitSave';
+  static const String totalSpent = 'totalSpent';
   static const String report = 'report';
   static const String savingGoals = 'savingGoals';
   static const String quiz = 'quiz';
@@ -1464,6 +1465,7 @@ mixin LocaleData {
     editLimitHint: 'Enter new limit',
     editLimitCancel: 'Cancel',
     editLimitSave: 'Save',
+    totalSpent: 'Total Spent',
     saveHabitTitle: 'Making Saving a Habit',
     saveHabitDesc:
     'It’s smart to save money regularly and turn it into a habit. The best way is to plan your savings before you spend.',
@@ -2269,6 +2271,7 @@ mixin LocaleData {
     editLimitHint: 'নতুন সীমা লিখুন',
     editLimitCancel: 'বাতিল করুন',
     editLimitSave: 'সংরক্ষণ করুন',
+    totalSpent: 'মোট খরচ',
     saveHabitTitle: 'সেভিং এর অভ্যাস গড়ে তোলা',
     saveHabitDesc:
     'নিয়মিত টাকা জমানো স্মার্ট একটি অভ্যাস। খরচ করার আগে সেভিং প্ল্যান করা সবচেয়ে ভালো উপায়।',

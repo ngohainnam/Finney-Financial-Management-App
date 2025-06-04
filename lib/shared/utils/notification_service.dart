@@ -1,6 +1,9 @@
 import 'dart:developer';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
+import 'global_navigator.dart';
+
+
 
 class NotificationService {
   static final FlutterLocalNotificationsPlugin plugin =
@@ -10,6 +13,18 @@ class NotificationService {
     const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
     const initializationSettings =
     InitializationSettings(android: androidSettings);
+
+    await plugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse response) async {
+        // Handle the notification tap
+        log('🔔 Notification tapped: ${response.payload}');
+
+        // Navigate to ReminderPage
+        // Replace this with your actual navigation logic
+        navigatorKey.currentState?.pushNamed('/reminder');
+      },
+    );
 
     await plugin.initialize(initializationSettings);
 

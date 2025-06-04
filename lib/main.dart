@@ -19,6 +19,10 @@ import 'package:finney/core/storage/storage_manager.dart';
 import 'pages/1-auth/presentation/inactivity_handler.dart';
 import 'package:finney/pages/1-auth/presentation/pin_creation.dart';
 import 'package:finney/pages/1-auth/presentation/pin_entry.dart';
+import 'shared/utils/global_navigator.dart';
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,7 +34,7 @@ void main() async {
 
   // Timezone config
   tz.initializeTimeZones();
-  tz.setLocalLocation(tz.getLocation('Australia/Melbourne'));
+  tz.setLocalLocation(tz.getLocation('Asia/Dhaka'));
 
   // Notification init
   await NotificationService.init();
@@ -111,6 +115,7 @@ class _MyAppState extends State<MyApp> {
     final hasLanguage = _prefs.containsKey('language');
 
     final app = MaterialApp(
+      navigatorKey: navigatorKey,
       theme: ThemeData(
         primaryColor: AppColors.primary,
         fontFamily: 'NotoSerifBengali',
