@@ -19,10 +19,9 @@ import 'package:finney/core/storage/storage_manager.dart';
 import 'pages/1-auth/presentation/inactivity_handler.dart';
 import 'package:finney/pages/1-auth/presentation/pin_creation.dart';
 import 'package:finney/pages/1-auth/presentation/pin_entry.dart';
-import 'shared/utils/global_navigator.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-
+final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -114,8 +113,9 @@ class _MyAppState extends State<MyApp> {
 
     final hasLanguage = _prefs.containsKey('language');
 
-    final app = MaterialApp(
+    return MaterialApp(
       navigatorKey: navigatorKey,
+      navigatorObservers: [routeObserver],
       theme: ThemeData(
         primaryColor: AppColors.primary,
         fontFamily: 'NotoSerifBengali',
@@ -134,27 +134,28 @@ class _MyAppState extends State<MyApp> {
       home: !hasLanguage
           ? const LanguageSelectionPage()
           : StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (context, authSnapshot) {
-          if (authSnapshot.connectionState == ConnectionState.waiting) {
-            return const Scaffold(body: Center(child: CircularProgressIndicator()));
-          }
-          if (authSnapshot.hasData) {
-            return FutureBuilder<Widget>(
-              future: _getInitialPage(authSnapshot.data!),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
+              stream: FirebaseAuth.instance.authStateChanges(),
+              builder: (context, authSnapshot) {
+                if (authSnapshot.connectionState == ConnectionState.waiting) {
                   return const Scaffold(body: Center(child: CircularProgressIndicator()));
                 }
-                return snapshot.data ?? const AuthPage();
+                if (authSnapshot.hasData) {
+                  return FutureBuilder<Widget>(
+                    future: _getInitialPage(authSnapshot.data!),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Scaffold(body: Center(child: CircularProgressIndicator()));
+                      }
+                      return snapshot.data ?? const AuthPage();
+                    },
+                  );
+                }
+                return const AuthPage();
               },
-            );
-          }
-          return const AuthPage();
-        },
+            ),
+      builder: (context, child) => InternetConnectionHandler(
+        child: InactivityHandler(child: child!),
       ),
     );
-
-    return InternetConnectionHandler(child: InactivityHandler(child: app));
   }
 }

@@ -394,7 +394,7 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
             padding: EdgeInsets.all(16),
             margin: EdgeInsets.only(bottom: 8),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
@@ -493,11 +493,11 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
                                       duration: Duration(milliseconds: 500),
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
-                                        color: _categoryColors[category]!.withOpacity(0.1),
+                                        color: _categoryColors[category]!.withValues(alpha: 0.1),
                                         boxShadow: _speakingCategory == category
                                             ? [
                                           BoxShadow(
-                                            color: _categoryColors[category]!.withOpacity(0.5),
+                                            color: _categoryColors[category]!.withValues(alpha: 0.5),
                                             blurRadius: 12,
                                             spreadRadius: 2,
                                           )
