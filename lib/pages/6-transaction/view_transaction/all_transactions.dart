@@ -125,8 +125,10 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
             ? LocaleData.selectItemsToDelete.getString(context)
             : LocaleData.transactions.getString(context),
           style: const TextStyle(
-            color: AppColors.primary,
+            color: AppColors.darkBlue,
             fontWeight: FontWeight.bold,
+            fontSize: 28,
+            letterSpacing: 1.2,
           ),
         ),
         backgroundColor: Colors.white,

@@ -232,7 +232,7 @@ class _ChangePinPageState extends State<ChangePinPage> {
         await storage.write(key: 'pin_${user.uid}', value: newPin);
         AppSnackBar.showSuccess(
           context,
-          message: LocaleData.changePin.getString(context),
+          message: LocaleData.pinSaved.getString(context),
         );
         Navigator.pop(context); // Return to Settings
       }
@@ -264,14 +264,15 @@ class _ChangePinPageState extends State<ChangePinPage> {
     return Scaffold(
       backgroundColor: AppColors.lightBackground,
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
+        backgroundColor: AppColors.lightBackground,
         title: Text(
           LocaleData.security.getString(context),
-          style: const TextStyle(color: Colors.white),
+          style: const TextStyle(
+            color: AppColors.darkBlue,
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.2,
+          ),
         ),
       ),
       body: SafeArea(

@@ -63,7 +63,7 @@ User Question: ${chatMessage.text}""";
       bool isFromVoiceInput = chatMessage.customProperties?['fromVoiceInput'] == true;
       if (isFromVoiceInput) {
         final isBengali = Localizations.localeOf(context).languageCode == 'bn';
-        await TtsService().setLanguage(isBengali ? "bn-BD" : "en-US");
+        await TtsService().setLanguage(isBengali);
         await TtsService().speak(response);
       }
 

@@ -2,6 +2,7 @@ import 'package:finney/shared/theme/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:finney/pages/2-chatbot/services/stt_service.dart';
+import 'package:finney/pages/2-chatbot/services/tts_service.dart';
 import 'package:finney/pages/2-chatbot/utils/robot_animation.dart'; 
 import 'package:finney/shared/localization/locales.dart';
 import 'package:flutter_localization/flutter_localization.dart';
@@ -24,6 +25,7 @@ class VoiceChatInterface extends StatefulWidget {
 
 class _VoiceChatInterfaceState extends State<VoiceChatInterface> {
   final STTService _sttService = STTService();
+  final TtsService _ttsService = TtsService();
   bool _isListening = false;
   String _lastWords = '';
   bool _isProcessing = false;
@@ -51,7 +53,9 @@ class _VoiceChatInterfaceState extends State<VoiceChatInterface> {
 
   Future<void> _toggleListening() async {
     if (_isProcessing) return;
-    
+
+    final isBengali = Localizations.localeOf(context).languageCode == 'bn';
+
     if (_isListening) {
       // Stop listening and process the query
       bool isNowListening = false;
@@ -60,20 +64,22 @@ class _VoiceChatInterfaceState extends State<VoiceChatInterface> {
         _isListening = isNowListening;
         _isProcessing = true;
       });
-      
+
       if (_lastWords.isNotEmpty) {
         await _sendVoiceMessageToAI(_lastWords);
-        
         await Future.delayed(const Duration(milliseconds: 1500));
       }
-      
+
       setState(() {
         _isProcessing = false;
         _lastWords = '';
       });
     } else {
-      // Start listening
-      bool isNowListening = await _sttService.toggleListening(_updateWords);
+      // Start listening with language selection
+      bool isNowListening = await _sttService.toggleListening(
+        _updateWords,
+        isBengali: isBengali,
+      );
       setState(() {
         _isListening = isNowListening;
       });
@@ -92,11 +98,14 @@ class _VoiceChatInterfaceState extends State<VoiceChatInterface> {
     widget.onSend(message);
   }
 
+  Future<void> _stopSpeech() async {
+    await _ttsService.stop();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.lightBackground,
-      // Add AppBar with title and back button
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -104,6 +113,13 @@ class _VoiceChatInterfaceState extends State<VoiceChatInterface> {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.of(context).pop(),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.volume_off, color: Colors.redAccent),
+            tooltip: "Stop Speech",
+            onPressed: _stopSpeech,
+          ),
+        ],
       ),
       body: Stack(
         children: [
@@ -112,7 +128,6 @@ class _VoiceChatInterfaceState extends State<VoiceChatInterface> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Current recognized text
                 if (_lastWords.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.all(20.0),
@@ -128,9 +143,8 @@ class _VoiceChatInterfaceState extends State<VoiceChatInterface> {
                       ),
                     ),
                   ),
-                
                 Text(
-                   _isListening
+                  _isListening
                       ? LocaleData.voiceListening.getString(context)
                       : _isProcessing
                           ? LocaleData.voiceProcessing.getString(context)
@@ -143,8 +157,6 @@ class _VoiceChatInterfaceState extends State<VoiceChatInterface> {
               ],
             ),
           ),
-          
-          //microphone button
           Positioned(
             left: 0,
             right: 0,
@@ -193,6 +205,7 @@ class _VoiceChatInterfaceState extends State<VoiceChatInterface> {
   @override
   void dispose() {
     _sttService.dispose();
+    _ttsService.stop();
     super.dispose();
   }
 }

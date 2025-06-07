@@ -44,14 +44,14 @@ class LanguageSelectionPage extends StatelessWidget {
               MyButton(
                 text: 'English',
                 onTap: () => _setLanguage(context, 'en'),
-                backgroundColor: AppColors.primary,
+                backgroundColor: AppColors.darkBlue,
                 textColor: AppColors.lightBackground,
               ),
               const SizedBox(height: 20),
               MyButton(
                 text: 'বাংলা',
                 onTap: () => _setLanguage(context, 'bn'),
-                backgroundColor: AppColors.primary,
+                backgroundColor: AppColors.darkBlue,
                 textColor: AppColors.lightBackground,
               ),
             ],
