@@ -4,7 +4,6 @@ import 'package:finney/shared/category.dart';
 
 class TransactionModel {
   final String? id;
-  final String name;
   final String category;
   final double amount;
   final DateTime date;
@@ -12,7 +11,6 @@ class TransactionModel {
 
   TransactionModel({
     this.id,
-    required this.name,
     required this.category,
     required this.amount,
     required this.date,
@@ -27,7 +25,6 @@ class TransactionModel {
   // Database operations
   Map<String, dynamic> toMap() {
     return {
-      'name': name,
       'category': category,
       'amount': amount,
       'date': date,
@@ -38,7 +35,6 @@ class TransactionModel {
   factory TransactionModel.fromMap(String docId, Map<String, dynamic> map) {
     return TransactionModel(
       id: docId,
-      name: map['name'] ?? '',
       category: map['category'] ?? '',
       amount: (map['amount'] ?? 0.0).toDouble(),
       date: (map['date'] is Timestamp) 
@@ -58,7 +54,6 @@ class TransactionModel {
   }) {
     return TransactionModel(
       id: id ?? this.id,
-      name: name ?? this.name,
       category: category ?? this.category,
       amount: amount ?? this.amount,
       date: date ?? this.date,

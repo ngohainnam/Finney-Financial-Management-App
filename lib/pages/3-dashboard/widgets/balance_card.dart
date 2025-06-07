@@ -3,6 +3,7 @@ import 'package:finney/shared/theme/app_color.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/shared/localization/locales.dart';
 import 'package:finney/pages/7-insights/components/time_selector.dart';
+import 'package:finney/shared/localization/localized_number_formatter.dart';
 
 class BalanceCard extends StatelessWidget {
   final double balance;
@@ -69,7 +70,7 @@ class BalanceCard extends StatelessWidget {
           // Main Balance
           Center(
             child: Text(
-              '৳ ${balance.toStringAsFixed(2)}',
+              '৳ ${LocalizedNumberFormatter.formatDouble(balance, context)}',
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 34,
@@ -94,7 +95,7 @@ class BalanceCard extends StatelessWidget {
               ),
               Expanded(
                 child: Text(
-                  '৳ ${income.toStringAsFixed(2)}',
+                  '৳ ${LocalizedNumberFormatter.formatDouble(income, context)}',
                   style: const TextStyle(
                     color: Colors.greenAccent,
                     fontSize: 15,
@@ -122,7 +123,7 @@ class BalanceCard extends StatelessWidget {
               ),
               Expanded(
                 child: Text(
-                  '৳ ${expenses.toStringAsFixed(2)}',
+                  '৳ ${LocalizedNumberFormatter.formatDouble(expenses, context)}',
                   style: const TextStyle(
                     color: Colors.redAccent,
                     fontSize: 15,
@@ -137,4 +138,5 @@ class BalanceCard extends StatelessWidget {
         ],
       ),
     );
-  }}
+  }
+}

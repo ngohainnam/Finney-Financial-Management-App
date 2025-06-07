@@ -141,7 +141,7 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
         actions: [
           if (!_isDeleteMode)
             IconButton(
-              icon: const Icon(Icons.delete_outline, color: Colors.black),
+              icon: const Icon(Icons.delete_outline, color: AppColors.darkBlue),
               onPressed: _toggleDeleteMode,
             )
           else

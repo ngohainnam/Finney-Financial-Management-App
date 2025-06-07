@@ -1,4 +1,5 @@
 import 'package:finney/shared/localization/locales.dart';
+import 'package:finney/shared/theme/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:finney/pages/5-learn/financial_learn/smart_spending_tips.dart';
@@ -17,6 +18,7 @@ import 'package:finney/pages/5-learn/quiz/quiz.dart';
 import 'package:finney/pages/5-learn/quiz/quiz_results_page.dart';
 import 'package:finney/pages/5-learn/financial_learn/savings_coach.dart';
 import 'package:flutter_localization/flutter_localization.dart';
+import 'package:finney/shared/widgets/common/snack_bar.dart';
 
 class Learn extends StatefulWidget {
   const Learn({super.key});
@@ -29,7 +31,6 @@ class _LearnState extends State<Learn> {
   final TextEditingController _searchController = TextEditingController();
   String _selectedTab = 'Lessons';
 
-  // Map to store progress and status for each lesson
   final Map<String, Map<String, dynamic>> _lessonProgress = {};
 
   List<Map<String, dynamic>> get _lessons => [
@@ -180,10 +181,8 @@ class _LearnState extends State<Learn> {
     for (var lesson in [..._lessons, ..._appTourLessons]) {
       final String key = lesson['lessonKey'];
 
-      // Initialize progress map for this lesson if needed
       _lessonProgress[key] ??= {'progress': 0.0, 'status': 'all'};
 
-      // Handle activity status (no videos)
       if (lesson['status'] == 'activity' || lesson['totalVideos'] == 0) {
         _lessonProgress[key]!['progress'] = 0.0;
         _lessonProgress[key]!['status'] = lesson['status'] ?? 'all';
@@ -212,14 +211,14 @@ class _LearnState extends State<Learn> {
           .toList(),
     );
 
-    // Clear our progress map
     _lessonProgress.clear();
 
     await _updateLessonStatuses();
 
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(LocaleData.learningReset.getString(context))),
+      AppSnackBar.showSuccess(
+        context,
+        message: LocaleData.learningReset.getString(context),
       );
     }
   }
@@ -227,7 +226,6 @@ class _LearnState extends State<Learn> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Update lesson statuses whenever dependencies (like locale) change
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _updateLessonStatuses();
     });
@@ -240,10 +238,8 @@ class _LearnState extends State<Learn> {
     final isLessonsTab = _selectedTab == 'Lessons';
     final isProgressTab = _selectedTab == 'Progress';
 
-    // Get the base lesson lists
     final allItems = [..._lessons, ..._appTourLessons];
 
-    // Enhance with progress data from our tracking map
     final allItemsWithProgress = allItems.map((lesson) {
       final key = lesson['lessonKey'];
       final progress = _lessonProgress.containsKey(key)
@@ -256,7 +252,6 @@ class _LearnState extends State<Learn> {
       };
     }).toList();
 
-    // Filter by status
     final ongoingLessons =
     allItemsWithProgress.where((e) => e['status'] == 'ongoing').toList();
     final completedLessons =
@@ -291,15 +286,15 @@ class _LearnState extends State<Learn> {
           LocaleData.learningHub.getString(context),
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 24,
-            color: Colors.blueAccent,
+            fontSize: 28,
+            color: AppColors.darkBlue,
+            letterSpacing: 1.2,
           ),
         ),
-        automaticallyImplyLeading: false,
         actions: [
           if (_selectedTab == 'Lessons' || _selectedTab == 'App Tour')
             IconButton(
-              icon: const Icon(Icons.refresh, color: Colors.blueAccent),
+              icon: const Icon(Icons.refresh, color: AppColors.darkBlue),
               onPressed: _resetAllProgress,
               tooltip: 'Reset Progress',
             ),

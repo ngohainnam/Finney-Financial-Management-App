@@ -1,8 +1,8 @@
+import 'package:finney/pages/2-chatbot/services/llm_transactionparser.dart';
 import 'package:finney/shared/theme/app_color.dart';
 import 'package:finney/core/storage/cloud/models/transaction_model.dart';
-import 'package:finney/shared/category.dart'; // Import CategoryUtils
+import 'package:finney/shared/category.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:finney/shared/localization/locales.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 
@@ -22,6 +22,17 @@ class TransactionPreviewPopup extends StatelessWidget {
   Widget build(BuildContext context) {
     final isIncome = transaction.amount > 0;
     final categoryColor = CategoryUtils.getColorForCategory(transaction.category);
+    final isBengali = Localizations.localeOf(context).languageCode == 'bn';
+
+    String formattedAmount;
+    if (isBengali) {
+      formattedAmount = '৳${TransactionParser.englishToBengaliNumber(
+        transaction.amount.abs().toStringAsFixed(2),
+        context,
+      )}';
+    } else {
+      formattedAmount = '৳${transaction.amount.abs().toStringAsFixed(2)}';
+    }
 
     return Dialog(
       shape: RoundedRectangleBorder(
@@ -40,7 +51,7 @@ class TransactionPreviewPopup extends StatelessWidget {
           children: [
             Text(
               LocaleData.transactionPreviewTitle.getString(context),
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -78,7 +89,7 @@ class TransactionPreviewPopup extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          transaction.name,
+                          transaction.category,
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
@@ -103,9 +114,7 @@ class TransactionPreviewPopup extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            isIncome
-                                ? '+${NumberFormat.currency(symbol: '\$').format(transaction.amount)}'
-                                : NumberFormat.currency(symbol: '\$').format(transaction.amount),
+                            formattedAmount,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
@@ -127,23 +136,23 @@ class TransactionPreviewPopup extends StatelessWidget {
               children: [
                 TextButton(
                   onPressed: onCancel,
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          side: BorderSide(
-                            color: AppColors.primary,
-                          ),
-                        ),
-                      ),
-                      child: Text(
-                        LocaleData.transactionPreviewCancel.getString(context),
-                        style: TextStyle(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w600,
-                        ),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      side: const BorderSide(
+                        color: AppColors.primary,
                       ),
                     ),
+                  ),
+                  child: Text(
+                    LocaleData.transactionPreviewCancel.getString(context),
+                    style: const TextStyle(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
 
                 const SizedBox(width: 16),
 
@@ -157,7 +166,7 @@ class TransactionPreviewPopup extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: Text( LocaleData.transactionPreviewConfirm.getString(context),),
+                  child: Text(LocaleData.transactionPreviewConfirm.getString(context)),
                 ),
               ],
             ),
@@ -181,7 +190,6 @@ class TransactionPreviewPopup extends StatelessWidget {
           transaction: transaction,
           onConfirm: (transaction) {
             Navigator.of(context).pop(true);
-            //execute onConfirm with the transaction
             onConfirm(transaction);
           },
           onCancel: () {

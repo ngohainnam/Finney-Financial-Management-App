@@ -2,6 +2,7 @@ import 'package:finney/pages/7-insights/components/charts/chart_service.dart';
 import 'package:finney/pages/7-insights/components/time_selector.dart';
 import 'package:finney/pages/7-insights/chart_query.dart';
 import 'package:finney/pages/7-insights/insights.dart';
+import 'package:finney/shared/localization/localized_number_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
@@ -105,11 +106,12 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> with SingleTickerProv
         final weekdayIndex = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].indexOf(weekday);
         final daysToSubtract = now.weekday - (weekdayIndex + 1);
         final date = now.subtract(Duration(days: daysToSubtract));
-        return DateFormat('EEEE, MMMM d, yyyy').format(date);
+        // Exclude weekday, only show date like "MMMM d, yyyy"
+        return DateFormat('MMMM d, yyyy').format(date);
       case ChartInterval.month:
         final day = int.tryParse(period) ?? 1;
         final date = DateTime(now.year, now.month, day);
-        return DateFormat('EEEE, MMMM d, yyyy').format(date);
+        return DateFormat('MMMM d, yyyy').format(date);
       case ChartInterval.year:
         final month = period.toLowerCase();
         final monthIndex = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'].indexOf(month);
@@ -132,7 +134,7 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> with SingleTickerProv
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -169,7 +171,7 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> with SingleTickerProv
           ),
         ),
         Text(
-          '${LocaleData.total.getString(context)}: ${currencyFormat.format(totalAmount)}',
+          '${LocaleData.total.getString(context)}: ৳${LocalizedNumberFormatter.formatDouble(totalAmount, context)}',
           style: TextStyle(
             color: _barColor,
             fontWeight: FontWeight.bold,
@@ -260,7 +262,7 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> with SingleTickerProv
                 axisSide: meta.axisSide,
                 space: 8,
                 child: Text(
-                  displayLabel,
+                  LocalizedNumberFormatter.formatNumber(displayLabel, context),
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 10,
@@ -306,7 +308,7 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> with SingleTickerProv
       horizontalInterval: _calculateYAxisInterval(_currentPageData),
       getDrawingHorizontalLine: (value) {
         return FlLine(
-          color: Colors.grey.withOpacity(0.2),
+          color: Colors.grey.withValues(alpha: 0.2),
           strokeWidth: 1,
           dashArray: [5, 5],
         );
@@ -319,7 +321,7 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> with SingleTickerProv
       final isSelected = entry.key == _selectedBarIndex;
       final baseColor = _barColor;
       final color = isSelected
-          ? baseColor.withOpacity((_animation.value * 0.3 + 0.7).clamp(0.0, 1.0))
+          ? baseColor.withValues(alpha: (_animation.value * 0.3 + 0.7).clamp(0.0, 1.0))
           : baseColor;
 
       return BarChartGroupData(
@@ -353,15 +355,19 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> with SingleTickerProv
 
         final index = response.spot!.touchedBarGroupIndex;
         final expense = _currentPageData[index];
-        final amount = currencyFormat.format(expense.amount);
         final fullDate = _formatFullDate(expense.period, widget.interval);
 
         setState(() {
           _selectedBarIndex = index;
+          final localizedAmount = '৳${LocalizedNumberFormatter.formatDouble(expense.amount, context)}';
+          final localizedDate = LocalizedNumberFormatter.formatDate(fullDate, context);
+
           if (widget.viewType == ChartViewType.expenses) {
-            _selectedPeriodInfo = 'You spent $amount in $fullDate';
+            _selectedPeriodInfo =
+              '${LocaleData.youSpent.getString(context)} $localizedAmount ${LocaleData.inWord.getString(context)} $localizedDate';
           } else {
-            _selectedPeriodInfo = 'You earned $amount in $fullDate';
+            _selectedPeriodInfo =
+              '${LocaleData.youEarned.getString(context)} $localizedAmount ${LocaleData.inWord.getString(context)} $localizedDate';
           }
         });
 

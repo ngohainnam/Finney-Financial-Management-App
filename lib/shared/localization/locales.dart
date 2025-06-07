@@ -10,9 +10,13 @@ mixin LocaleData {
   static const String address = 'address';
   static const String email = 'email';
   static const String userId = 'userId';
+  static const String pinVerified = 'pinVerified';
   static const String edit = 'edit';
   static const String save = 'save';
   static const String close = 'close';
+  static const String youSpent = 'youSpent';
+  static const String youEarned = 'youEarned';
+  static const String inWord = 'inWord';
   static const String appearance = 'appearance';
   static const String language = 'language';
   static const String languageEnglish = 'languageEnglish';
@@ -99,7 +103,7 @@ mixin LocaleData {
   static const String reminder = 'reminder';
 
   // Chatbot page keys
-  static const String chatbotTitle = 'chatbotTitle';
+  static const String dashboardTitle = 'dashboardTitle';
   static const String chatbotHelp = 'chatbotHelp';
   static const String chatbotClearChat = 'chatbotClearChat';
   static const String welcomeMessage = 'welcomeMessage';
@@ -780,6 +784,7 @@ mixin LocaleData {
   static const String passwordStrong = 'password_strong';
   static const String passwordWeak = 'password_weak';
   static const String invalidGmailError = 'invalid_gmail_error';
+  static const String chatbotTitle = 'chatbotTitle';
   static const String passwordsNotMatchError = 'passwords_not_match_error';
   static const String weakPasswordError = 'weak_password_error';
   static const String hiveStorageError = 'hive_storage_error';
@@ -1034,7 +1039,7 @@ mixin LocaleData {
     confirmPin: 'Confirm 4-digit PIN',
     pinSaved: 'PIN saved!',
     invalidPin: 'Please enter a 4-digit PIN',
-    pinsDoNotMatch: 'Pins do not match',
+    pinsDoNotMatch: 'PIN do not match',
     cancel: 'Cancel',
     helpSupport: 'Help & Support',
     helpSupportComingSoon: 'Help & Support page coming soon!',
@@ -1087,7 +1092,7 @@ mixin LocaleData {
     resourceSafetyVideo2: 'Guide to Financial Security',
     resourceSafetyArticle1: 'Investopedia: Financial Security Tips',
     resourceSafetyArticle2: 'MoneySmart: Protect Yourself from Scams',
-    chatbotTitle: 'Finney AI',
+    dashboardTitle: 'Finney AI',
     chatbotHelp: 'Help',
     chatbotClearChat: 'Clear Chat',
     welcomeMessage: 'Welcome to Finney AI! How can I assist you today?',
@@ -1122,6 +1127,7 @@ mixin LocaleData {
     income: 'Income',
     expenses: 'Expenses',
     expense: 'Expense',
+    pinVerified: 'PIN verified successfully',
     thisMonth: 'This Month',
     thisWeek: 'This Week',
     thisYear: 'This Year',
@@ -1177,6 +1183,7 @@ mixin LocaleData {
     addToSavings: 'Add to Savings',
     amount: 'Amount',
     savings: 'Saving',
+    forgotPin: 'Forgot PIN?',
     pleaseEnterAmount: 'Please enter an amount',
     pleaseEnterValidNumber: 'Please enter a valid number',
     amountMustBePositive: 'Amount must be positive',
@@ -1275,6 +1282,7 @@ mixin LocaleData {
     quizCompleted: 'Quiz Completed!',
     quizResultScore: 'Your score: %s/%s',
     quizFinish: 'Finish',
+    pinReset: 'PIN is reset',
     quizTryAgain: 'Try Again',
     quizQuestion1: 'What is the main benefit of compound interest?',
     quizQuestion1Answer1: 'Money grows faster over time',
@@ -1330,6 +1338,7 @@ mixin LocaleData {
     understandingMoneyPoint2: 'Different types of money (cash, digital)',
     understandingMoneyPoint3: 'Basic needs vs wants',
     simpleBudgetingTitle: 'Simple Budgeting',
+    chatbotTitle: 'AI Assistant',
     simpleBudgetingPoint1: 'Tracking daily expenses',
     simpleBudgetingPoint2: 'The 50-30-20 rule simplified',
     simpleBudgetingPoint3: 'Saving small amounts regularly',
@@ -1615,6 +1624,9 @@ mixin LocaleData {
     quizQ12A4: 'Takes more time',
     quizQ13: 'Why is saving early in the month smart?',
     quizQ13A1: 'To avoid shopping',
+    youSpent: 'You spent',
+    youEarned: 'You earned',
+    inWord: 'in',
     quizQ13A2: 'So you don’t have to budget',
     quizQ13A3: 'To build financial discipline',
     quizQ13A4: 'To pay fines early',
@@ -1661,6 +1673,7 @@ mixin LocaleData {
     quizQ21A4: 'Having insurance',
     quizQ22: 'When should you ideally save money?',
     quizQ22A1: 'End of the month',
+    createPin: 'Create PIN',
     quizQ22A2: 'After income',
     quizQ22A3: 'After expenses',
     quizQ22A4: 'When borrowing',
@@ -1808,6 +1821,7 @@ mixin LocaleData {
     feedbackMessageKeepGoing:
     "📘 চালিয়ে যান! লার্ন সেকশনটি আবার দেখুন এবং চেষ্টা করুন।",
     feedbackMessageGood: "👍 দারুণ! আপনি সঠিক পথে আছেন!",
+    chatbotTitle: "ফিনির AI সহকারী",
     feedbackMessageExcellent: "🎉 অসাধারণ! আপনি অর্থ ব্যবস্থাপনায় মাস্টার!",
     restartQuiz: 'কুইজ পুনরায় চালু করুন',
     savingMoneyVideo2Title: "সেভিং কেন জরুরি",
@@ -1928,7 +1942,7 @@ mixin LocaleData {
     resourceSafetyVideo2: 'আর্থিক নিরাপত্তার গাইড',
     resourceSafetyArticle1: 'ইনভেস্টোপিডিয়া: আর্থিক নিরাপত্তা টিপস',
     resourceSafetyArticle2: 'মানিস্মার্ট: প্রতারণা থেকে নিজেকে রক্ষা করুন',
-    chatbotTitle: 'ফিনি এআই',
+    dashboardTitle: 'ফিনি এআই',
     chatbotHelp: 'সহায়তা',
     chatbotClearChat: 'চ্যাট মুছুন',
     welcomeMessage:
@@ -2009,6 +2023,9 @@ mixin LocaleData {
     targetAmount: 'লক্ষ্য: %s',
     percentCompleted: '%s% সম্পন্ন',
     targetDate: 'লক্ষ্য তারিখ:',
+    youSpent: 'তুমি খরচ করেছো',
+    youEarned: 'তুমি উপার্জন করেছো',
+    inWord: 'এতে',
     daysLeft: '%d দিন বাকি',
     daysOverdue: '%d দিন অতিবাহিত',
     addSavings: 'সঞ্চয় যোগ করুন',
@@ -2128,6 +2145,8 @@ mixin LocaleData {
     quizQuestion3Answer3: 'গ্যারান্টিযুক্ত রিটার্ন',
     quizQuestion4: '4% অবসর নিয়ম কী?',
     quizQuestion4Answer1: 'অবসরে বছরে 4% সঞ্চয় উত্তোলন করা',
+    forgotPin: 'পিন ভুলে গেছেন?',
+    pinReset: 'পিন পুনরায় সেট করুন',
     quizQuestion4Answer2: 'অবসরের জন্য আয়ের 4% সঞ্চয় করা',
     quizQuestion4Answer3: 'পরিকল্পিত সময়ের চেয়ে 4% বেশি কাজ করা',
     quizQuestion5: 'আয় সুরক্ষার জন্য কোন ধরনের বীমা সবচেয়ে গুরুত্বপূর্ণ?',
@@ -2200,6 +2219,7 @@ mixin LocaleData {
     advancedBudgetingPoint1: 'মাসিক বাজেট পরিকল্পনা তৈরি করা',
     advancedBudgetingPoint2: 'আর্থিক লক্ষ্য নির্ধারণ',
     advancedBudgetingPoint3: 'অনিয়মিত আয় পরিচালনা',
+    createPin: 'পিন তৈরি করুন',
     creditBasicsTitle: 'ক্রেডিট মৌলিক বিষয়',
     creditBasicsPoint1: 'ক্রেডিট স্কোর বোঝা',
     creditBasicsPoint2: 'দায়িত্বশীল ক্রেডিট কার্ড ব্যবহার',
@@ -2369,6 +2389,7 @@ mixin LocaleData {
     quizResetConfirm:
     'আপনি কি সমস্ত কুইজ ফলাফল মুছে ফেলতে চান? একবার করলে এটা আর ফিরে নেওয়া যাবে না',
     reset: 'রিসেট',
+    pinVerified: 'পিন যাচাই করা হয়েছে',
     quizAttempts: 'চেষ্টা',
     quizAverage: 'গড়',
     quizLastAttempt: 'সর্বশেষ চেষ্টা',

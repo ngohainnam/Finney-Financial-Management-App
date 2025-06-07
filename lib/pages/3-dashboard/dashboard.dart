@@ -258,10 +258,12 @@ class DashboardState extends State<Dashboard> with RouteAware {
               appBar: AppBar(
                 backgroundColor: AppColors.lightBackground,
                 title: Text(
-                  LocaleData.chatbotTitle.getString(context),
+                  LocaleData.dashboardTitle.getString(context),
                   style: const TextStyle(
-                    color: AppColors.primary,
+                    color: AppColors.darkBlue,
                     fontWeight: FontWeight.bold,
+                    fontSize: 28,
+                    letterSpacing: 1.2,
                   ),
                 ),
                 automaticallyImplyLeading: true,

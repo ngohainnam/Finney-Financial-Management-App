@@ -8,7 +8,6 @@ import 'package:finney/pages/9-setting/language_selection.dart';
 
 Future<void> signOut(BuildContext context) async {
   try {
-    final userId = FirebaseAuth.instance.currentUser?.uid;
     await FirebaseAuth.instance.signOut();
     final prefs = await SharedPreferences.getInstance();
     final language = prefs.getString('language');
@@ -16,7 +15,6 @@ Future<void> signOut(BuildContext context) async {
     if (language != null) {
       await prefs.setString('language', language);
     }
-    debugPrint('Sign-out complete, PIN preserved for user: $userId');
     AppSnackBar.showSuccess(
       context,
       message: LocaleData.logOut.getString(context),

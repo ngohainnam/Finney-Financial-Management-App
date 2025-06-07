@@ -2,13 +2,13 @@ import 'package:finney/core/storage/cloud/models/user_model.dart';
 import 'package:finney/core/storage/storage_manager.dart';
 import 'package:finney/pages/1-auth/presentation/google_sign_in.dart';
 import 'package:finney/pages/1-auth/presentation/pin_creation.dart';
-import 'package:finney/pages/1-auth/widgets/my_button.dart';
 import 'package:finney/pages/1-auth/widgets/my_textfield.dart';
 import 'package:finney/pages/1-auth/widgets/square_tile.dart';
 import 'package:finney/pages/3-dashboard/dashboard.dart';
 import 'package:finney/shared/localization/locales.dart';
 import 'package:finney/shared/path/app_images.dart';
 import 'package:finney/shared/theme/app_color.dart';
+import 'package:finney/shared/widgets/common/my_button.dart';
 import 'package:finney/shared/widgets/common/snack_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -63,20 +63,31 @@ class _LoginPageState extends State<LoginPage> {
         final storage = FlutterSecureStorage();
         final pin = await storage.read(key: 'pin_${user.uid}');
 
-        Navigator.pop(context);
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => pin == null || pin.isEmpty ? const PinCreationPage() : const Dashboard(),
-          ),
-        );
+        // Remove the dialog before navigation
+        if (mounted) Navigator.pop(context);
+
+        // Navigate to PIN creation or Dashboard
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => pin == null || pin.isEmpty
+                  ? const PinCreationPage()
+                  : const Dashboard(),
+            ),
+          );
+        }
       } else {
-        Navigator.pop(context);
-        AppSnackBar.showError(context, message: 'Failed to retrieve user data.');
+        if (mounted) Navigator.pop(context);
+        if (mounted) {
+          AppSnackBar.showError(context, message: 'Failed to retrieve user data.');
+        }
       }
     } catch (e) {
-      Navigator.pop(context);
-      AppSnackBar.showError(context, message: 'Incorrect email/password.');
+      if (mounted) Navigator.pop(context);
+      if (mounted) {
+        AppSnackBar.showError(context, message: 'Incorrect email/password.');
+      }
     }
   }
 
@@ -107,19 +118,17 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 25),
+
                 MyTextField(
                   controller: emailController,
                   hintText: LocaleData.emailHint.getString(context),
                   obscureText: false,
                 ),
-                const SizedBox(height: 10),
                 MyTextField(
                   controller: passwordController,
                   hintText: LocaleData.passwordHint.getString(context),
                   obscureText: true,
                 ),
-                const SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
                   child: Row(
@@ -133,7 +142,7 @@ class _LoginPageState extends State<LoginPage> {
                         child: Text(
                           LocaleData.forgotPassword.getString(context),
                           style: const TextStyle(
-                            color: AppColors.darkBlue,
+                            color: AppColors.primary,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -146,7 +155,7 @@ class _LoginPageState extends State<LoginPage> {
                   text: LocaleData.loginNow.getString(context),
                   onTap: signUserIn,
                 ),
-                const SizedBox(height: 50),
+                const SizedBox(height: 30),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -162,7 +171,6 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     Text(
                       LocaleData.notMember.getString(context),
-                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(width: 4),
                     GestureDetector(
@@ -170,7 +178,7 @@ class _LoginPageState extends State<LoginPage> {
                       child: Text(
                         LocaleData.registerNow.getString(context),
                         style: const TextStyle(
-                          color: AppColors.darkBlue,
+                          color: AppColors.primary,
                           fontWeight: FontWeight.bold,
                         ),
                       ),

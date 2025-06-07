@@ -3,7 +3,7 @@ import 'package:finney/pages/2-chatbot/chatbot.dart';
 import 'package:finney/pages/4-saving/saving_goal_page.dart';
 import 'package:finney/pages/7-insights/insights.dart';
 import 'package:finney/pages/5-learn/learn.dart';
-import 'package:finney/pages/8-report/report.dart';
+//import 'package:finney/pages/8-report/report.dart';
 import 'package:finney/pages/9-setting/setting.dart';
 import 'package:finney/pages/10-reminders/budget_reminder_page.dart';
 import 'package:flutter/material.dart';
@@ -66,6 +66,8 @@ class NavigationTiles extends StatelessWidget {
           MaterialPageRoute(builder: (_) => const Chatbot()),
         ),
       ),
+
+/* Review part for now: Joy's section
       _FeatureItem(
         title: 'Prediction',
         icon: Icons.insights_rounded,
@@ -75,6 +77,7 @@ class NavigationTiles extends StatelessWidget {
           MaterialPageRoute(builder: (_) => const Report()),
         ),
       ),
+*/
       _FeatureItem(
         title: 'Goals',
         icon: Icons.flag,

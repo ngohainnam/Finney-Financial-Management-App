@@ -1,3 +1,4 @@
+import 'package:finney/shared/localization/localized_number_formatter.dart';
 import 'package:finney/shared/theme/app_color.dart';
 import 'package:finney/pages/7-insights/components/charts/bar_chart.dart';
 import 'package:finney/pages/7-insights/components/charts/chart_service.dart' as chart_service;
@@ -156,7 +157,7 @@ class _InsightsState extends State<Insights> with SingleTickerProviderStateMixin
     final years = yearTotals.keys.toList()..sort();
     return years
         .map((year) => chart_service.PeriodExpense(
-              period: year.toString(),
+              period: LocalizedNumberFormatter.formatNumber(year.toString(), context),
               amount: yearTotals[year]!,
             ))
         .toList();
@@ -238,15 +239,17 @@ class _InsightsState extends State<Insights> with SingleTickerProviderStateMixin
         title: Text(
           LocaleData.insights.getString(context),
           style: const TextStyle(
-            color: AppColors.primary,
+            color: AppColors.darkBlue,
             fontWeight: FontWeight.bold,
+            fontSize: 28,
+            letterSpacing: 1.2,
           ),
         ),
         bottom: TabBar(
           controller: _tabController,
-          labelColor: AppColors.primary,
+          labelColor: AppColors.darkBlue,
           unselectedLabelColor: Colors.grey,
-          indicatorColor: AppColors.primary,
+          indicatorColor: AppColors.darkBlue,
           tabs: [
             Tab(
               icon: const Icon(Icons.bar_chart),

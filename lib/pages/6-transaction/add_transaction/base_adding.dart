@@ -1,6 +1,5 @@
 import 'package:finney/core/storage/cloud/service/transaction_cloud_service.dart';
 import 'package:finney/shared/category.dart';
-import 'package:finney/pages/9-setting/currency_formatter.dart';
 import 'package:finney/shared/widgets/common/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -45,7 +44,7 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
     if (widget.existingTransaction != null) {
       _selectedCategory = widget.existingTransaction!.category;
       _selectedDate = widget.existingTransaction!.date;
-      _amountController.text = CurrencyFormatter.formatWithoutSymbol(widget.existingTransaction!.amount.abs());
+      _amountController.text = widget.existingTransaction!.amount.abs().toString();
       _descriptionController.text = widget.existingTransaction!.description ?? '';
     } else {
       if (categories.isNotEmpty) {
@@ -73,7 +72,7 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
     }
 
     try {
-      double amount = CurrencyFormatter.parse(_amountController.text);
+      double amount = double.tryParse(_amountController.text) ?? 0;
       if (amount <= 0) {
         _showErrorSnackBar(LocaleData.pleaseEnterPositiveAmount.getString(context));
         return;
@@ -97,7 +96,6 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
 
       final transaction = TransactionModel(
         id: widget.existingTransaction?.id,
-        name: _selectedCategory,
         category: _selectedCategory,
         amount: amountValue,
         date: _selectedDate,

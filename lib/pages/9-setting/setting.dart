@@ -221,7 +221,7 @@ class _SettingState extends State<Setting> {
                       Expanded(
                         flex: 2,
                         child: Container(
-                          color: AppColors.primary,
+                          color: AppColors.darkBlue,
                         ),
                       ),
                       Expanded(
@@ -240,7 +240,7 @@ class _SettingState extends State<Setting> {
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                          color: AppColors.primary,
+                          color: Colors.transparent,
                           width: double.infinity,
                           child: Row(
                             children: [

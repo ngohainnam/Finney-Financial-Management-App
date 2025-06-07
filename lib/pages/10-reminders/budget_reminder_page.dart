@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:finney/shared/widgets/common/my_button.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -10,6 +11,7 @@ import 'package:android_intent_plus/android_intent.dart';
 import 'package:android_intent_plus/flag.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/shared/localization/locales.dart';
+import 'package:finney/shared/category.dart'; 
 
 class BudgetReminderPage extends StatefulWidget {
   const BudgetReminderPage({super.key});
@@ -24,37 +26,8 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
   bool _isSpeaking = false;
   String? _speakingCategory;
 
-
   final Map<String, Map<String, dynamic>> _categoryData = {};
-  List<String> categoryOrder = [
-    'Shopping',
-    'Food',
-    'Entertainment',
-    'Transport',
-    'Health',
-    'Utilities',
-    'Others'
-  ];
-
-  final Map<String, IconData> _categoryIcons = {
-    'Shopping': Icons.shopping_bag,
-    'Food': Icons.restaurant,
-    'Entertainment': Icons.movie,
-    'Transport': Icons.directions_car,
-    'Health': Icons.medical_services,
-    'Utilities': Icons.call,
-    'Others': Icons.category,
-  };
-
-  final Map<String, Color> _categoryColors = {
-    'Shopping': AppColors.categoryShopping,
-    'Food': AppColors.categoryFood,
-    'Entertainment': AppColors.categoryEntertainment,
-    'Transport': AppColors.categoryTransport,
-    'Health': AppColors.categoryHealth,
-    'Utilities': AppColors.categoryUtilities,
-    'Others': AppColors.categoryDefault,
-  };
+  List<String> categoryOrder = CategoryUtils.expenseCategories;
 
   @override
   void initState() {
@@ -77,17 +50,13 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
 
     for (var doc in txnSnapshot.docs) {
       final data = doc.data();
-      String id = doc.id;
       double amount = (data['amount'] ?? 0).toDouble();
       String cat = data['category'] ?? 'Others';
 
-      debugPrint("TXN [$id]: $cat | $amount");
-
-      if (amount < 0) { // Only include expenses
+      if (amount < 0) {
         categorySpent[cat] = (categorySpent[cat] ?? 0) + amount.abs();
       }
     }
-
 
     final budgetSnapshot = await budgetRef.get();
     for (var doc in budgetSnapshot.docs) {
@@ -100,9 +69,9 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
       }
     }
 
+    if (!mounted) return;
     setState(() {});
   }
-
 
   Future<void> _editLimit(String category) async {
     final controller = TextEditingController(
@@ -117,9 +86,9 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
                 Localizations
                     .localeOf(context)
                     .languageCode == 'bn'
-                    ? "${getLocalizedCategoryName(
+                    ? "${CategoryUtils.getLocalizedCategoryName(
                     category, context)}-এর সীমা পরিবর্তন করুন"
-                    : "Edit limit for ${getLocalizedCategoryName(
+                    : "Edit limit for ${CategoryUtils.getLocalizedCategoryName(
                     category, context)}"
             ),
             content: TextField(
@@ -155,6 +124,7 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
                         .doc(category)
                         .set({'limit': newLimit, 'category': category},
                         SetOptions(merge: true));
+                    if (!mounted) return;
                     _loadBudgetData();
                     Navigator.pop(context);
                   }
@@ -201,13 +171,13 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
           ? ' ${numberToWords(number % 1000)}'
           : ''}';
     }
-    return number.toString(); // fallback
+    return number.toString();
   }
-
 
   Future<void> _speakSummary() async {
     if (_isSpeaking) {
       await _flutterTts.stop();
+      if (!mounted) return;
       setState(() {
         _isSpeaking = false;
         _speakingCategory = null;
@@ -215,6 +185,7 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
       return;
     }
 
+    if (!mounted) return;
     setState(() => _isSpeaking = true);
 
     final isBengali = Localizations
@@ -227,9 +198,10 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
       final data = _categoryData[category];
       if (data == null) continue;
 
+      if (!mounted) return;
       setState(() => _speakingCategory = category);
 
-      final categoryName = isBengali ? getLocalizedCategoryName(
+      final categoryName = isBengali ? CategoryUtils.getLocalizedCategoryName(
           category, context) : category;
       final int spent = data['spent'].toInt();
       final int limit = data['limit'].toInt();
@@ -245,12 +217,12 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
       await Future.delayed(Duration(seconds: 8));
     }
 
+    if (!mounted) return;
     setState(() {
       _isSpeaking = false;
       _speakingCategory = null;
     });
   }
-
 
   String _bn(int value) {
     const digits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
@@ -266,7 +238,6 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
       context: context,
       initialTime: TimeOfDay(hour: 20, minute: 0),
       builder: (context, child) {
-        // Force English locale just inside the time picker
         return Localizations.override(
           context: context,
           locale: const Locale('en'),
@@ -292,7 +263,6 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
         );
       },
     );
-
 
     if (picked == null) return;
 
@@ -328,38 +298,15 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
           hour12)} টা ${_bn(picked.minute)} মিনিটে।";
       await _flutterTts.speak(speakText);
 
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Reminder set for ${picked.format(context)}')),
-        );
-      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Reminder set for ${picked.format(context)}')),
+      );
     } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Reminder setup failed: ${e.toString()}')),
-        );
-      }
-    }
-  }
-
-
-  String getLocalizedCategoryName(String category, BuildContext context) {
-    switch (category) {
-      case 'Shopping':
-        return LocaleData.shopping.getString(context);
-      case 'Food':
-        return LocaleData.food.getString(context);
-      case 'Entertainment':
-        return LocaleData.entertainment.getString(context);
-      case 'Transport':
-        return LocaleData.transport.getString(context);
-      case 'Health':
-        return LocaleData.health.getString(context);
-      case 'Utilities':
-        return LocaleData.utilities.getString(context);
-      case 'Others':
-      default:
-        return LocaleData.others.getString(context);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Reminder setup failed: ${e.toString()}')),
+      );
     }
   }
 
@@ -374,8 +321,9 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
         title: Text(
           LocaleData.budgetReminderTitle.getString(context),
           style: TextStyle(
-            color: AppColors.primary,
-            fontSize: 20,
+            color: AppColors.darkBlue,
+            letterSpacing: 1.2,
+            fontSize: 28,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -389,7 +337,6 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
           SizedBox(height: 12),
-
           Container(
             padding: EdgeInsets.all(16),
             margin: EdgeInsets.only(bottom: 8),
@@ -409,7 +356,7 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
                 ),
                 SizedBox(height: 4),
                 Text(
-                      () {
+                  () {
                     double totalSpent = _categoryData.values
                         .map((e) => (e['spent'] ?? 0.0) as double)
                         .fold(0.0, (a, b) => a + b);
@@ -427,9 +374,7 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
               ],
             ),
           ),
-
           SizedBox(height: 12),
-
           ...categoryOrder.map((category) {
             final data = _categoryData[category] ?? {'spent': 0.0, 'limit': 1.0};
             double spent = data['spent'];
@@ -448,7 +393,7 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
                 child: Container(
                   margin: EdgeInsets.only(bottom: 14),
                   decoration: BoxDecoration(
-                    color: Colors.white, // Always white, no blue/orange background
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
@@ -458,14 +403,13 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
                       )
                     ],
                   ),
-
                   child: Row(
                     children: [
                       Container(
                         width: 6,
                         height: 90,
                         decoration: BoxDecoration(
-                          color: _categoryColors[category],
+                          color: CategoryUtils.getColorForCategory(category),
                           borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(16),
                             bottomLeft: Radius.circular(16),
@@ -493,11 +437,11 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
                                       duration: Duration(milliseconds: 500),
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
-                                        color: _categoryColors[category]!.withValues(alpha: 0.1),
+                                        color: CategoryUtils.getColorForCategory(category).withValues(alpha: 0.1),
                                         boxShadow: _speakingCategory == category
                                             ? [
                                           BoxShadow(
-                                            color: _categoryColors[category]!.withValues(alpha: 0.5),
+                                            color: CategoryUtils.getColorForCategory(category).withValues(alpha: 0.5),
                                             blurRadius: 12,
                                             spreadRadius: 2,
                                           )
@@ -509,8 +453,8 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
                                   );
                                 },
                                 child: Icon(
-                                  _categoryIcons[category],
-                                  color: _categoryColors[category],
+                                  CategoryUtils.getIconForCategory(category),
+                                  color: CategoryUtils.getColorForCategory(category),
                                   size: 24,
                                 ),
                               ),
@@ -523,7 +467,7 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
                                       children: [
                                         Expanded(
                                           child: Text(
-                                            getLocalizedCategoryName(category, context),
+                                            CategoryUtils.getLocalizedCategoryName(category, context),
                                             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                               fontWeight: FontWeight.w600,
                                               color: AppColors.primary,
@@ -567,43 +511,22 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
             );
           }),
           SizedBox(height: 30),
-          ElevatedButton.icon(
-            icon: Icon(
-              _isSpeaking ? Icons.stop : Icons.volume_up,
-              color: Colors.white,
-            ),
-            label: Text(
-              _isSpeaking
-                  ? LocaleData.stopSummary.getString(context)
-                  : LocaleData.playSummary.getString(context),
-              style: TextStyle(color: Colors.white, fontSize: 16),
-            ),
-            onPressed: _speakSummary,
-            style: ElevatedButton.styleFrom(
-              elevation: 3,
-              backgroundColor: AppColors.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              padding: EdgeInsets.symmetric(vertical: 14),
-            ),
+          MyButton(
+            onTap: _speakSummary,
+            icon: _isSpeaking ? Icons.stop : Icons.play_arrow,
+            text: _isSpeaking
+                ? LocaleData.stopSummary.getString(context)
+                : LocaleData.playSummary.getString(context),
+            backgroundColor: _isSpeaking ? Colors.redAccent : AppColors.darkBlue,
+            textColor: Colors.white,
           ),
           SizedBox(height: 12),
-          ElevatedButton.icon(
-            icon: Icon(Icons.alarm, color: Colors.white),
-            label: Text(
-              LocaleData.setDailyReminder.getString(context),
-              style: TextStyle(color: Colors.white, fontSize: 16),
-            ),
-            onPressed: _pickReminderTime,
-            style: ElevatedButton.styleFrom(
-              elevation: 3,
-              backgroundColor: AppColors.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              padding: EdgeInsets.symmetric(vertical: 14),
-            ),
+          MyButton(
+            onTap: _pickReminderTime,
+            icon: Icons.alarm,
+            text: LocaleData.setDailyReminder.getString(context),
+            backgroundColor: AppColors.darkBlue,
+            textColor: Colors.white,
           ),
           SizedBox(height: 24),
         ],

@@ -1,9 +1,9 @@
 import 'package:finney/shared/path/app_images.dart';
+import 'package:finney/shared/widgets/common/my_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:finney/shared/theme/app_color.dart';
 import 'package:finney/shared/widgets/common/snack_bar.dart';
-import 'package:finney/pages/1-auth/widgets/my_button.dart';
 import 'package:finney/pages/1-auth/widgets/my_textfield.dart';
 import 'package:finney/shared/localization/locales.dart';
 import 'package:flutter_localization/flutter_localization.dart';

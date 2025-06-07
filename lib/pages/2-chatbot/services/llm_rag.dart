@@ -103,7 +103,7 @@ $formattedTransactions
             ? "+${currencyFormat.format(transaction.amount)}" 
             : currencyFormat.format(transaction.amount);
         
-        buffer.writeln("- ${dateFormat.format(transaction.date)}: ${transaction.name} (${transaction.category}) - $formattedAmount");
+        buffer.writeln("- ${dateFormat.format(transaction.date)}: ${transaction.category} (${transaction.category}) - $formattedAmount");
         if (transaction.description != null && transaction.description!.isNotEmpty) {
           buffer.writeln("  Description: ${transaction.description}");
         }

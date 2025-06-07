@@ -18,6 +18,7 @@ import 'presentation/welcome_screen.dart';
 import 'dart:async';
 import 'package:finney/shared/localization/locales.dart';
 import 'package:flutter_localization/flutter_localization.dart';
+
 class Chatbot extends StatefulWidget {
   final String? initialQuestion;
   
@@ -31,7 +32,6 @@ class Chatbot extends StatefulWidget {
 }
 
 class _ChatbotState extends State<Chatbot> {
-  // Use core services from StorageManager
   final ChatCloudService _chatCloudService = StorageManager().chatCloudService;
   final TransactionCloudService _transactionService = StorageManager().transactionService;
   late LlmService _llmService;
@@ -39,18 +39,8 @@ class _ChatbotState extends State<Chatbot> {
   bool showWelcomeScreen = true;
   List<ChatMessage> messages = [];
   List<Content> conversationHistory = [];
-  
-  // Stream subscription to properly dispose
   StreamSubscription? _messagesSubscription;
-  
-  // For transaction handling
-  bool _awaitingTransactionConfirmation = false;
-  Map<String, dynamic>? _pendingTransaction;
-
-  // For AI typing animation
   bool _isAiTyping = false;
-  
-  // For cloud message loading
   bool _isLoadingMessages = true;
 
   @override
@@ -65,9 +55,6 @@ class _ChatbotState extends State<Chatbot> {
     }
   }
 
-  // ADD THESE ADAPTER METHODS TO HANDLE TYPE CONVERSIONS
-
-  // Adapter method to save a message
   Future<void> saveMessage(ChatMessage message, {required String role}) async {
     final chatModel = ChatMessageModel(
       text: message.text,
@@ -77,14 +64,11 @@ class _ChatbotState extends State<Chatbot> {
       role: role,
       mediaUrl: message.medias?.isNotEmpty == true ? message.medias!.first.url : null,
     );
-    
     await _chatCloudService.addMessage(chatModel);
   }
   
-  // Adapter method to convert ChatMessageModel to List<Content> for Gemini
   List<Content> toGeminiContent(List<ChatMessageModel> messages) {
     return messages.map((message) {
-      // Convert each message to Gemini Content format
       return Content(
         role: message.role,
         parts: [TextPart(message.text)],
@@ -114,17 +98,12 @@ class _ChatbotState extends State<Chatbot> {
 
   void _loadCloudMessages() {
     if (!mounted) return;
-    
     setState(() {
       _isLoadingMessages = true;
     });
-    
-    // Store the subscription so we can cancel it later
     _messagesSubscription = _chatCloudService.streamMessages().listen(
       (cloudMessages) {
         if (!mounted) return;
-        
-        // Convert CloudMessages to ChatMessages
         final convertedMessages = cloudMessages.map((cloudMsg) {
           return ChatMessage(
             text: cloudMsg.text,
@@ -139,29 +118,22 @@ class _ChatbotState extends State<Chatbot> {
             customProperties: {'role': cloudMsg.role},
           );
         }).toList();
-        
         setState(() {
           messages = convertedMessages;
           showWelcomeScreen = messages.isEmpty;
           _isLoadingMessages = false;
         });
-        
-        // Update conversation history for LLM context
         conversationHistory = toGeminiContent(cloudMessages);
         _llmService.updateConversationHistory(conversationHistory);
       }, 
       onError: (error) {
         debugPrint('Error loading cloud messages: $error');
-        
         if (!mounted) return;
-        
         setState(() {
           _isLoadingMessages = false;
           messages = [];
           showWelcomeScreen = true;
         });
-        
-        // Show error using AppSnackBar
         AppSnackBar.showError(
           context,
           message: LocaleData.errorLoadingMessages.getString(context),
@@ -171,63 +143,41 @@ class _ChatbotState extends State<Chatbot> {
   }
 
   void _sendMessage(ChatMessage chatMessage) async {
-    if (_awaitingTransactionConfirmation) {
-      _handleTransactionConfirmation(chatMessage);
-      return;
-    }
-
     setState(() {
       messages = [chatMessage] + messages;
       showWelcomeScreen = false;
-      _isAiTyping = true;  // Start the typing animation
+      _isAiTyping = true;
     });
-    
-    // Save to cloud storage service
     await saveMessage(chatMessage, role: 'user');
-
-    // The animation will show the AI is thinking
-    final response = await _llmService.sendMessage(chatMessage);
-    
+    final response = await _llmService.sendMessage(chatMessage, context);
     if (TransactionParser.hasTransactionInfo(response)) {
       final transactionData = TransactionParser.extractTransactionFromMessage(response);
-      
       if (transactionData != null) {
-        // Create transaction model for preview
         final transactionModel = TransactionParser.createTransactionModel(transactionData);
-        
         final message = ChatMessage(
           user: ChatConstants.geminiUser,
           createdAt: DateTime.now(),
           text: response,
         );
-        
         setState(() {
-          _isAiTyping = false;  // Stop the typing animation
+          _isAiTyping = false;
           messages = [message] + messages;
         });
-        
-        // Save to cloud storage service
         await saveMessage(message, role: 'model');
-        
-        // Show the transaction preview dialog with simplified interface (no edit)
         if (mounted) {
           final confirmed = await TransactionPreviewPopup.show(
             context: context, 
             transaction: transactionModel,
             onConfirm: (confirmedTransaction) async {
               try {
-                // Handle confirmation - save the transaction using core service
                 await _transactionService.addTransaction(confirmedTransaction);
-                
                 if (mounted) {
-                  // Show success message using AppSnackBar
                   AppSnackBar.showSuccess(
                     context,
                     message: LocaleData.transactionAddedSuccess.getString(context),
                   );
                 }
               } catch (e) {
-                // Show error using AppSnackBar if transaction fails
                 if (mounted) {
                   AppSnackBar.showError(
                     context,
@@ -237,178 +187,33 @@ class _ChatbotState extends State<Chatbot> {
               }
             },
           );
-          
-          // Handle cancellation
           if (confirmed == false) {
             if (mounted) {
-            // Show success message using AppSnackBar
-            AppSnackBar.showInfo(
-              context,
-              message: LocaleData.transactionCanceled.getString(context),
+              AppSnackBar.showInfo(
+                context,
+                message: LocaleData.transactionCanceled.getString(context),
               );
             }
           }
         }
-        
         return;
       }
     }
-
     final message = ChatMessage(
       user: ChatConstants.geminiUser,
       createdAt: DateTime.now(),
       text: response,
     );
-
     setState(() {
-      _isAiTyping = false; 
+      _isAiTyping = false;
       messages = [message] + messages;
     });
-    
-    // Save to cloud storage service
     await saveMessage(message, role: 'model');
-  }
-
-  void _handleTransactionConfirmation(ChatMessage userMessage) async {
-    setState(() {
-      messages = [userMessage] + messages;
-      _isAiTyping = true;  // Start typing animation
-    });
-    
-    // Save user confirmation message
-    await saveMessage(userMessage, role: 'user');
-    
-    
-    if (_pendingTransaction != null) {
-      final transactionModel = TransactionParser.createTransactionModel(_pendingTransaction!);
-      
-      if (TransactionParser.isConfirmingTransaction(userMessage.text)) {
-        try {
-          await _transactionService.addTransaction(transactionModel);
-
-          if (mounted) {
-            // Use AppSnackBar for success messages
-            AppSnackBar.showSuccess(
-              context,
-              message: LocaleData.transactionAddedSuccess.getString(context),
-            );
-          }
-          
-          final message = ChatMessage(
-            user: ChatConstants.geminiUser,
-            createdAt: DateTime.now(),
-            text: LocaleData.transactionAddedSuccess.getString(context),
-          );
-          
-          setState(() {
-            _isAiTyping = false;
-            messages = [message] + messages;
-          });
-          
-          await saveMessage(message, role: 'model');
-          
-        } catch (e) {
-          // Use AppSnackBar for error messages
-          if (mounted) {
-            AppSnackBar.showError(
-              context,
-              message: LocaleData.transactionAddError.getString(context),
-            );
-          }
-          
-          final message = ChatMessage(
-            user: ChatConstants.geminiUser,
-            createdAt: DateTime.now(),
-            text: LocaleData.transactionAddError.getString(context),
-          );
-          
-          setState(() {
-            _isAiTyping = false;
-            messages = [message] + messages;
-          });
-          
-          await saveMessage(message, role: 'model');
-        }
-      } else {
-        // If the user's response wasn't clear, show the popup
-        final message = ChatMessage(
-          user: ChatConstants.geminiUser,
-          createdAt: DateTime.now(),
-          text: LocaleData.transactionConfirmPrompt.getString(context),
-        );
-        
-        setState(() {
-          _isAiTyping = false;
-          messages = [message] + messages;
-        });
-        
-        await saveMessage(message, role: 'model');
-        
-        // Show the popup
-        if (mounted) {
-          await TransactionPreviewPopup.show(
-            context: context,
-            transaction: transactionModel,
-            onConfirm: (confirmedTransaction) async {
-              try {
-                await _transactionService.addTransaction(confirmedTransaction);
-                
-                if (mounted) {
-                  // Use AppSnackBar for success messages
-                  AppSnackBar.showSuccess(
-                    context,
-                    message: LocaleData.transactionAddedSuccess.getString(context),
-                  );
-                  
-                  final confirmMessage = ChatMessage(
-                    user: ChatConstants.geminiUser,
-                    createdAt: DateTime.now(),
-                    text: LocaleData.transactionAddedSuccess.getString(context),
-                  );
-                  
-                  setState(() {
-                    messages = [confirmMessage] + messages;
-                  });
-                  
-                  await saveMessage(confirmMessage, role: 'model');
-                }
-              } catch (e) {
-                // Use AppSnackBar for error messages
-                if (mounted) {
-                  AppSnackBar.showError(
-                    context,
-                    message: LocaleData.transactionAddError.getString(context),
-                  );
-                }
-              }
-            },
-          );
-        }
-      }
-    } else {
-      // If somehow _pendingTransaction is null
-      final message = ChatMessage(
-        user: ChatConstants.geminiUser,
-        createdAt: DateTime.now(),
-        text: LocaleData.transactionNoPending.getString(context),
-      );
-      
-      setState(() {
-        _isAiTyping = false;
-        messages = [message] + messages;
-      });
-      
-      await saveMessage(message, role: 'model');
-    }
-    
-    _awaitingTransactionConfirmation = false;
-    _pendingTransaction = null;
   }
 
   void _sendMediaMessage() async {
     final picker = ImagePicker();
     final file = await picker.pickImage(source: ImageSource.gallery);
-
     if (file != null) {
       final message = ChatMessage(
         user: ChatConstants.currentUser,
@@ -439,16 +244,11 @@ class _ChatbotState extends State<Chatbot> {
 
   Future<void> clearChat() async {
     await _chatCloudService.clearChat();
-    
     setState(() {
       messages = [];
       conversationHistory = [];
       showWelcomeScreen = true;
-      _awaitingTransactionConfirmation = false;
-      _pendingTransaction = null;
     });
-    
-    // Show confirmation using AppSnackBar
     if (mounted) {
       AppSnackBar.showInfo(
         context,
@@ -475,13 +275,15 @@ class _ChatbotState extends State<Chatbot> {
         title: Text(
           LocaleData.chatbotTitle.getString(context),
           style: const TextStyle(
-            color: AppColors.primary,
+            color: AppColors.darkBlue,
             fontWeight: FontWeight.bold,
+            fontSize: 28,
+            letterSpacing: 1.2,
           ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.delete_outline),
+            icon: const Icon(Icons.delete_outline, color: AppColors.darkBlue),
             onPressed: clearChat,
           ),
         ],
@@ -495,26 +297,25 @@ class _ChatbotState extends State<Chatbot> {
                   ? const Center(child: CircularProgressIndicator())
                   : showWelcomeScreen 
                     ? WelcomeScreen(
-                            suggestedQuestions: suggestedQuestions,
-                            onSendMessage: _sendMessage,
-                            currentUser: ChatConstants.currentUser,
-                            onQuestionSelected: () {
-                              setState(() {
-                                showWelcomeScreen = false;
-                              });
-                            },
-                          )
-                        : ChatInterface(
-                            currentUser: ChatConstants.currentUser,
-                            onSend: _sendMessage,
-                            messages: messages,
-                            onMediaSend: _sendMediaMessage,
-                            isAiTyping: _isAiTyping,
-                          ),
+                        suggestedQuestions: suggestedQuestions,
+                        onSendMessage: _sendMessage,
+                        currentUser: ChatConstants.currentUser,
+                        onQuestionSelected: () {
+                          setState(() {
+                            showWelcomeScreen = false;
+                          });
+                        },
+                      )
+                    : ChatInterface(
+                        currentUser: ChatConstants.currentUser,
+                        onSend: _sendMessage,
+                        messages: messages,
+                        onMediaSend: _sendMediaMessage,
+                        isAiTyping: _isAiTyping,
+                      ),
               ),
             ],
           ),
-          
           Positioned(
             right: 17,
             bottom: 80,

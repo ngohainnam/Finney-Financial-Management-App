@@ -1,7 +1,7 @@
 import 'package:finney/shared/path/app_images.dart';
 import 'package:finney/shared/theme/app_color.dart';
+import 'package:finney/shared/widgets/common/my_button.dart';
 import 'package:finney/shared/widgets/common/snack_bar.dart';
-import 'package:finney/pages/1-auth/widgets/my_button.dart';
 import 'package:finney/pages/1-auth/widgets/my_textfield.dart';
 import 'package:finney/pages/1-auth/widgets/square_tile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -183,8 +183,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
 
-                const SizedBox(height: 25),
-
                 // Name field
                 MyTextField(
                   controller: nameController,
@@ -192,15 +190,11 @@ class _RegisterPageState extends State<RegisterPage> {
                   obscureText: false,
                 ),
 
-                const SizedBox(height: 10),
-
                 MyTextField(
                   controller: emailController,
                   hintText: LocaleData.emailHint.getString(context),
                   obscureText: false,
                 ),
-
-                const SizedBox(height: 10),
 
                 MyTextField(
                   controller: passwordController,
@@ -238,8 +232,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
 
-                const SizedBox(height: 10),
-
                 MyTextField(
                   controller: confirmedController,
                   hintText: LocaleData.confirmPasswordHint.getString(context),
@@ -253,30 +245,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   onTap: signUserUp,
                 ),
 
-                const SizedBox(height: 50),
-
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Divider(thickness: 0.5, color: AppColors.blurGray),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Text(
-                          LocaleData.continueWith.getString(context),
-                          style: TextStyle(color: AppColors.blurGray),
-                        ),
-                      ),
-                      Expanded(
-                        child: Divider(thickness: 0.5, color: AppColors.blurGray),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 50),
+                const SizedBox(height: 30),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -288,14 +257,14 @@ class _RegisterPageState extends State<RegisterPage> {
                   ],
                 ),
 
-                const SizedBox(height: 50),
+                const SizedBox(height: 30),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       LocaleData.alreadyMember.getString(context),
-                      style: TextStyle(color: AppColors.blurGray)),
+                      style: TextStyle(color: AppColors.darkBlue)),
                     const SizedBox(width: 4),
                     GestureDetector(
                       onTap: widget.onTap,
@@ -319,7 +288,7 @@ class _RegisterPageState extends State<RegisterPage> {
     emailController.dispose();
     passwordController.dispose();
     confirmedController.dispose();
-    nameController.dispose(); // Dispose name controller
+    nameController.dispose();
     super.dispose();
   }
 }

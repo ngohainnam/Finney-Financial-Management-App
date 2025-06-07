@@ -1,3 +1,4 @@
+import 'package:finney/shared/localization/localized_number_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -52,7 +53,7 @@ class CategoryExpenseItem extends StatelessWidget {
               
               // Amount
               Text(
-                amount.toStringAsFixed(2),
+                LocalizedNumberFormatter.formatDouble(amount, context),
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 15,
@@ -100,7 +101,7 @@ class CategoryExpenseItem extends StatelessWidget {
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
-                  '${percentage.toStringAsFixed(1)}%',
+                  '${LocalizedNumberFormatter.formatNumber(percentage.toStringAsFixed(1), context)}%',
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
