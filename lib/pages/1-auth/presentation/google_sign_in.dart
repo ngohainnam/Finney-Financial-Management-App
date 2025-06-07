@@ -41,7 +41,6 @@ class GoogleSignInService {
           id: user.uid,
           email: user.email ?? '',
           name: user.displayName ?? 'Unknown',
-          photoUrl: user.photoURL,
         );
         
         // Save the user to Firestore

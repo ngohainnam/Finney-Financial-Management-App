@@ -141,38 +141,6 @@ class UserCloudService {
     }
   }
   
-  // Update user preferences
-  Future<void> updatePreferences(Map<String, dynamic> preferences) async {
-    try {
-      await _checkConnectivity();
-      
-      await _userDocument.update({'preferences': preferences});
-    } catch (e) {
-      debugPrint('Error updating preferences: $e');
-      rethrow;
-    }
-  }
-  
-  // Update a single preference
-  Future<void> updatePreference(String key, dynamic value) async {
-    try {
-      await _checkConnectivity();
-      
-      UserModel? user = await getCurrentUser();
-      if (user == null) {
-        throw Exception('User not found');
-      }
-      
-      Map<String, dynamic> preferences = user.preferences ?? {};
-      preferences[key] = value;
-      
-      await _userDocument.update({'preferences': preferences});
-    } catch (e) {
-      debugPrint('Error updating preference: $e');
-      rethrow;
-    }
-  }
-  
   // Delete user account and data
   Future<void> deleteUser(String password) async {
     try {
