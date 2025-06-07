@@ -14,6 +14,8 @@ mixin LocaleData {
   static const String edit = 'edit';
   static const String save = 'save';
   static const String close = 'close';
+  static const String selectTime = 'selectTime';
+  static const String selectDate = 'selectDate';
   static const String youSpent = 'youSpent';
   static const String youEarned = 'youEarned';
   static const String inWord = 'inWord';
@@ -1282,6 +1284,7 @@ mixin LocaleData {
     quizCompleted: 'Quiz Completed!',
     quizResultScore: 'Your score: %s/%s',
     quizFinish: 'Finish',
+    selectDate: 'Select Date',
     pinReset: 'PIN is reset',
     quizTryAgain: 'Try Again',
     quizQuestion1: 'What is the main benefit of compound interest?',
@@ -1475,6 +1478,7 @@ mixin LocaleData {
     editLimitCancel: 'Cancel',
     editLimitSave: 'Save',
     totalSpent: 'Total Spent',
+    selectTime: 'Select Time',
     saveHabitTitle: 'Making Saving a Habit',
     saveHabitDesc:
     'It’s smart to save money regularly and turn it into a habit. The best way is to plan your savings before you spend.',
@@ -2163,6 +2167,7 @@ mixin LocaleData {
     retirementPlanningPoint2: 'চক্রবৃদ্ধি সুদের শক্তি',
     retirementPlanningPoint3: 'অবসর সঞ্চয় লক্ষ্য',
     insuranceProtectionTitle: 'বীমা ও সুরক্ষা',
+    selectDate: 'তারিখ নির্বাচন করুন',
     insuranceProtectionPoint1: 'প্রয়োজনীয় বীমার ধরন',
     insuranceProtectionPoint2: 'কভারেজ প্রয়োজন গণনা',
     insuranceProtectionPoint3: 'খরচ এবং সুরক্ষার ভারসাম্য',
@@ -2386,6 +2391,7 @@ mixin LocaleData {
     quizNoResults: 'কোন কুইজ ফলাফল পাওয়া যায়নি।',
     quizResults: 'কুইজ ফলাফল',
     quizReset: 'ফলাফল রিসেট করুন',
+    selectTime: 'সময় নির্বাচন করুন',
     quizResetConfirm:
     'আপনি কি সমস্ত কুইজ ফলাফল মুছে ফেলতে চান? একবার করলে এটা আর ফিরে নেওয়া যাবে না',
     reset: 'রিসেট',

@@ -77,9 +77,11 @@ Widget build(BuildContext context) {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  CategoryUtils.getLocalizedCategoryName(transaction.category, context),
-                  style: TextStyle(
-                    color: Colors.grey.shade600,
+                    (transaction.description ?? '').length > 30
+                      ? '${transaction.description!.substring(0, 30)}...'
+                      : (transaction.description ?? ''),
+                    style: TextStyle(
+                    color: AppColors.darkBlue.withValues(alpha: 0.7),
                     fontSize: 12,
                   ),
                 ),

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:finney/pages/1-auth/widgets/my_textfield.dart';
 import 'package:finney/shared/widgets/common/my_button.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -78,67 +79,113 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
       text: _categoryData[category]?['limit']?.toStringAsFixed(0) ?? '0',
     );
 
+    final isBengali = Localizations.localeOf(context).languageCode == 'bn';
+    final categoryName = CategoryUtils.getLocalizedCategoryName(category, context);
+
     await showDialog(
       context: context,
-      builder: (_) =>
-          AlertDialog(
-            title: Text(
-                Localizations
-                    .localeOf(context)
-                    .languageCode == 'bn'
-                    ? "${CategoryUtils.getLocalizedCategoryName(
-                    category, context)}-এর সীমা পরিবর্তন করুন"
-                    : "Edit limit for ${CategoryUtils.getLocalizedCategoryName(
-                    category, context)}"
-            ),
-            content: TextField(
-              controller: controller,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                  hintText: Localizations
-                      .localeOf(context)
-                      .languageCode == 'bn'
-                      ? "নতুন সীমা লিখুন"
-                      : "Enter new limit"
+      builder: (_) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.edit,
+                color: AppColors.primary,
+                size: 24,
               ),
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text(
-                    Localizations
-                        .localeOf(context)
-                        .languageCode == 'bn'
-                        ? "বাতিল করুন"
-                        : "Cancel"
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                isBengali
+                    ? "$categoryName-এর সীমা পরিবর্তন করুন"
+                    : "Edit limit for $categoryName",
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              ElevatedButton(
-                onPressed: () async {
-                  double? newLimit = double.tryParse(controller.text);
-                  if (newLimit != null) {
-                    await FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(uid)
-                        .collection('budgets')
-                        .doc(category)
-                        .set({'limit': newLimit, 'category': category},
-                        SetOptions(merge: true));
-                    if (!mounted) return;
-                    _loadBudgetData();
-                    Navigator.pop(context);
-                  }
-                },
-                child: Text(
-                    Localizations
-                        .localeOf(context)
-                        .languageCode == 'bn'
-                        ? "সংরক্ষণ করুন"
-                        : "Save"
+            ),
+          ],
+        ),
+        content: MyTextField(
+          controller: controller,
+          hintText: isBengali ? "নতুন সীমা লিখুন" : "Enter new limit",
+          obscureText: false,
+          keyboardType: TextInputType.number,
+        ),
+        actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+        actions: [
+          Row(
+            children: [
+              Expanded(
+                child: TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      side: BorderSide(
+                        color: AppColors.primary.withValues(alpha: 0.5),
+                      ),
+                    ),
+                  ),
+                  child: Text(
+                    isBengali ? "বাতিল করুন" : "Cancel",
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
-              )
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () async {
+                    double? newLimit = double.tryParse(controller.text);
+                    if (newLimit != null) {
+                      await FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(uid)
+                          .collection('budgets')
+                          .doc(category)
+                          .set({'limit': newLimit, 'category': category},
+                          SetOptions(merge: true));
+                      if (!mounted) return;
+                      _loadBudgetData();
+                      Navigator.pop(context);
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text(
+                    isBengali ? "সংরক্ষণ করুন" : "Save",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
+        ],
+      ),
     );
   }
 
@@ -230,35 +277,42 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
   }
 
   Future<void> _pickReminderTime() async {
-    final isBengali = Localizations
-        .localeOf(context)
-        .languageCode == 'bn';
+    final isBengali = Localizations.localeOf(context).languageCode == 'bn';
 
     TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay(hour: 20, minute: 0),
+      helpText: LocaleData.selectTime.getString(context),
+      cancelText: LocaleData.cancel.getString(context),
+      confirmText: LocaleData.transactionPreviewConfirm.getString(context),
       builder: (context, child) {
-        return Localizations.override(
-          context: context,
-          locale: const Locale('en'),
-          child: Theme(
-            data: Theme.of(context).copyWith(
-              timePickerTheme: TimePickerThemeData(
-                dialTextStyle: TextStyle(
-                  fontFamily: isBengali ? 'NotoSansBengali' : null,
-                  fontSize: isBengali ? 14 : null,
-                ),
-                hourMinuteTextStyle: TextStyle(
-                  fontFamily: isBengali ? 'NotoSansBengali' : null,
-                  fontSize: isBengali ? 18 : null,
-                ),
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: AppColors.darkBlue,
+              onPrimary: Colors.white,
+              onSurface: AppColors.darkBlue,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.darkBlue,
+                textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
-            child: MediaQuery(
-              data: MediaQuery.of(context).copyWith(
-                  alwaysUse24HourFormat: false),
-              child: child!,
-            ),
+            timePickerTheme: TimePickerThemeData(
+              dialTextStyle: TextStyle(
+                fontFamily: isBengali ? 'NotoSansBengali' : null,
+                fontSize: isBengali ? 14 : null,
+              ),
+              hourMinuteTextStyle: TextStyle(
+                fontFamily: isBengali ? 'NotoSansBengali' : null,
+                fontSize: isBengali ? 18 : null,
+              ),
+            ), dialogTheme: DialogThemeData(backgroundColor: Colors.white),
+          ),
+          child: MediaQuery(
+            data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: false),
+            child: child!,
           ),
         );
       },

@@ -1,4 +1,5 @@
 import 'package:finney/core/storage/cloud/models/transaction_model.dart';
+import 'package:finney/shared/localization/localized_number_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:finney/shared/theme/app_color.dart';
@@ -50,7 +51,6 @@ class TransactionList extends StatelessWidget {
   String _formatDate(String date, BuildContext context) {
     final today = DateTime.now();
     final yesterday = today.subtract(const Duration(days: 1));
-
     final transactionDate = DateTime.parse(date);
 
     if (DateFormat('yyyy-MM-dd').format(today) == date) {
@@ -58,7 +58,8 @@ class TransactionList extends StatelessWidget {
     } else if (DateFormat('yyyy-MM-dd').format(yesterday) == date) {
       return LocaleData.yesterday.getString(context);
     }
-    return DateFormat('EEEE, MMMM d').format(transactionDate);
+    String formatted = DateFormat('MMMM d, yyyy').format(transactionDate);
+    return LocalizedNumberFormatter.formatDate(formatted, context);
   }
 
   @override

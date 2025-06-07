@@ -1,5 +1,6 @@
 import 'package:finney/core/storage/cloud/service/transaction_cloud_service.dart';
 import 'package:finney/shared/category.dart';
+import 'package:finney/shared/theme/app_color.dart';
 import 'package:finney/shared/widgets/common/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -368,6 +369,27 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
       initialDate: _selectedDate,
       firstDate: DateTime(2020),
       lastDate: DateTime.now().add(const Duration(days: 365)),
+      helpText: LocaleData.selectDate.getString(context),
+      cancelText: LocaleData.cancel.getString(context),  
+      confirmText: LocaleData.transactionPreviewConfirm.getString(context),     
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: AppColors.darkBlue, 
+              onPrimary: Colors.white,   
+              onSurface: AppColors.darkBlue,   
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.darkBlue,
+                textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ), dialogTheme: DialogThemeData(backgroundColor: Colors.white),
+          ),
+          child: child!,
+        );
+      },
     );
 
     if (picked != null && picked != _selectedDate) {
