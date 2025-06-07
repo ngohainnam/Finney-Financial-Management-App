@@ -1,16 +1,42 @@
-# INTRODUCTION
+# Finney - AI-driven Expense Tracker
 
-P26 PROJECT - FINNEY - AI-driven expense tracker.
-
-## DEVELOPMENT PROGRESS
-| Date & Time         | Developer             | Branch | ✅ Completed Tasks | 🚧 In Progress | Issues |
-|---------------------|----------------------|--------|--------------------|---------------|--------|
-| **9th March 2025 (4:19 PM)**  | Hai Nam Ngo  | `main` | - Implemented authentication using Firebase.<br>- Designed UI for authentication.<br>- Created template/folder structure.<br>- Developed reusable widgets and theme. | - Google Sign-in integration.<br>- AI Chatbot development. | None |
-| **10th March 2025 (5:15 PM)**  | Hai Nam Ngo  | `main` | - Fixed Android NDK version issue. |  | NDK version conflict on Android. |
-| **10th March 2025 (7:25 PM)**  | Do Thanh Phuc Dang | `master` | - Checked code upload (2nd attempt). |
-| **16th March 2025 (11:33 PM)**  | Do Thanh Phuc Dang | `master` | - Add Hive local storage. |
-| **25th March 2025 (01:33 PM)**  | Do Thanh Phuc Dang | `master` | - Implement chatbot UI. - Need to add history question  - Adjust UI scrolling|
-| **1st April 2025 (02:20 AM)**  | Do Thanh Phuc Dang | `master` | - Add google sign in function|
-  | None |
+Finney is an AI-powered expense tracking app designed to help users manage their finances and improve financial and digital literacy, especially for people in Bangladesh. The app supports both Bengali and English languages, making it accessible to a wider audience.
 
 ---
+
+## Features
+
+- **Bilingual Support:** Use the app in either Bengali or English for greater accessibility.
+- **User Authentication:** Secure login and registration with Firebase.
+- **Google Sign-In:** Quick and easy access using your Google account.
+- **Expense Tracking:** Add, edit, and view your daily expenses with intuitive interfaces.
+- **Local Storage:** Offline support using Hive, so your data is always available.
+- **AI Chatbot:** Get financial advice, budgeting tips, and answers to your questions in both Bengali and English.
+- **Modern UI:** Clean, responsive, and user-friendly design tailored for ease of use.
+- **Empowering Literacy:** Designed to support financial and digital literacy initiatives in Bangladesh.
+
+---
+
+## How to Build APK
+
+To generate a release APK:
+```bash
+flutter build apk --release
+```
+The APK will be located at `build/app/outputs/flutter-apk/app-release.apk`.
+
+---
+
+## Contributors
+- Hai Nam Ngo
+- Do Thanh Phuc Dang
+- Feliks Ezra Ananda
+- Tahmidul Haque Chowdhury
+- Mahmudur Rahman Sakib
+- Maisha Fabiha Ahmed
+
+---
+
+## License
+
+This project is licensed under the MIT License.
