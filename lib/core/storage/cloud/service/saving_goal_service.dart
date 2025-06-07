@@ -155,7 +155,6 @@ class SavingGoalService {
       }
 
       final transaction = TransactionModel(
-        name: 'Savings Transfer',
         category: 'Savings',
         amount: -amount,
         date: DateTime.now(),
@@ -213,7 +212,6 @@ class SavingGoalService {
       }
 
       final transaction = TransactionModel(
-        name: 'Savings Goal Completed',
         category: 'Savings',
         amount: goal.savedAmount,
         date: DateTime.now(),

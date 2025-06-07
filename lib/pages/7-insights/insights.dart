@@ -1,3 +1,4 @@
+import 'package:finney/shared/localization/localized_number_formatter.dart';
 import 'package:finney/shared/theme/app_color.dart';
 import 'package:finney/pages/7-insights/components/charts/bar_chart.dart';
 import 'package:finney/pages/7-insights/components/charts/chart_service.dart' as chart_service;
@@ -6,11 +7,11 @@ import 'package:finney/pages/7-insights/components/time_selector.dart';
 import 'package:finney/core/storage/cloud/service/transaction_cloud_service.dart';
 import 'package:finney/pages/3-dashboard/dashboard.dart';
 import 'package:finney/core/storage/cloud/models/transaction_model.dart';
-import 'package:finney/core/storage/storage_manager.dart'; // Added for singleton access
+import 'package:finney/core/storage/storage_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/shared/localization/locales.dart';
-import 'package:finney/shared/widgets/common/snack_bar.dart'; // Added for snackbars
+import 'package:finney/shared/widgets/common/snack_bar.dart';
 
 enum ChartViewType { expenses, income }
 
@@ -23,43 +24,38 @@ class Insights extends StatefulWidget {
 
 class _InsightsState extends State<Insights> with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  late final TransactionCloudService _transactionService; // Changed to late final
+  late final TransactionCloudService _transactionService;
   final chart_service.ChartService _chartService = chart_service.ChartService();
-  
+
   List<TransactionModel> _transactions = [];
   List<chart_service.PeriodExpense> _periodExpenses = [];
   List<chart_service.PeriodExpense> _periodIncome = [];
   List<chart_service.CategoryExpense> _categoryExpenses = [];
   List<chart_service.CategoryExpense> _categoryIncome = [];
   TimeRangeData _currentTimeRange = DashboardState.currentTimeRange;
-  
-  // Add view type state
+
   ChartViewType _currentViewType = ChartViewType.expenses;
-  
   bool _isLoading = true;
-  
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    
-    // Get transaction service from StorageManager
     _transactionService = StorageManager().transactionService;
-    
     _loadData();
   }
-  
+
   @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
   }
-  
+
   Future<void> _loadData() async {
     setState(() {
       _isLoading = true;
     });
-    
+
     try {
       _transactionService.getTransactions().listen(
         (transactions) {
@@ -77,7 +73,7 @@ class _InsightsState extends State<Insights> with SingleTickerProviderStateMixin
               _isLoading = false;
             });
             AppSnackBar.showError(
-              context, 
+              context,
               message: 'Error loading transactions: ${error.toString()}',
             );
           }
@@ -89,54 +85,53 @@ class _InsightsState extends State<Insights> with SingleTickerProviderStateMixin
           _isLoading = false;
         });
         AppSnackBar.showError(
-          context, 
+          context,
           message: 'Error loading transactions: ${e.toString()}',
         );
       }
     }
   }
-  
+
   void _onTimeRangeChanged(TimeRangeData newTimeRange) {
     setState(() {
       _currentTimeRange = newTimeRange;
       _updateChartsForTimeRange();
-      
-      // Update the shared timeRange in Dashboard if needed
       DashboardState.currentTimeRange = newTimeRange;
     });
   }
-  
+
   void _updateChartsForTimeRange() {
     if (_transactions.isEmpty) return;
-    
-    // Use ChartService to determine interval
+
     final interval = _chartService.getIntervalForTimeRange(_currentTimeRange);
-    
+
     setState(() {
-      // Update bar chart data - both expense and income
-      _periodExpenses = _chartService.getPeriodExpenses(
-        _transactions,
-        _currentTimeRange,
-        interval,
-        context,
-        transactionType: chart_service.TransactionType.expense,
-      );
-      
-      _periodIncome = _chartService.getPeriodExpenses(
-        _transactions,
-        _currentTimeRange,
-        interval,
-        context,
-        transactionType: chart_service.TransactionType.income,
-      );
-      
-      // Update pie chart data - both expense and income
+      if (_currentTimeRange.range == TimeRange.allTime) {
+        // Group by year for all time, each year is a bar
+        _periodExpenses = _groupByYear(_transactions, chart_service.TransactionType.expense);
+        _periodIncome = _groupByYear(_transactions, chart_service.TransactionType.income);
+      } else {
+        _periodExpenses = _chartService.getPeriodExpenses(
+          _transactions,
+          _currentTimeRange,
+          interval,
+          context,
+          transactionType: chart_service.TransactionType.expense,
+        );
+        _periodIncome = _chartService.getPeriodExpenses(
+          _transactions,
+          _currentTimeRange,
+          interval,
+          context,
+          transactionType: chart_service.TransactionType.income,
+        );
+      }
+
       _categoryExpenses = _chartService.getCategoryExpenses(
         _transactions,
         _currentTimeRange,
         transactionType: chart_service.TransactionType.expense,
       );
-      
       _categoryIncome = _chartService.getCategoryExpenses(
         _transactions,
         _currentTimeRange,
@@ -144,18 +139,39 @@ class _InsightsState extends State<Insights> with SingleTickerProviderStateMixin
       );
     });
   }
-  
-  // Add this method to build toggle buttons in the Insights page
+
+  // Use 'isIncome' property from TransactionModel for type check
+  List<chart_service.PeriodExpense> _groupByYear(
+      List<TransactionModel> transactions, chart_service.TransactionType type) {
+    final Map<int, double> yearTotals = {};
+    for (final tx in transactions) {
+      // For expenses, amount < 0 or isIncome == false
+      // For income, amount > 0 or isIncome == true
+      if (type == chart_service.TransactionType.all ||
+          (type == chart_service.TransactionType.expense && !tx.isIncome) ||
+          (type == chart_service.TransactionType.income && tx.isIncome)) {
+        final year = tx.date.year;
+        yearTotals[year] = (yearTotals[year] ?? 0) + tx.amount.abs();
+      }
+    }
+    final years = yearTotals.keys.toList()..sort();
+    return years
+        .map((year) => chart_service.PeriodExpense(
+              period: LocalizedNumberFormatter.formatNumber(year.toString(), context),
+              amount: yearTotals[year]!,
+            ))
+        .toList();
+  }
+
   Widget _buildToggleButtons() {
     return Container(
       height: 40,
       decoration: BoxDecoration(
-        color: Colors.grey.withValues(alpha: 0.1), 
+        color: Colors.grey.withAlpha(25),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         children: [
-          // Expenses button
           Expanded(
             child: GestureDetector(
               onTap: () => setState(() => _currentViewType = ChartViewType.expenses),
@@ -179,8 +195,6 @@ class _InsightsState extends State<Insights> with SingleTickerProviderStateMixin
               ),
             ),
           ),
-          
-          // Income button
           Expanded(
             child: GestureDetector(
               onTap: () => setState(() => _currentViewType = ChartViewType.income),
@@ -211,11 +225,9 @@ class _InsightsState extends State<Insights> with SingleTickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
-    // Get current data based on selected view
-    final currentPeriodData = _currentViewType == ChartViewType.expenses 
-        ? _periodExpenses 
+    final currentPeriodData = _currentViewType == ChartViewType.expenses
+        ? _periodExpenses
         : _periodIncome;
-        
     final currentCategoryData = _currentViewType == ChartViewType.expenses
         ? _categoryExpenses
         : _categoryIncome;
@@ -227,15 +239,17 @@ class _InsightsState extends State<Insights> with SingleTickerProviderStateMixin
         title: Text(
           LocaleData.insights.getString(context),
           style: const TextStyle(
-            color: AppColors.primary,
+            color: AppColors.darkBlue,
             fontWeight: FontWeight.bold,
+            fontSize: 28,
+            letterSpacing: 1.2,
           ),
         ),
         bottom: TabBar(
           controller: _tabController,
-          labelColor: AppColors.primary,
+          labelColor: AppColors.darkBlue,
           unselectedLabelColor: Colors.grey,
-          indicatorColor: AppColors.primary,
+          indicatorColor: AppColors.darkBlue,
           tabs: [
             Tab(
               icon: const Icon(Icons.bar_chart),
@@ -248,11 +262,10 @@ class _InsightsState extends State<Insights> with SingleTickerProviderStateMixin
           ],
         ),
       ),
-      body: _isLoading 
+      body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
-                // Time selector and toggle buttons
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
@@ -260,14 +273,15 @@ class _InsightsState extends State<Insights> with SingleTickerProviderStateMixin
                       TimeRangeSelector(
                         initialTimeRange: _currentTimeRange,
                         onTimeRangeChanged: _onTimeRangeChanged,
+                        firstTransactionDate: _transactions.isNotEmpty
+                            ? _transactions.map((t) => t.date).reduce((a, b) => a.isBefore(b) ? a : b)
+                            : DateTime.now(),
                       ),
                       const SizedBox(height: 16),
                       _buildToggleButtons(),
                     ],
                   ),
                 ),
-                
-                // Tab content
                 Expanded(
                   child: TabBarView(
                     controller: _tabController,
@@ -276,7 +290,7 @@ class _InsightsState extends State<Insights> with SingleTickerProviderStateMixin
                       SingleChildScrollView(
                         padding: const EdgeInsets.all(16.0),
                         child: UnifiedBarChart(
-                          title: _currentViewType == ChartViewType.expenses 
+                          title: _currentViewType == ChartViewType.expenses
                               ? LocaleData.expenseAnalysis.getString(context)
                               : LocaleData.incomeAnalysis.getString(context),
                           periodExpenses: currentPeriodData,
@@ -285,7 +299,6 @@ class _InsightsState extends State<Insights> with SingleTickerProviderStateMixin
                           viewType: _currentViewType,
                         ),
                       ),
-                      
                       // Pie Chart Tab
                       SingleChildScrollView(
                         padding: const EdgeInsets.all(16.0),

@@ -2,6 +2,7 @@ import 'package:finney/pages/7-insights/components/charts/chart_service.dart';
 import 'package:finney/pages/7-insights/components/time_selector.dart';
 import 'package:finney/pages/7-insights/chart_query.dart';
 import 'package:finney/pages/7-insights/insights.dart';
+import 'package:finney/shared/localization/localized_number_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
@@ -29,12 +30,13 @@ class UnifiedBarChart extends StatefulWidget {
 }
 
 class _UnifiedBarChartState extends State<UnifiedBarChart> with SingleTickerProviderStateMixin {
-  final int _itemsPerPage = 12;
   int _currentPage = 0;
   String? _selectedPeriodInfo;
   int? _selectedBarIndex;
   late AnimationController _animationController;
   late Animation<double> _animation;
+
+  final int _itemsPerPage = 12;
 
   @override
   void initState() {
@@ -50,36 +52,34 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> with SingleTickerProv
   }
 
   @override
+  void didUpdateWidget(UnifiedBarChart oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.periodExpenses != oldWidget.periodExpenses ||
+        widget.timeRange.range != oldWidget.timeRange.range) {
+      _currentPage = 0;
+    }
+  }
+
+  @override
   void dispose() {
     _animationController.dispose();
     super.dispose();
   }
 
-  // Get bar color based on view type
   Color get _barColor {
     return widget.viewType == ChartViewType.income
         ? Colors.green
         : Colors.redAccent;
   }
 
-  @override
-  void didUpdateWidget(UnifiedBarChart oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.periodExpenses != oldWidget.periodExpenses) {
-      _currentPage = 0;
-    }
-  }
-
   int get _totalPages {
-    return max(1, (widget.periodExpenses.length / _itemsPerPage).ceil());
+    return (widget.periodExpenses.length / _itemsPerPage).ceil().clamp(1, 999);
   }
 
   List<PeriodExpense> get _currentPageData {
     if (widget.periodExpenses.isEmpty) return [];
-
     final startIndex = _currentPage * _itemsPerPage;
-    final endIndex = min(startIndex + _itemsPerPage, widget.periodExpenses.length);
-
+    final endIndex = (startIndex + _itemsPerPage).clamp(0, widget.periodExpenses.length);
     return widget.periodExpenses.sublist(startIndex, endIndex);
   }
 
@@ -96,6 +96,9 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> with SingleTickerProv
   }
 
   String _formatFullDate(String period, ChartInterval interval) {
+    if (widget.timeRange.range == TimeRange.allTime) {
+      return period;
+    }
     final now = DateTime.now();
     switch (interval) {
       case ChartInterval.week:
@@ -103,11 +106,12 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> with SingleTickerProv
         final weekdayIndex = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].indexOf(weekday);
         final daysToSubtract = now.weekday - (weekdayIndex + 1);
         final date = now.subtract(Duration(days: daysToSubtract));
-        return DateFormat('EEEE, MMMM d, yyyy').format(date);
+        // Exclude weekday, only show date like "MMMM d, yyyy"
+        return DateFormat('MMMM d, yyyy').format(date);
       case ChartInterval.month:
-        final day = int.parse(period);
+        final day = int.tryParse(period) ?? 1;
         final date = DateTime(now.year, now.month, day);
-        return DateFormat('EEEE, MMMM d, yyyy').format(date);
+        return DateFormat('MMMM d, yyyy').format(date);
       case ChartInterval.year:
         final month = period.toLowerCase();
         final monthIndex = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'].indexOf(month);
@@ -119,9 +123,9 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> with SingleTickerProv
   @override
   Widget build(BuildContext context) {
     final currencyFormat = NumberFormat.currency(symbol: '৳');
-    final totalAmount = widget.periodExpenses.isEmpty
+    final totalAmount = _currentPageData.isEmpty
         ? 0.0
-        : widget.periodExpenses.fold(0.0, (sum, expense) => sum + expense.amount);
+        : _currentPageData.fold(0.0, (sum, expense) => sum + expense.amount);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -141,8 +145,7 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> with SingleTickerProv
         children: [
           _buildHeader(currencyFormat, totalAmount),
           const SizedBox(height: 8),
-
-          if (widget.periodExpenses.isEmpty)
+          if (_currentPageData.isEmpty)
             _buildEmptyState()
           else
             _buildChart(currencyFormat),
@@ -168,7 +171,7 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> with SingleTickerProv
           ),
         ),
         Text(
-          '${LocaleData.total.getString(context)}: ${currencyFormat.format(totalAmount)}',
+          '${LocaleData.total.getString(context)}: ৳${LocalizedNumberFormatter.formatDouble(totalAmount, context)}',
           style: TextStyle(
             color: _barColor,
             fontWeight: FontWeight.bold,
@@ -211,10 +214,8 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> with SingleTickerProv
             swapAnimationCurve: Curves.linear,
           ),
         ),
-
         if (_totalPages > 1)
           _buildPagination(),
-
         const SizedBox(height: 16),
         _buildSummaryText(currencyFormat),
       ],
@@ -222,7 +223,7 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> with SingleTickerProv
   }
 
   Widget _buildSummaryText(NumberFormat currencyFormat) {
-    if (widget.periodExpenses.isEmpty) return const SizedBox.shrink();
+    if (_currentPageData.isEmpty) return const SizedBox.shrink();
 
     if (_selectedPeriodInfo != null) {
       return Container(
@@ -257,12 +258,11 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> with SingleTickerProv
             if (index >= 0 && index < _currentPageData.length) {
               final label = _currentPageData[index].period;
               final displayLabel = label.length > 5 ? label.substring(0, 5) : label;
-
               return SideTitleWidget(
                 axisSide: meta.axisSide,
                 space: 8,
                 child: Text(
-                  displayLabel,
+                  LocalizedNumberFormatter.formatNumber(displayLabel, context),
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 10,
@@ -277,7 +277,7 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> with SingleTickerProv
       ),
       leftTitles: AxisTitles(
         sideTitles: SideTitles(
-          showTitles: true,
+          showTitles: false,
           getTitlesWidget: (value, meta) {
             if (value == 0) return const SizedBox();
             return SideTitleWidget(
@@ -303,7 +303,7 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> with SingleTickerProv
 
   FlGridData _buildGridData() {
     return FlGridData(
-      show: true,
+      show: false,
       drawVerticalLine: false,
       horizontalInterval: _calculateYAxisInterval(_currentPageData),
       getDrawingHorizontalLine: (value) {
@@ -355,19 +355,22 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> with SingleTickerProv
 
         final index = response.spot!.touchedBarGroupIndex;
         final expense = _currentPageData[index];
-        final amount = currencyFormat.format(expense.amount);
         final fullDate = _formatFullDate(expense.period, widget.interval);
 
         setState(() {
           _selectedBarIndex = index;
+          final localizedAmount = '৳${LocalizedNumberFormatter.formatDouble(expense.amount, context)}';
+          final localizedDate = LocalizedNumberFormatter.formatDate(fullDate, context);
+
           if (widget.viewType == ChartViewType.expenses) {
-            _selectedPeriodInfo = 'You spent $amount on $fullDate';
+            _selectedPeriodInfo =
+              '${LocaleData.youSpent.getString(context)} $localizedAmount ${LocaleData.inWord.getString(context)} $localizedDate';
           } else {
-            _selectedPeriodInfo = 'You earned $amount on $fullDate';
+            _selectedPeriodInfo =
+              '${LocaleData.youEarned.getString(context)} $localizedAmount ${LocaleData.inWord.getString(context)} $localizedDate';
           }
         });
 
-        // Reset animation
         _animationController.reset();
         _animationController.forward();
       },
@@ -399,7 +402,7 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> with SingleTickerProv
             onPressed: _currentPage > 0 ? _previousPage : null,
           ),
           Text(
-            LocaleData.pagination.getString(context).replaceAll('%d', '${_currentPage + 1}').replaceAll('%d', '$_totalPages'),
+            'Page ${_currentPage + 1} of $_totalPages',
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           IconButton(
@@ -442,22 +445,19 @@ class _UnifiedBarChartState extends State<UnifiedBarChart> with SingleTickerProv
     return 50;
   }
 
-  int min(int a, int b) => a < b ? a : b;
-  int max(int a, int b) => a > b ? a : b;
-
   Map<String, dynamic> _getChartDataForLLM() {
     final Map<String, dynamic> data = {};
 
-    if (widget.periodExpenses.isEmpty) {
+    if (_currentPageData.isEmpty) {
       return {'empty': true};
     }
 
-    data['periods'] = widget.periodExpenses.map((expense) => {
+    data['periods'] = _currentPageData.map((expense) => {
       'period': expense.period,
       'amount': expense.amount,
     }).toList();
 
-    data['total'] = widget.periodExpenses.fold(
+    data['total'] = _currentPageData.fold(
         0.0, (sum, expense) => sum + expense.amount);
 
     data['interval'] = widget.interval.toString().split('.').last;

@@ -20,6 +20,9 @@ class ChatCloudService {
       throw Exception('No internet connection available. Please check your connection and try again.');
     }
   }
+  
+  // Collection name for chat messages
+  static const String collectionName = 'chat_messages';
 
   // Get the current user's chat messages collection reference
   CollectionReference get _messagesCollection {
@@ -27,7 +30,7 @@ class ChatCloudService {
     if (user == null) {
       throw Exception('No authenticated user found');
     }
-    return _firestore.collection('users').doc(user.uid).collection('chat_messages');
+    return _firestore.collection('users').doc(user.uid).collection(collectionName);
   }
   
   // Add a new chat message
@@ -38,7 +41,7 @@ class ChatCloudService {
       return await _messagesCollection.add(message.toMap());
     } catch (e) {
       debugPrint('Error adding message: $e');
-    rethrow;
+      rethrow;
     }
   }
   

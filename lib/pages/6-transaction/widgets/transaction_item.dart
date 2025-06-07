@@ -1,6 +1,7 @@
 import 'package:finney/core/storage/cloud/models/transaction_model.dart';
 import 'package:finney/pages/6-transaction/add_transaction/add_expense_screen.dart';
 import 'package:finney/pages/6-transaction/add_transaction/add_income_screen.dart';
+import 'package:finney/shared/localization/localized_number_formatter.dart';
 import 'package:finney/shared/theme/app_color.dart';
 import 'package:finney/shared/category.dart';
 import 'package:flutter/material.dart';
@@ -68,7 +69,7 @@ Widget build(BuildContext context) {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  transaction.name,
+                  CategoryUtils.getLocalizedCategoryName(transaction.category, context),
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
@@ -76,9 +77,11 @@ Widget build(BuildContext context) {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  CategoryUtils.getLocalizedCategoryName(transaction.category, context),
-                  style: TextStyle(
-                    color: Colors.grey.shade600,
+                    (transaction.description ?? '').length > 30
+                      ? '${transaction.description!.substring(0, 30)}...'
+                      : (transaction.description ?? ''),
+                    style: TextStyle(
+                    color: AppColors.darkBlue.withValues(alpha: 0.7),
                     fontSize: 12,
                   ),
                 ),
@@ -92,8 +95,8 @@ Widget build(BuildContext context) {
                 children: [
                   Text(
                     transaction.amount > 0
-                        ? '+${transaction.amount.toStringAsFixed(2)}'
-                        : transaction.amount.toStringAsFixed(2),
+                        ? '+${LocalizedNumberFormatter.formatDouble(transaction.amount, context)}'
+                        : LocalizedNumberFormatter.formatDouble(transaction.amount, context),
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -113,7 +116,6 @@ Widget build(BuildContext context) {
   void _showEditScreen(BuildContext context) {
     final transactionModel = TransactionModel(
       id: transaction.id,
-      name: transaction.name,
       category: transaction.category,
       amount: transaction.amount,
       date: transaction.date,

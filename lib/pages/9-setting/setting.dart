@@ -1,3 +1,4 @@
+import 'package:finney/pages/9-setting/change_pin.page.dart';
 import 'package:finney/shared/localization/locales.dart';
 import 'package:finney/pages/9-setting/language_selection.dart';
 import 'package:finney/pages/9-setting/widgets/dropdown_setting.dart';
@@ -7,9 +8,9 @@ import 'package:finney/shared/theme/app_color.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/shared/widgets/common/snack_bar.dart';
 import 'package:finney/shared/widgets/common/settings_notifier.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'widgets/profile_dialog.dart';
-import 'widgets/security_dialog.dart';
 import 'widgets/setting_option.dart';
 
 class Setting extends StatefulWidget {
@@ -125,20 +126,9 @@ class _SettingState extends State<Setting> {
   }
 
   void _showSecuritySettings() {
-    showDialog(
-      context: context,
-      builder: (context) => SecurityDialog(
-        onSavePin: (pin) async {
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setString('pin', pin);
-          if (mounted) {
-            AppSnackBar.showSuccess(
-              context,
-              message: LocaleData.pinSaved.getString(context),
-            );
-          }
-        },
-      ),
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ChangePinPage()),
     );
   }
 
@@ -150,14 +140,33 @@ class _SettingState extends State<Setting> {
   }
 
   Future<void> _signOut() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-    await FirebaseAuth.instance.signOut(); 
-    if (mounted) {
+  try {
+      final userId = FirebaseAuth.instance.currentUser?.uid;
+      await FirebaseAuth.instance.signOut();
+      final prefs = await SharedPreferences.getInstance();
+      final language = prefs.getString('language');
+      await prefs.clear();
+      if (language != null) {
+        await prefs.setString('language', language);
+      }
+      final storage = FlutterSecureStorage();
+      await storage.delete(key: 'other_key_if_any');
+      debugPrint('Sign-out complete, PIN preserved for user: $userId');
+      AppSnackBar.showSuccess(
+        context,
+        message: LocaleData.logOut.getString(context),
+      );
+      await Future.delayed(const Duration(seconds: 1));
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => const LanguageSelectionPage()),
+        MaterialPageRoute(builder: (_) => const LanguageSelectionPage()),
         (route) => false,
+      );
+    } catch (e) {
+      debugPrint('Sign-out error: $e');
+      AppSnackBar.showError(
+        context,
+        message: LocaleData.queryError.getString(context),
       );
     }
   }
@@ -212,7 +221,7 @@ class _SettingState extends State<Setting> {
                       Expanded(
                         flex: 2,
                         child: Container(
-                          color: AppColors.primary,
+                          color: AppColors.darkBlue,
                         ),
                       ),
                       Expanded(
@@ -231,7 +240,7 @@ class _SettingState extends State<Setting> {
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                          color: AppColors.primary,
+                          color: Colors.transparent,
                           width: double.infinity,
                           child: Row(
                             children: [
@@ -263,24 +272,13 @@ class _SettingState extends State<Setting> {
                                       ? '${LocaleData.greeting.getString(context)} ${LocaleData.user.getString(context)}'
                                       : '${LocaleData.greeting.getString(context)} $fullName',
                                   style: const TextStyle(
-                                    fontSize: 20,
+                                    fontSize: 30,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
                                   ),
                                   textAlign: TextAlign.center,
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  email.isEmpty
-                                      ? LocaleData.notAvailable.getString(context)
-                                      : email,
-                                  style: const TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 14,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                const SizedBox(height: 15),
+                                ),                                
+                                const SizedBox(height: 10),
                                 InkWell(
                                   borderRadius: BorderRadius.circular(15),
                                   onTap: _showProfileDialog,
@@ -304,7 +302,7 @@ class _SettingState extends State<Setting> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 30),
+                        const SizedBox(height: 15),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 5),
                           child: Container(

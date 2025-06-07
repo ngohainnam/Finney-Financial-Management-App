@@ -1,28 +1,23 @@
 import 'package:finney/core/storage/cloud/models/transaction_model.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/material.dart';
+import 'package:finney/shared/localization/localized_number_formatter.dart';
 
 class TransactionParser {
+  /// Checks if the message contains transaction info (English or Bengali)
   static bool hasTransactionInfo(String message) {
-    return message.contains("[AT]");
+    return message.contains("I think you want to add this transaction") ||
+           message.contains("আমি মনে");
   }
 
-  static bool isConfirmingTransaction(String message) {
-    String lowercase = message.toLowerCase();
-    return lowercase.contains('yes') || lowercase.contains('হ্যাঁ');
-  }
-
-  static bool isCancelingTransaction(String message) {
-    String lowercase = message.toLowerCase();
-    return lowercase.contains('no') || lowercase.contains('না');
-  }
-
+  /// Extracts transaction fields from the LLM message (English or Bengali)
   static Map<String, dynamic>? extractTransactionFromMessage(String message) {
     try {
       // Amount: $30.00 or পরিমাণ: ৳৩০.০০
-      RegExp amountRegex = RegExp(r'(Amount|পরিমাণ):\s*[\$৳]?\s*([\d,.০-৯]+)');
+      RegExp amountRegex = RegExp(r'(Amount|পরিমাণ)\s*:\s*[\$৳]?\s*([\d,.০-৯]+)');
       final amountMatch = amountRegex.firstMatch(message);
       if (amountMatch == null) return null;
-      String amountStr = _bengaliToEnglishNumber(amountMatch.group(2) ?? '0');
+      String amountStr = LocalizedNumberFormatter.bengaliToEnglishNumber(amountMatch.group(2) ?? '0');
       double amount = double.tryParse(amountStr.replaceAll(',', '')) ?? 0;
 
       // Name: KFC or নাম: KFC
@@ -47,8 +42,8 @@ class TransactionParser {
           date = DateFormat('MMM d, yyyy', 'en').parse(dateStr);
         } else if (RegExp(r'\d{1,2} [\u0980-\u09FF]+, \d{4}').hasMatch(dateStr)) {
           // Bengali format: ১৬ এপ্রিল, ২০২৫
-          String engDateStr = _bengaliToEnglishNumber(dateStr);
-          engDateStr = _bengaliMonthToEnglish(engDateStr);
+          String engDateStr = LocalizedNumberFormatter.bengaliToEnglishNumber(dateStr);
+          engDateStr = LocalizedNumberFormatter.bengaliMonthToEnglish(engDateStr);
           date = DateFormat('d MMMM, yyyy', 'en').parse(engDateStr);
         } else {
           date = DateTime.now();
@@ -77,37 +72,7 @@ class TransactionParser {
     }
   }
 
-  // Helper: Bengali numerals to English
-  static String _bengaliToEnglishNumber(String input) {
-    const bn = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
-    for (int i = 0; i < bn.length; i++) {
-      input = input.replaceAll(bn[i], i.toString());
-    }
-    return input;
-  }
-
-  // Helper: Bengali months to English months
-  static String _bengaliMonthToEnglish(String input) {
-    const months = {
-      'জানুয়ারী': 'January',
-      'ফেব্রুয়ারী': 'February',
-      'মার্চ': 'March',
-      'এপ্রিল': 'April',
-      'মে': 'May',
-      'জুন': 'June',
-      'জুলাই': 'July',
-      'আগস্ট': 'August',
-      'সেপ্টেম্বর': 'September',
-      'অক্টোবর': 'October',
-      'নভেম্বর': 'November',
-      'ডিসেম্বর': 'December',
-    };
-    months.forEach((bn, en) {
-      input = input.replaceAll(bn, en);
-    });
-    return input;
-  }
-
+  /// Checks if the category is an income type (English or Bengali)
   static bool isIncomeCategory(String category) {
     final incomeCategories = [
       'salary', 'investment', 'business', 'gift', 'income', 'others',
@@ -117,15 +82,29 @@ class TransactionParser {
     return incomeCategories.any((c) => normalized.contains(c));
   }
 
+  /// Creates a TransactionModel from parsed data
   static TransactionModel createTransactionModel(Map<String, dynamic> data) {
     double finalAmount = data['isIncome'] ? data['amount'] : -data['amount'];
-
     return TransactionModel(
-      name: data['name'],
       category: data['category'],
       amount: finalAmount,
       date: data['date'],
       description: data['description'],
     );
+  }
+
+  /// English to Bengali number conversion for display
+  static String englishToBengaliNumber(String input, BuildContext context) {
+    return LocalizedNumberFormatter.formatNumber(input, context);
+  }
+
+  /// Bengali numerals to English
+  static String bengaliToEnglishNumber(String input) {
+    return LocalizedNumberFormatter.bengaliToEnglishNumber(input);
+  }
+
+  /// Bengali months to English months
+  static String bengaliMonthToEnglish(String input) {
+    return LocalizedNumberFormatter.bengaliMonthToEnglish(input);
   }
 }

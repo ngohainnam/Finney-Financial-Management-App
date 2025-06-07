@@ -27,12 +27,11 @@ class AppColors {
   static const Color categoryHealth = Color(0xFFF44336);
   static const Color categoryUtilities = Color(0xFF9C27B0);
   static const Color categoryDefault = Color(0xFF9E9E9E); 
-  static const Color categorySalary = Color(0xFF4CAF50);
+  static const Color categorySalary = Color.fromARGB(255, 6, 149, 11);
   static const Color categoryInvestment = Color(0xFF2196F3);
   static const Color categoryBusiness = Color(0xFFFF9800);
   static const Color categoryGift = Color(0xFFE91E63);
+  static const Color categorySavings = Colors.blue;
 
-
-  //for learn
   static const Color budgetEdu = Color(0xFFDCEDC8);
 }

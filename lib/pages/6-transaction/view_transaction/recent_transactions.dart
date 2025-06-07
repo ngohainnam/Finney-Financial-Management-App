@@ -1,4 +1,5 @@
 import 'package:finney/core/storage/cloud/models/transaction_model.dart';
+import 'package:finney/pages/3-dashboard/widgets/delete_transaction_dialog.dart';
 import 'package:finney/pages/6-transaction/view_transaction/all_transactions.dart';
 import 'package:finney/pages/6-transaction/widgets/transaction_list.dart';
 import 'package:finney/pages/7-insights/components/time_selector.dart';
@@ -51,39 +52,24 @@ class _RecentTransactionsState extends State<RecentTransactions> {
   Future<void> _showDeleteConfirmationDialog() async {
     if (_selectedTransactions.isEmpty) return;
 
-    return showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(LocaleData.deleteTransactions.getString(context)),
-        content: Text(
-          LocaleData.confirmDeleteTransactions
-              .getString(context)
-              .replaceFirst('%d', _selectedTransactions.length.toString()),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(LocaleData.cancel.getString(context)),
-          ),
-          TextButton(
-            onPressed: () {
-              // Call the callback with a list for multiple, or single for one
-              if (_selectedTransactions.length == 1) {
-                widget.onDeleteTransaction?.call(_selectedTransactions.first);
-              } else {
-                widget.onDeleteTransaction?.call(_selectedTransactions.toList());
-              }
-              _selectedTransactions.clear();
-              _toggleDeleteMode();
-              Navigator.pop(context);
-            },
-            child: Text(
-              LocaleData.delete.getString(context),
-              style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
+    final confirmed = await DeleteTransactionDialog.show(
+      context,
+      message: LocaleData.confirmDeleteAction
+          .getString(context)
+          .replaceFirst('%d', _selectedTransactions.length.toString()),
+      title: LocaleData.deleteTransactions.getString(context),
     );
+
+    if (confirmed) {
+      // Call the callback with a list for multiple, or single for one
+      if (_selectedTransactions.length == 1) {
+        widget.onDeleteTransaction?.call(_selectedTransactions.first);
+      } else {
+        widget.onDeleteTransaction?.call(_selectedTransactions.toList());
+      }
+      _selectedTransactions.clear();
+      _toggleDeleteMode();
+    }
   }
 
   @override
@@ -116,7 +102,7 @@ class _RecentTransactionsState extends State<RecentTransactions> {
                 children: [
                   if (!_isDeleteMode)
                     IconButton(
-                      icon: const Icon(Icons.delete_outline),
+                      icon: const Icon(Icons.delete_outline, color: AppColors.darkBlue),
                       onPressed: recentTransactions.isEmpty ? null : _toggleDeleteMode,
                     )
                   else ...[

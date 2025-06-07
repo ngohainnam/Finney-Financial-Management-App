@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'quiz_questions.dart';
+import 'package:finney/shared/localization/locales.dart';
+import 'package:finney/pages/5-learn/string_extension.dart';
 
 class QuizReviewPage extends StatelessWidget {
   final List<QuizQuestion> questions;
@@ -16,17 +18,17 @@ class QuizReviewPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FB),
       appBar: AppBar(
-        title: const Text("Review Answers"),
+        title: Text(LocaleData.reviewAnswers.getString(context)),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 1,
       ),
       body: ListView.builder(
-        itemCount: questions.length,
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 32), // bottom padding
+        itemCount: userAnswers.length,
         itemBuilder: (context, index) {
           final question = questions[index];
-          final selected = userAnswers[index];
+          final selected = index < userAnswers.length ? userAnswers[index] : null;
           final correct = question.correctAnswerIndex;
 
           return Container(

@@ -1,5 +1,6 @@
 import 'package:finney/shared/theme/app_color.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class MyTextField extends StatelessWidget {
   final TextEditingController controller;
@@ -7,12 +8,18 @@ class MyTextField extends StatelessWidget {
   final bool obscureText;
   final Function(String)? onChanged;
   final Widget? suffixIcon;
+  final TextInputType? keyboardType;
+  final int? maxLength;
+  final List<TextInputFormatter>? inputFormatters;
 
   const MyTextField({
     super.key,
     required this.controller,
     required this.hintText,
     required this.obscureText,
+    this.keyboardType,
+    this.maxLength,
+    this.inputFormatters,
     this.onChanged,
     this.suffixIcon,
   });
@@ -20,23 +27,24 @@ class MyTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 25.0),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
       child: TextField(
         controller: controller,
         obscureText: obscureText,
-        onChanged: onChanged, 
+        onChanged: onChanged,
+        keyboardType: keyboardType,
+        maxLength: maxLength,
+        inputFormatters: inputFormatters,
         decoration: InputDecoration(
-          enabledBorder: const OutlineInputBorder(
-            borderSide: BorderSide(color: AppColors.softGray),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: AppColors.darkBlue),
-          ),
-          fillColor: Colors.white,
-          filled: true,
           hintText: hintText,
-          hintStyle: TextStyle(color: AppColors.blurGray),
-          suffixIcon: suffixIcon, 
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          filled: true,
+          fillColor: AppColors.blurGray.withValues(alpha: 0.2),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          suffixIcon: suffixIcon,
         ),
       ),
     );

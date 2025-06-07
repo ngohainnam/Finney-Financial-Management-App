@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'quiz_questions.dart';
 import 'quiz_result.dart';
+import 'package:finney/shared/localization/locales.dart';
+import 'package:finney/pages/5-learn/string_extension.dart';
 
 class QuizPage extends StatefulWidget {
   const QuizPage({super.key});
@@ -21,7 +23,12 @@ class _QuizPageState extends State<QuizPage> {
   @override
   void initState() {
     super.initState();
-    selectedQuestions = List.from(quizQuestions)..shuffle();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    selectedQuestions = List.from(quizQuestions(context))..shuffle();
     selectedQuestions = selectedQuestions.take(10).toList();
     _userAnswers = List.filled(selectedQuestions.length, null);
   }
@@ -71,7 +78,6 @@ class _QuizPageState extends State<QuizPage> {
       body: SafeArea(
         child: Column(
           children: [
-            // UI: AppBar replacement
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
@@ -87,9 +93,9 @@ class _QuizPageState extends State<QuizPage> {
                       color: const Color(0xFFD6E9FF),
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: const Text(
-                      "Test Your Knowledge",
-                      style: TextStyle(
+                    child: Text(
+                      LocaleData.testYourKnowledge.getString(context),
+                      style: const TextStyle(
                         color: Colors.black87,
                         fontWeight: FontWeight.w500,
                       ),
@@ -111,12 +117,11 @@ class _QuizPageState extends State<QuizPage> {
 
             const SizedBox(height: 8),
             Text(
-              "Question ${_currentIndex + 1}/${selectedQuestions.length}",
+              "${LocaleData.question.getString(context)} ${(_currentIndex + 1).toBn(context)}/${selectedQuestions.length.toBn(context)}",
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 24),
 
-            // UI: Quiz Card
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -152,7 +157,6 @@ class _QuizPageState extends State<QuizPage> {
                         ),
                       ),
                       const SizedBox(height: 24),
-
 
                       ...List.generate(question.options.length, (index) {
                         final isCorrect = index == question.correctAnswerIndex;
@@ -199,7 +203,9 @@ class _QuizPageState extends State<QuizPage> {
                           ),
                         ),
                         child: Text(
-                          _currentIndex + 1 == selectedQuestions.length ? "Finish" : "Next",
+                          (_currentIndex + 1 == selectedQuestions.length
+                              ? LocaleData.finish.getString(context)
+                              : LocaleData.next.getString(context)),
                           style: const TextStyle(fontSize: 16),
                         ),
                       ),

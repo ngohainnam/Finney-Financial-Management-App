@@ -17,6 +17,9 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/shared/widgets/common/snack_bar.dart';
 import 'package:finney/shared/widgets/common/settings_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:finney/main.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -25,7 +28,7 @@ class Dashboard extends StatefulWidget {
   DashboardState createState() => DashboardState();
 }
 
-class DashboardState extends State<Dashboard> {
+class DashboardState extends State<Dashboard> with RouteAware {
   late final TransactionCloudService _transactionService;
   final chart_service.ChartService _chartService = chart_service.ChartService();
 
@@ -38,7 +41,6 @@ class DashboardState extends State<Dashboard> {
   List<TransactionModel> _transactions = [];
 
   bool _isLoading = true;
-  bool _isRefreshing = false;
 
   @override
   void initState() {
@@ -46,6 +48,26 @@ class DashboardState extends State<Dashboard> {
     _transactionService = StorageManager().transactionService;
     _loadDashboardData();
     _loadTextSize();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) {
+      routeObserver.subscribe(this, route);
+    }
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    _loadDashboardData();
   }
 
   Future<void> _loadTextSize() async {
@@ -63,7 +85,6 @@ class DashboardState extends State<Dashboard> {
 
   void _updateChartsForTimeRange() {
     if (_transactions.isEmpty) return;
-
     _updateBalanceData();
   }
 
@@ -91,29 +112,63 @@ class DashboardState extends State<Dashboard> {
     });
   }
 
+  Future<double> _getInitialBalanceFromOnboarding() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return 0.0;
+    final userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    final onboarding = userDoc.data()?['onboarding'];
+    if (onboarding != null && onboarding['balance'] != null) {
+      return (onboarding['balance'] as num).toDouble();
+    }
+    return 0.0;
+  }
+
   Future<void> _loadDashboardData() async {
-    if (_isRefreshing) return;
+    setState(() {
+      _isLoading = _transactions.isEmpty;
+    });
 
     try {
-      setState(() {
-        _isLoading = _transactions.isEmpty;
-        _isRefreshing = true;
-      });
-
-      _transactionService.getTransactions().listen((transactions) {
+      _transactionService.getTransactions().listen((transactions) async {
         if (mounted) {
           setState(() {
             _transactions = transactions;
-            _updateChartsForTimeRange();
+          });
+
+          final filteredTransactions = _chartService.filterTransactionsByTimeRange(
+            _transactions,
+            currentTimeRange,
+          );
+
+          double income = 0.0;
+          double expenses = 0.0;
+
+          for (var transaction in filteredTransactions) {
+            if (transaction.amount > 0) {
+              income += transaction.amount;
+            } else {
+              expenses += transaction.amount.abs();
+            }
+          }
+
+          double balance = income - expenses;
+
+          // If no transactions, use onboarding balance
+          if (_transactions.isEmpty) {
+            balance = await _getInitialBalanceFromOnboarding();
+          }
+
+          setState(() {
+            _monthlyIncome = income;
+            _monthlyExpenseTotal = expenses;
+            _currentBalance = balance;
             _isLoading = false;
-            _isRefreshing = false;
           });
         }
       }, onError: (error) {
         if (mounted) {
           setState(() {
             _isLoading = false;
-            _isRefreshing = false;
           });
           AppSnackBar.showError(
             context,
@@ -126,7 +181,6 @@ class DashboardState extends State<Dashboard> {
       if (mounted) {
         setState(() {
           _isLoading = false;
-          _isRefreshing = false;
         });
         AppSnackBar.showError(
           context,
@@ -137,17 +191,13 @@ class DashboardState extends State<Dashboard> {
   }
 
   void _handleTransactionAdded(TransactionModel transaction) {
-    setState(() {
-      _transactions.add(transaction);
-      _updateChartsForTimeRange();
-    });
-
     _transactionService.addTransaction(transaction).then((_) {
       if (mounted) {
         AppSnackBar.showSuccess(
           context,
           message: LocaleData.transactionSaved.getString(context),
         );
+        _loadDashboardData();
       }
     }).catchError((error) {
       debugPrint('Error adding transaction: $error');
@@ -167,13 +217,6 @@ class DashboardState extends State<Dashboard> {
 
     if (transactionsToDelete.isEmpty) return;
 
-    setState(() {
-      for (var transaction in transactionsToDelete) {
-        _transactions.remove(transaction);
-      }
-      _updateChartsForTimeRange();
-    });
-
     Future.wait(
       transactionsToDelete.where((t) => t.id != null).map((transaction) {
         return _transactionService.deleteTransaction(transaction.id!);
@@ -186,14 +229,11 @@ class DashboardState extends State<Dashboard> {
               ? LocaleData.transactionDeleted.getString(context)
               : '${transactionsToDelete.length} ${LocaleData.transactionDeleted.getString(context)}',
         );
+        _loadDashboardData();
       }
     }).catchError((error) {
       debugPrint('Error deleting transaction(s): $error');
       if (mounted) {
-        setState(() {
-          _transactions.addAll(transactionsToDelete);
-          _updateChartsForTimeRange();
-        });
         AppSnackBar.showError(
           context,
           message: LocaleData.failedToDeleteTransaction.getString(context),
@@ -238,15 +278,16 @@ class DashboardState extends State<Dashboard> {
               appBar: AppBar(
                 backgroundColor: AppColors.lightBackground,
                 title: Text(
-                  LocaleData.chatbotTitle.getString(context),
+                  LocaleData.dashboardTitle.getString(context),
                   style: const TextStyle(
-                    color: AppColors.primary,
+                    color: AppColors.darkBlue,
                     fontWeight: FontWeight.bold,
+                    fontSize: 28,
+                    letterSpacing: 1.2,
                   ),
                 ),
                 automaticallyImplyLeading: true,
-                actions: [
-                ],
+                actions: [],
               ),
               body: _isLoading
                   ? const Center(child: CircularProgressIndicator())
@@ -255,30 +296,27 @@ class DashboardState extends State<Dashboard> {
                         Column(
                           children: [
                             Expanded(
-                              child: RefreshIndicator(
-                                onRefresh: _loadDashboardData,
-                                child: SingleChildScrollView(
-                                  physics: const AlwaysScrollableScrollPhysics(),
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      BalanceCard(
-                                        balance: _currentBalance,
-                                        income: _monthlyIncome,
-                                        expenses: _monthlyExpenseTotal,
-                                        timeRange: currentTimeRange,
-                                      ),
-                                      TimeRangeSelector(
-                                        initialTimeRange: currentTimeRange,
-                                        onTimeRangeChanged: _onTimeRangeChanged,
-                                      ),
-                                      const RobotAnimationHeader(),
-                                      const NavigationTiles(),
-                                      _buildRecentTransactions(),
-                                      const SizedBox(height: 100),
-                                    ],
-                                  ),
+                              child: SingleChildScrollView(
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                padding: const EdgeInsets.all(16.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    BalanceCard(
+                                      balance: _currentBalance,
+                                      income: _monthlyIncome,
+                                      expenses: _monthlyExpenseTotal,
+                                      timeRange: currentTimeRange,
+                                    ),
+                                    TimeRangeSelector(
+                                      initialTimeRange: currentTimeRange,
+                                      onTimeRangeChanged: _onTimeRangeChanged,
+                                    ),
+                                    const RobotAnimationHeader(),
+                                    const NavigationTiles(),
+                                    _buildRecentTransactions(),
+                                    const SizedBox(height: 100),
+                                  ],
                                 ),
                               ),
                             ),

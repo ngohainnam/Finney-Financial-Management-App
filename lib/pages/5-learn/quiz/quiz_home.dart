@@ -11,7 +11,7 @@ class QuizHomePage extends StatelessWidget {
     try {
       // Get the cloud service from StorageManager
       final learningService = StorageManager().learningService;
-      
+
       // Fetch the summary from cloud service
       return await learningService.getQuizSummary();
     } catch (e) {
@@ -81,9 +81,9 @@ class QuizHomePage extends StatelessWidget {
                             Text(
                               summary['last'] != null
                                   ? DateFormat('MMM d, h:mm a').format(
-                                      summary['last'] is String 
-                                          ? DateTime.parse(summary['last']) 
-                                          : summary['last'])
+                                  summary['last'] is String
+                                      ? DateTime.parse(summary['last'])
+                                      : summary['last'])
                                   : "-",
                               style: const TextStyle(fontSize: 16),
                             ),

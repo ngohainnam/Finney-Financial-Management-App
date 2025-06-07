@@ -15,6 +15,7 @@ class CategoryUtils {
     'Transport',
     'Health',
     'Utilities',
+    'Savings',
     'Others',
   ];
 
@@ -91,37 +92,52 @@ class CategoryUtils {
     switch (category) {
       // Expense icons
       case 'Shopping':
+      case 'শপিং':
         icon = Icons.shopping_bag;
         break;
       case 'Food':
+      case 'খাবার':
         icon = Icons.restaurant;
         break;
       case 'Entertainment':
+      case 'বিনোদন':
         icon = Icons.movie;
         break;
       case 'Transport':
+      case 'পরিবহন':
         icon = Icons.directions_car;
         break;
       case 'Health':
+      case 'স্বাস্থ্য':
         icon = Icons.medical_services;
         break;
       case 'Utilities':
+      case 'ইউটিলিটি':
         icon = Icons.phone;
+        break;
+
+      case 'Savings':
+      case 'সঞ্চয়':
+        icon = Icons.savings;
         break;
 
       // Income icons
       case 'Salary':
+      case 'বেতন':
         icon = Icons.work;
-        break;  // Added missing break
+        break;
       case 'Investment':
+      case 'বিনিয়োগ':
         icon = Icons.trending_up;
-        break;  // Added missing break
+        break;
       case 'Business':
+      case 'ব্যবসা':
         icon = Icons.business;
-        break;  // Added missing break
+        break;
       case 'Gift':
+      case 'উপহার':
         icon = Icons.card_giftcard;
-        break;  // Added missing break
+        break;
 
       // Default icon
       default:
@@ -141,37 +157,52 @@ class CategoryUtils {
     switch (category) {
       // Expense colors
       case 'Shopping':
+      case 'শপিং':
         color = AppColors.categoryShopping;
         break;
       case 'Food':
+      case 'খাবার':
         color = AppColors.categoryFood;
         break;
       case 'Entertainment':
+      case 'বিনোদন':
         color = AppColors.categoryEntertainment;
         break;
       case 'Transport':
+      case 'পরিবহন':
         color = AppColors.categoryTransport;
         break;
       case 'Health':
+      case 'স্বাস্থ্য':
         color = AppColors.categoryHealth;
         break;
       case 'Utilities':
+      case 'ইউটিলিটি':
         color = AppColors.categoryUtilities;
+        break;
+      
+      case 'Savings':
+      case 'সঞ্চয়':
+        color = AppColors.categorySavings;
         break;
 
       // Income colors
       case 'Salary':
+      case 'বেতন':
         color = AppColors.categorySalary;
-        break;  // Added missing break
+        break;
       case 'Investment':
+      case 'বিনিয়োগ':
         color = AppColors.categoryInvestment;
-        break;  // Added missing break
+        break;
       case 'Business':
+      case 'ব্যবসা':
         color = AppColors.categoryBusiness;
-        break;  // Added missing break
+        break;
       case 'Gift':
+      case 'উপহার':
         color = AppColors.categoryGift;
-        break;  // Added missing break
+        break;
 
       // Default color
       default:

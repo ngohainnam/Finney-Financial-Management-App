@@ -1,6 +1,6 @@
 import 'package:finney/core/storage/cloud/service/transaction_cloud_service.dart';
 import 'package:finney/shared/category.dart';
-import 'package:finney/pages/9-setting/currency_formatter.dart';
+import 'package:finney/shared/theme/app_color.dart';
 import 'package:finney/shared/widgets/common/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -28,7 +28,7 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
   DateTime _selectedDate = DateTime.now();
   bool _isSaving = false;
   String? _errorMessage;
-  late final TransactionCloudService _transactionService;
+  late final TransactionCloudService _transactionService; // Changed to late final
 
   TextEditingController get amountController => _amountController;
 
@@ -45,7 +45,7 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
     if (widget.existingTransaction != null) {
       _selectedCategory = widget.existingTransaction!.category;
       _selectedDate = widget.existingTransaction!.date;
-      _amountController.text = CurrencyFormatter.formatWithoutSymbol(widget.existingTransaction!.amount.abs());
+      _amountController.text = widget.existingTransaction!.amount.abs().toString();
       _descriptionController.text = widget.existingTransaction!.description ?? '';
     } else {
       if (categories.isNotEmpty) {
@@ -68,31 +68,23 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
     });
 
     if (_amountController.text.isEmpty || _amountController.text == '0') {
-      setState(() {
-        _errorMessage = LocaleData.pleaseEnterValidAmount.getString(context);
-      });
+      _showErrorSnackBar(LocaleData.pleaseEnterValidAmount.getString(context));
       return;
     }
 
     try {
-      double amount = CurrencyFormatter.parse(_amountController.text);
+      double amount = double.tryParse(_amountController.text) ?? 0;
       if (amount <= 0) {
-        setState(() {
-          _errorMessage = LocaleData.pleaseEnterPositiveAmount.getString(context);
-        });
+        _showErrorSnackBar(LocaleData.pleaseEnterPositiveAmount.getString(context));
         return;
       }
     } catch (e) {
-      setState(() {
-        _errorMessage = LocaleData.pleaseEnterValidNumber.getString(context);
-      });
+      _showErrorSnackBar(LocaleData.pleaseEnterValidNumber.getString(context));
       return;
     }
 
     if (_selectedCategory.isEmpty) {
-      setState(() {
-        _errorMessage = LocaleData.pleaseSelectCategory.getString(context);
-      });
+      _showErrorSnackBar(LocaleData.pleaseSelectCategory.getString(context));
       return;
     }
 
@@ -105,7 +97,6 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
 
       final transaction = TransactionModel(
         id: widget.existingTransaction?.id,
-        name: _selectedCategory,
         category: _selectedCategory,
         amount: amountValue,
         date: _selectedDate,
@@ -138,10 +129,20 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
       if (mounted) {
         setState(() {
           _isSaving = false;
-          _errorMessage = LocaleData.failedToSaveTransaction.getString(context);
         });
+        _showErrorSnackBar(LocaleData.failedToSaveTransaction.getString(context));
       }
     }
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.redAccent,
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   @override
@@ -368,6 +369,27 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
       initialDate: _selectedDate,
       firstDate: DateTime(2020),
       lastDate: DateTime.now().add(const Duration(days: 365)),
+      helpText: LocaleData.selectDate.getString(context),
+      cancelText: LocaleData.cancel.getString(context),  
+      confirmText: LocaleData.transactionPreviewConfirm.getString(context),     
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: AppColors.darkBlue, 
+              onPrimary: Colors.white,   
+              onSurface: AppColors.darkBlue,   
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.darkBlue,
+                textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ), dialogTheme: DialogThemeData(backgroundColor: Colors.white),
+          ),
+          child: child!,
+        );
+      },
     );
 
     if (picked != null && picked != _selectedDate) {

@@ -1,5 +1,6 @@
 import 'package:finney/pages/7-insights/components/charts/pie/pie_category_item.dart';
 import 'package:finney/pages/7-insights/chart_query.dart';
+import 'package:finney/shared/localization/localized_number_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
@@ -92,7 +93,7 @@ class _CategoryPieChartState extends State<CategoryPieChart> with SingleTickerPr
                 ),
               ),
               Text(
-                '${LocaleData.total.getString(context)}: ${currencyFormat.format(total)}',
+                '${LocaleData.total.getString(context)}: ৳${LocalizedNumberFormatter.formatDouble(total, context)}',
                 style: TextStyle(
                   color: _themeColor,
                   fontWeight: FontWeight.bold,
@@ -158,16 +159,22 @@ class _CategoryPieChartState extends State<CategoryPieChart> with SingleTickerPr
 
                               // Select the new section
                               final category = widget.categoryData[index];
-                              final amount = currencyFormat.format(category['amount']);
-                              final categoryName = category['name'];
+                              final amount = '৳${LocalizedNumberFormatter.formatDouble(category['amount'], context)}';
+                              final categoryName = CategoryUtils.getLocalizedCategoryName(
+                                category['name'] ?? category['category'],
+                                context,
+                              );
                               final percentage = (category['amount'] / total * 100).toStringAsFixed(1);
+                              final localizedPercent = LocalizedNumberFormatter.formatNumber(percentage, context);
 
                               setState(() {
                                 _selectedSectionIndex = index;
                                 if (widget.viewType == ChartViewType.expenses) {
-                                  _selectedCategoryInfo = 'You spent $amount ($percentage%) on $categoryName';
+                                  _selectedCategoryInfo =
+                                    '${LocaleData.youSpent.getString(context)} $amount ($localizedPercent%) ${LocaleData.inWord.getString(context)} $categoryName';
                                 } else {
-                                  _selectedCategoryInfo = 'You earned $amount ($percentage%) from $categoryName';
+                                  _selectedCategoryInfo =
+                                    '${LocaleData.youEarned.getString(context)} $amount ($localizedPercent%) ${LocaleData.inWord.getString(context)} $categoryName';
                                 }
                               });
 
@@ -243,10 +250,13 @@ class _CategoryPieChartState extends State<CategoryPieChart> with SingleTickerPr
 
     return sortedCategories.map((category) {
       final percentage = total > 0 ? (category['amount'] / total * 100) : 0;
-
+      final categoryName = CategoryUtils.getLocalizedCategoryName(
+        category['name'] ?? category['category'],
+        context,
+      );
       return CategoryExpenseItem(
         color: category['color'],
-        name: category['name'],
+        name: categoryName,
         amount: category['amount'],
         percentage: percentage,
         formatter: formatter,
