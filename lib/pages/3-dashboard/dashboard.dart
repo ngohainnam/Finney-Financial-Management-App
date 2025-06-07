@@ -17,7 +17,8 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/shared/widgets/common/snack_bar.dart';
 import 'package:finney/shared/widgets/common/settings_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-// Import the routeObserver from main.dart
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finney/main.dart';
 
 class Dashboard extends StatefulWidget {
@@ -64,7 +65,6 @@ class DashboardState extends State<Dashboard> with RouteAware {
     super.dispose();
   }
 
-  // Called every time the dashboard appears (including after popping from another page)
   @override
   void didPopNext() {
     _loadDashboardData();
@@ -112,36 +112,56 @@ class DashboardState extends State<Dashboard> with RouteAware {
     });
   }
 
+  Future<double> _getInitialBalanceFromOnboarding() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return 0.0;
+    final userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    final onboarding = userDoc.data()?['onboarding'];
+    if (onboarding != null && onboarding['balance'] != null) {
+      return (onboarding['balance'] as num).toDouble();
+    }
+    return 0.0;
+  }
+
   Future<void> _loadDashboardData() async {
     setState(() {
       _isLoading = _transactions.isEmpty;
     });
 
     try {
-      _transactionService.getTransactions().listen((transactions) {
+      _transactionService.getTransactions().listen((transactions) async {
         if (mounted) {
           setState(() {
             _transactions = transactions;
-            final filteredTransactions = _chartService.filterTransactionsByTimeRange(
-              _transactions,
-              currentTimeRange,
-            );
+          });
 
-            double income = 0.0;
-            double expenses = 0.0;
+          final filteredTransactions = _chartService.filterTransactionsByTimeRange(
+            _transactions,
+            currentTimeRange,
+          );
 
-            for (var transaction in filteredTransactions) {
-              if (transaction.amount > 0) {
-                income += transaction.amount;
-              } else {
-                expenses += transaction.amount.abs();
-              }
+          double income = 0.0;
+          double expenses = 0.0;
+
+          for (var transaction in filteredTransactions) {
+            if (transaction.amount > 0) {
+              income += transaction.amount;
+            } else {
+              expenses += transaction.amount.abs();
             }
+          }
 
+          double balance = income - expenses;
+
+          // If no transactions, use onboarding balance
+          if (_transactions.isEmpty) {
+            balance = await _getInitialBalanceFromOnboarding();
+          }
+
+          setState(() {
             _monthlyIncome = income;
             _monthlyExpenseTotal = expenses;
-            _currentBalance = income - expenses;
-
+            _currentBalance = balance;
             _isLoading = false;
           });
         }

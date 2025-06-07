@@ -15,6 +15,7 @@ class CategoryUtils {
     'Transport',
     'Health',
     'Utilities',
+    'Savings',
     'Others',
   ];
 
@@ -115,6 +116,11 @@ class CategoryUtils {
         icon = Icons.phone;
         break;
 
+      case 'Savings':
+      case 'সঞ্চয়':
+        icon = Icons.savings;
+        break;
+
       // Income icons
       case 'Salary':
       case 'বেতন':
@@ -173,6 +179,11 @@ class CategoryUtils {
       case 'Utilities':
       case 'ইউটিলিটি':
         color = AppColors.categoryUtilities;
+        break;
+      
+      case 'Savings':
+      case 'সঞ্চয়':
+        color = AppColors.categorySavings;
         break;
 
       // Income colors

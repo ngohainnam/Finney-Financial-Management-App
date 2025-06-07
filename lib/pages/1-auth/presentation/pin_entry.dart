@@ -7,6 +7,8 @@ import 'package:finney/pages/3-dashboard/dashboard.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/shared/widgets/common/snack_bar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:finney/pages/0-onboarding/onboarding_intro.dart';
 
 class PinEntryPage extends StatefulWidget {
   const PinEntryPage({super.key});
@@ -57,10 +59,22 @@ class _PinEntryPageState extends State<PinEntryPage> {
         _input.clear();
         _isVerifying = false;
       });
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const Dashboard()),
-      );
+
+      // Check onboarding status in Firestore
+      final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      final onboarding = userDoc.data()?['onboarding'];
+
+      if (onboarding == null || onboarding.isEmpty) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => OnboardingIntroPage()),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const Dashboard()),
+        );
+      }
     } else {
       AppSnackBar.showError(
         context,

@@ -816,7 +816,7 @@ mixin LocaleData {
   static const String confirmNewPin = 'confirmNewPin';
   static const String enterNewPin = 'enterNewPin';
   static const String budgetReminderTitle = 'budgetReminderTitle';
-  static const String thisWeeksSpending = 'thisWeeksSpending';
+  static const String thisMonthsSpending = 'thisMonthsSpending';
   static const String stopSummary = 'stopSummary';
   static const String playSummary = 'playSummary';
   static const String setDailyReminder = 'setDailyReminder';
@@ -1467,7 +1467,7 @@ mixin LocaleData {
     medium : 'Medium',
     large : 'Large',
     budgetReminderTitle: 'Budget Reminder',
-    thisWeeksSpending: "This Week's Spending",
+    thisMonthsSpending: "This Month's Spending",
     stopSummary: 'Stop',
     playSummary: 'Speak My Budget',
     setDailyReminder: 'Set Daily Reminder',
@@ -2286,7 +2286,7 @@ mixin LocaleData {
     medium : 'মাঝারি',
     large : 'বড়',
     budgetReminderTitle: 'বাজেট রিমাইন্ডার',
-    thisWeeksSpending: 'এই সপ্তাহের খরচ',
+    thisMonthsSpending: 'এই মাসের খরচ',
     stopSummary: 'বন্ধ করুন',
     playSummary: 'বাজেট শুনুন',
     setDailyReminder: 'দৈনিক রিমাইন্ডার সেট করুন',

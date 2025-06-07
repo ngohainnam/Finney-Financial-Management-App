@@ -387,7 +387,7 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
         padding: EdgeInsets.all(16),
         children: [
           Text(
-            LocaleData.thisWeeksSpending.getString(context),
+            LocaleData.thisMonthsSpending.getString(context),
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
           SizedBox(height: 12),

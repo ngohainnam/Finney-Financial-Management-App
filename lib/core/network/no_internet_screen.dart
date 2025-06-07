@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:finney/core/storage/storage_manager.dart';
+import 'package:finney/shared/theme/app_color.dart';
 
 class InternetConnectionHandler extends StatelessWidget {
   final Widget child;
   final Widget? offlineWidget;
-  
+
   const InternetConnectionHandler({
     super.key,
     required this.child,
     this.offlineWidget,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<bool>(
@@ -18,7 +19,7 @@ class InternetConnectionHandler extends StatelessWidget {
       initialData: StorageManager().isConnected,
       builder: (context, snapshot) {
         final isConnected = snapshot.data ?? false;
-        
+
         if (isConnected) {
           return child;
         } else {
@@ -27,9 +28,10 @@ class InternetConnectionHandler extends StatelessWidget {
       },
     );
   }
-  
+
   Widget _buildDefaultOfflineWidget(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -37,14 +39,15 @@ class InternetConnectionHandler extends StatelessWidget {
             Icon(
               Icons.signal_wifi_off,
               size: 80.0,
-              color: Theme.of(context).primaryColor,
+              color: Colors.redAccent,
             ),
             const SizedBox(height: 24.0),
-            const Text(
+            Text(
               'No Internet Connection',
               style: TextStyle(
                 fontSize: 22.0,
                 fontWeight: FontWeight.bold,
+                color: AppColors.darkBlue,
               ),
               textAlign: TextAlign.center,
             ),
@@ -55,7 +58,7 @@ class InternetConnectionHandler extends StatelessWidget {
                 'Please check your internet connection and try again.',
                 style: TextStyle(
                   fontSize: 16.0,
-                  color: Colors.grey[700],
+                  color: AppColors.darkBlue.withValues(alpha: 0.7),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -71,10 +74,14 @@ class InternetConnectionHandler extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).primaryColor,
+                backgroundColor: Colors.redAccent,
+                foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 24.0,
                   vertical: 12.0,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
                 ),
               ),
               child: const Text(

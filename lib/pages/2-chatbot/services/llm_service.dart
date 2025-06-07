@@ -46,7 +46,8 @@ User Question: ${chatMessage.text}""";
 
     if (chatMessage.medias?.isNotEmpty ?? false) {
       Uint8List images = File(chatMessage.medias!.first.url).readAsBytesSync();
-      parts.add(Part.uint8List(images));
+      parts.add(Part.text(augmentedQuestion)); // Add the prompt
+      parts.add(Part.uint8List(images));      
     } else {
       parts.add(Part.text(augmentedQuestion));
     }
