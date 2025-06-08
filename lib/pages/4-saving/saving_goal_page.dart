@@ -7,6 +7,7 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/shared/localization/locales.dart';
 import 'package:finney/shared/theme/app_color.dart';
 import 'package:finney/shared/widgets/common/snack_bar.dart';
+import 'package:finney/shared/widgets/common/settings_notifier.dart';
 
 class SavingGoalPage extends StatefulWidget {
   const SavingGoalPage({super.key});
@@ -20,139 +21,160 @@ class _SavingGoalPageState extends State<SavingGoalPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        title: Text(
-          LocaleData.mySavingGoals.getString(context),
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: false,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, size: 28),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.help_outline_rounded, size: 28),
-            onPressed: _showSavingsInfo,
+    return ValueListenableBuilder<String>(
+      valueListenable: SettingsNotifier().textSizeNotifier,
+      builder: (context, textSize, child) {
+        double textScaleFactor;
+        switch (textSize) {
+          case 'Small':
+            textScaleFactor = 0.8;
+            break;
+          case 'Large':
+            textScaleFactor = 1.2;
+            break;
+          default:
+            textScaleFactor = 1.0;
+        }
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: TextScaler.linear(textScaleFactor),
           ),
-          ElevatedButton.icon(
-            onPressed: _navigateToAddGoal,
-            icon: const Icon(Icons.add_circle_outline, size: 20),
-            label: Text(
-              LocaleData.newGoal.getString(context),
-              style: const TextStyle(fontSize: 14),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(17.5),
+          child: Scaffold(
+            backgroundColor: Colors.grey[50],
+            appBar: AppBar(
+              title: Text(
+                LocaleData.mySavingGoals.getString(context),
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 8,
+              centerTitle: false,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back_rounded, size: 28),
+                onPressed: () => Navigator.of(context).pop(),
               ),
-            ),
-          ),
-        ],
-      ),
-      body: StreamBuilder<List<SavingGoal>>(
-        stream: _goalService.getGoals(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const CircularProgressIndicator(),
-                  const SizedBox(height: 20),
-                  Text(
-                    LocaleData.loadingGoals.getString(context),
-                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.savings_outlined,
-                    size: 80,
-                    color: Colors.grey[400],
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    LocaleData.noSavingGoals.getString(context),
-                    style: TextStyle(fontSize: 18, color: Colors.grey[700]),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton.icon(
-                    onPressed: _navigateToAddGoal,
-                    icon: const Icon(Icons.add_circle_outline),
-                    label: Text(LocaleData.createFirstGoal.getString(context)),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 16,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          final goals = snapshot.data!;
-
-          return Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Card(
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: _buildTotalSavingsProgress(goals),
-                  ),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.help_outline_rounded, size: 28),
+                  onPressed: _showSavingsInfo,
                 ),
-              ),
-              Expanded(
-                child: RefreshIndicator(
-                  onRefresh: _refreshGoals,
-                  color: AppColors.primary,
-                  child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: goals.length,
-                    itemBuilder: (context, index) => Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: GoalCard(
-                        goal: goals[index],
-                        onTap: () => _navigateToEditGoal(goals[index]),
-                        onAddSavings: (amount) => _addToSavings(goals[index], amount),
-                        onDelete: () => _deleteGoal(goals[index]),
-                      ),
+                ElevatedButton.icon(
+                  onPressed: _navigateToAddGoal,
+                  icon: const Icon(Icons.add_circle_outline, size: 20),
+                  label: Text(
+                    LocaleData.newGoal.getString(context),
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(17.5),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
                     ),
                   ),
                 ),
-              ),
-            ],
-          );
-        },
-      ),
+              ],
+            ),
+            body: StreamBuilder<List<SavingGoal>>(
+              stream: _goalService.getGoals(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const CircularProgressIndicator(),
+                        const SizedBox(height: 20),
+                        Text(
+                          LocaleData.loadingGoals.getString(context),
+                          style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.savings_outlined,
+                          size: 80,
+                          color: Colors.grey[400],
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          LocaleData.noSavingGoals.getString(context),
+                          style: TextStyle(fontSize: 18, color: Colors.grey[700]),
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton.icon(
+                          onPressed: _navigateToAddGoal,
+                          icon: const Icon(Icons.add_circle_outline),
+                          label: Text(LocaleData.createFirstGoal.getString(context)),
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 16,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                final goals = snapshot.data!;
+
+                return Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Card(
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: _buildTotalSavingsProgress(goals),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: RefreshIndicator(
+                        onRefresh: _refreshGoals,
+                        color: AppColors.primary,
+                        child: ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          itemCount: goals.length,
+                          itemBuilder: (context, index) => Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: GoalCard(
+                              goal: goals[index],
+                              onTap: () => _navigateToEditGoal(goals[index]),
+                              onAddSavings: (amount) => _addToSavings(goals[index], amount),
+                              onDelete: () => _deleteGoal(goals[index]),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 

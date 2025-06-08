@@ -18,6 +18,7 @@ import 'presentation/welcome_screen.dart';
 import 'dart:async';
 import 'package:finney/shared/localization/locales.dart';
 import 'package:flutter_localization/flutter_localization.dart';
+import 'package:finney/shared/widgets/common/settings_notifier.dart';
 
 class Chatbot extends StatefulWidget {
   final String? initialQuestion;
@@ -267,9 +268,28 @@ class _ChatbotState extends State<Chatbot> {
   Widget build(BuildContext context) {
     final suggestedQuestions = ChatConstants.getSuggestedQuestions(context);
 
-    return Scaffold(
-      backgroundColor: AppColors.lightBackground,
-      appBar: AppBar(
+    return ValueListenableBuilder<String>(
+      valueListenable: SettingsNotifier().textSizeNotifier,
+      builder: (context, textSize, child) {
+        double textScaleFactor;
+        switch (textSize) {
+          case 'Small':
+            textScaleFactor = 0.8;
+            break;
+          case 'Large':
+            textScaleFactor = 1.2;
+            break;
+          default:
+            textScaleFactor = 1.0;
+        }
+
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: TextScaler.linear(textScaleFactor),
+          ),
+          child: Scaffold(
+            backgroundColor: AppColors.lightBackground,
+            appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text(
@@ -334,13 +354,16 @@ class _ChatbotState extends State<Chatbot> {
                     Icons.mic,
                     color: Colors.white,
                     size: 24.0,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

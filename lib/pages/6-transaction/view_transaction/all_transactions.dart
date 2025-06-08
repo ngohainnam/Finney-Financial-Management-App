@@ -8,6 +8,7 @@ import 'package:finney/pages/3-dashboard/widgets/delete_transaction_dialog.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/shared/localization/locales.dart';
+import 'package:finney/shared/widgets/common/settings_notifier.dart';
 
 class AllTransactionsScreen extends StatefulWidget {
   final List<TransactionModel> transactions;
@@ -118,105 +119,126 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          _isDeleteMode
-            ? LocaleData.selectItemsToDelete.getString(context)
-            : LocaleData.transactions.getString(context),
-          style: const TextStyle(
-            color: AppColors.darkBlue,
-            fontWeight: FontWeight.bold,
-            fontSize: 28,
-            letterSpacing: 1.2,
+    return ValueListenableBuilder<String>(
+      valueListenable: SettingsNotifier().textSizeNotifier,
+      builder: (context, textSize, child) {
+        double textScaleFactor;
+        switch (textSize) {
+          case 'Small':
+            textScaleFactor = 0.8;
+            break;
+          case 'Large':
+            textScaleFactor = 1.2;
+            break;
+          default:
+            textScaleFactor = 1.0;
+        }
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: TextScaler.linear(textScaleFactor),
           ),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(
-            _isDeleteMode ? Icons.close : Icons.arrow_back,
-            color: Colors.black,
-          ),
-          onPressed: _isDeleteMode ? _toggleDeleteMode : () => Navigator.pop(context),
-        ),
-        actions: [
-          if (!_isDeleteMode)
-            IconButton(
-              icon: const Icon(Icons.delete_outline, color: AppColors.darkBlue),
-              onPressed: _toggleDeleteMode,
-            )
-          else
-            StreamBuilder<List<TransactionModel>>(
-              stream: _transactionService.getTransactions(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return const IconButton(
-                    icon: Icon(Icons.delete, color: Colors.grey),
-                    onPressed: null,
-                  );
-                }
-                final transactions = _filterTransactionsByTimeRange(snapshot.data!);
-                final selectedTransactions = _getSelectedTransactions(transactions);
-                return IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: selectedTransactions.isEmpty
-                      ? null
-                      : () => _showDeleteConfirmationDialog(transactions),
-                );
-              },
-            ),
-        ],
-      ),
-      backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: TimeRangeSelector(
-              initialTimeRange: _currentTimeRange,
-              onTimeRangeChanged: (newTimeRange) {
-                setState(() {
-                  _currentTimeRange = newTimeRange;
-                });
-                widget.onTimeRangeChanged(newTimeRange);
-              },
-            ),
-          ),
-          Expanded(
-            child: StreamBuilder<List<TransactionModel>>(
-              stream: _transactionService.getTransactions(),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Text(LocaleData.errorLoadingTransactions.getString(context)),
-                  );
-                }
-                if (!snapshot.hasData) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                final allTransactions = snapshot.data!;
-                final filteredTransactions = _filterTransactionsByTimeRange(allTransactions);
-                return SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: TransactionList(
-                      transactions: filteredTransactions,
-                      onDeleteTransaction: widget.onDeleteTransaction,
-                      showAll: true,
-                      isDeleteMode: _isDeleteMode,
-                      selectedTransactions: Set<TransactionModel>.from(
-                        _getSelectedTransactions(filteredTransactions)
-                      ),
-                      onTransactionSelected: _toggleTransactionSelection,
-                    ),
+          child: Scaffold(
+            appBar: AppBar(
+              title: Text(
+                _isDeleteMode
+                  ? LocaleData.selectItemsToDelete.getString(context)
+                  : LocaleData.transactions.getString(context),
+                style: const TextStyle(
+                  color: AppColors.darkBlue,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 28,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              backgroundColor: Colors.white,
+              elevation: 0,
+              leading: IconButton(
+                icon: Icon(
+                  _isDeleteMode ? Icons.close : Icons.arrow_back,
+                  color: Colors.black,
+                ),
+                onPressed: _isDeleteMode ? _toggleDeleteMode : () => Navigator.pop(context),
+              ),
+              actions: [
+                if (!_isDeleteMode)
+                  IconButton(
+                    icon: const Icon(Icons.delete_outline, color: AppColors.darkBlue),
+                    onPressed: _toggleDeleteMode,
+                  )
+                else
+                  StreamBuilder<List<TransactionModel>>(
+                    stream: _transactionService.getTransactions(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const IconButton(
+                          icon: Icon(Icons.delete, color: Colors.grey),
+                          onPressed: null,
+                        );
+                      }
+                      final transactions = _filterTransactionsByTimeRange(snapshot.data!);
+                      final selectedTransactions = _getSelectedTransactions(transactions);
+                      return IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: selectedTransactions.isEmpty
+                            ? null
+                            : () => _showDeleteConfirmationDialog(transactions),
+                      );
+                    },
                   ),
-                );
-              },
+              ],
+            ),
+            backgroundColor: Colors.white,
+            body: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: TimeRangeSelector(
+                    initialTimeRange: _currentTimeRange,
+                    onTimeRangeChanged: (newTimeRange) {
+                      setState(() {
+                        _currentTimeRange = newTimeRange;
+                      });
+                      widget.onTimeRangeChanged(newTimeRange);
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: StreamBuilder<List<TransactionModel>>(
+                    stream: _transactionService.getTransactions(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        return Center(
+                          child: Text(LocaleData.errorLoadingTransactions.getString(context)),
+                        );
+                      }
+                      if (!snapshot.hasData) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      final allTransactions = snapshot.data!;
+                      final filteredTransactions = _filterTransactionsByTimeRange(allTransactions);
+                      return SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: TransactionList(
+                            transactions: filteredTransactions,
+                            onDeleteTransaction: widget.onDeleteTransaction,
+                            showAll: true,
+                            isDeleteMode: _isDeleteMode,
+                            selectedTransactions: Set<TransactionModel>.from(
+                              _getSelectedTransactions(filteredTransactions)
+                            ),
+                            onTransactionSelected: _toggleTransactionSelection,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

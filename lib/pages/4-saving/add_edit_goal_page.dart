@@ -1,4 +1,5 @@
 import 'package:finney/shared/theme/app_color.dart';
+import 'package:finney/shared/widgets/common/settings_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -138,7 +139,25 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return ValueListenableBuilder<String>(
+      valueListenable: SettingsNotifier().textSizeNotifier,
+      builder: (context, textSize, child) {
+        double textScaleFactor;
+        switch (textSize) {
+          case 'Small':
+            textScaleFactor = 0.8;
+            break;
+          case 'Large':
+            textScaleFactor = 1.2;
+            break;
+          default:
+            textScaleFactor = 1.0;
+        }
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: TextScaler.linear(textScaleFactor),
+          ),
+          child:  Scaffold(
       appBar: AppBar(
         title: Text(
           widget.existingGoal == null
@@ -319,13 +338,16 @@ class _AddEditGoalPageState extends State<AddEditGoalPage> {
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
-                  ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

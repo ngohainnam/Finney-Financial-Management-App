@@ -13,7 +13,8 @@ import 'package:android_intent_plus/flag.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/shared/localization/locales.dart';
 import 'package:finney/shared/localization/localized_number_formatter.dart';
-import 'package:finney/shared/category.dart'; 
+import 'package:finney/shared/category.dart';
+import 'package:finney/shared/widgets/common/settings_notifier.dart';
 
 class BudgetReminderPage extends StatefulWidget {
   const BudgetReminderPage({super.key});
@@ -370,225 +371,246 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.lightBackground,
-      appBar: AppBar(
-        backgroundColor: AppColors.lightBackground,
-        elevation: 0,
-        titleSpacing: 0,
-        title: Text(
-          LocaleData.budgetReminderTitle.getString(context),
-          style: TextStyle(
-            color: AppColors.darkBlue,
-            letterSpacing: 1.2,
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
+    return ValueListenableBuilder<String>(
+      valueListenable: SettingsNotifier().textSizeNotifier,
+      builder: (context, textSize, child) {
+        double textScaleFactor;
+        switch (textSize) {
+          case 'Small':
+            textScaleFactor = 0.8;
+            break;
+          case 'Large':
+            textScaleFactor = 1.2;
+            break;
+          default:
+            textScaleFactor = 1.0;
+        }
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: TextScaler.linear(textScaleFactor),
           ),
-        ),
-        iconTheme: IconThemeData(color: Colors.black),
-      ),
-      body: ListView(
-        padding: EdgeInsets.all(16),
-        children: [
-          Text(
-            LocaleData.thisMonthsSpending.getString(context),
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-          ),
-          SizedBox(height: 12),
-          Container(
-            padding: EdgeInsets.all(16),
-            margin: EdgeInsets.only(bottom: 8),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+          child: Scaffold(
+            backgroundColor: AppColors.lightBackground,
+            appBar: AppBar(
+              backgroundColor: AppColors.lightBackground,
+              elevation: 0,
+              titleSpacing: 0,
+              title: Text(
+                LocaleData.budgetReminderTitle.getString(context),
+                style: TextStyle(
+                  color: AppColors.darkBlue,
+                  letterSpacing: 1.2,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              iconTheme: IconThemeData(color: Colors.black),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            body: ListView(
+              padding: EdgeInsets.all(16),
               children: [
                 Text(
-                  LocaleData.totalSpent.getString(context),
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black54,
-                  ),
+                  LocaleData.thisMonthsSpending.getString(context),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
-                SizedBox(height: 4),
-                Text(
-                  () {
-                    double totalSpent = _categoryData.values
-                        .map((e) => (e['spent'] ?? 0.0) as double)
-                        .fold(0.0, (a, b) => a + b);
-                    double totalLimit = _categoryData.values
-                        .map((e) => (e['limit'] ?? 0.0) as double)
-                        .fold(0.0, (a, b) => a + b);
-                    return "৳${LocalizedNumberFormatter.formatNumber(totalSpent.toInt().toString(), context)} / ৳${LocalizedNumberFormatter.formatNumber(totalLimit.toInt().toString(), context)}";
-                  }(),
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: AppColors.primary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 12),
-          ...categoryOrder.map((category) {
-            final data = _categoryData[category] ?? {'spent': 0.0, 'limit': 1.0};
-            double spent = data['spent'];
-            double limit = data['limit'];
-            double percent = (spent / (limit == 0 ? 1 : limit)).clamp(0.0, 1.0);
-
-            Color statusColor = percent < 0.7
-                ? Colors.green
-                : (percent < 1 ? Colors.orange : Colors.redAccent);
-
-            return Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () => _editLimit(category),
-                borderRadius: BorderRadius.circular(16),
-                child: Container(
-                  margin: EdgeInsets.only(bottom: 14),
+                SizedBox(height: 12),
+                Container(
+                  padding: EdgeInsets.all(16),
+                  margin: EdgeInsets.only(bottom: 8),
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 5,
-                        offset: Offset(0, 3),
-                      )
-                    ],
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Row(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        width: 6,
-                        height: 90,
-                        decoration: BoxDecoration(
-                          color: CategoryUtils.getColorForCategory(category),
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(16),
-                            bottomLeft: Radius.circular(16),
-                          ),
+                      Text(
+                        LocaleData.totalSpent.getString(context),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.black54,
                         ),
                       ),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              TweenAnimationBuilder<double>(
-                                tween: Tween<double>(
-                                  begin: 1.0,
-                                  end: _speakingCategory == category ? 1.3 : 1.0,
-                                ),
-                                duration: Duration(milliseconds: 500),
-                                curve: Curves.elasticOut,
-                                builder: (context, scale, child) {
-                                  return Transform.scale(
-                                    scale: scale,
-                                    child: AnimatedContainer(
-                                      duration: Duration(milliseconds: 500),
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: CategoryUtils.getColorForCategory(category).withValues(alpha: 0.1),
-                                        boxShadow: _speakingCategory == category
-                                            ? [
-                                          BoxShadow(
-                                            color: CategoryUtils.getColorForCategory(category).withValues(alpha: 0.5),
-                                            blurRadius: 12,
-                                            spreadRadius: 2,
-                                          )
-                                        ]
-                                            : [],
-                                      ),
-                                      child: child,
-                                    ),
-                                  );
-                                },
-                                child: Icon(
-                                  CategoryUtils.getIconForCategory(category),
-                                  color: CategoryUtils.getColorForCategory(category),
-                                  size: 24,
+                      SizedBox(height: 4),
+                      Text(
+                        () {
+                          double totalSpent = _categoryData.values
+                              .map((e) => (e['spent'] ?? 0.0) as double)
+                              .fold(0.0, (a, b) => a + b);
+                          double totalLimit = _categoryData.values
+                              .map((e) => (e['limit'] ?? 0.0) as double)
+                              .fold(0.0, (a, b) => a + b);
+                          return "৳${LocalizedNumberFormatter.formatNumber(totalSpent.toInt().toString(), context)} / ৳${LocalizedNumberFormatter.formatNumber(totalLimit.toInt().toString(), context)}";
+                        }(),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 12),
+                ...categoryOrder.map((category) {
+                  final data = _categoryData[category] ?? {'spent': 0.0, 'limit': 1.0};
+                  double spent = data['spent'];
+                  double limit = data['limit'];
+                  double percent = (spent / (limit == 0 ? 1 : limit)).clamp(0.0, 1.0);
+
+                  Color statusColor = percent < 0.7
+                      ? Colors.green
+                      : (percent < 1 ? Colors.orange : Colors.redAccent);
+
+                  return Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () => _editLimit(category),
+                      borderRadius: BorderRadius.circular(16),
+                      child: Container(
+                        margin: EdgeInsets.only(bottom: 14),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 5,
+                              offset: Offset(0, 3),
+                            )
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 6,
+                              height: 90,
+                              decoration: BoxDecoration(
+                                color: CategoryUtils.getColorForCategory(category),
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(16),
+                                  bottomLeft: Radius.circular(16),
                                 ),
                               ),
-                              SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
+                            ),
+                            SizedBox(width: 12),
+                            Expanded(
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                                child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            CategoryUtils.getLocalizedCategoryName(category, context),
-                                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                              fontWeight: FontWeight.w600,
-                                              color: AppColors.primary,
+                                    TweenAnimationBuilder<double>(
+                                      tween: Tween<double>(
+                                        begin: 1.0,
+                                        end: _speakingCategory == category ? 1.3 : 1.0,
+                                      ),
+                                      duration: Duration(milliseconds: 500),
+                                      curve: Curves.elasticOut,
+                                      builder: (context, scale, child) {
+                                        return Transform.scale(
+                                          scale: scale,
+                                          child: AnimatedContainer(
+                                            duration: Duration(milliseconds: 500),
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: CategoryUtils.getColorForCategory(category).withValues(alpha: 0.1),
+                                              boxShadow: _speakingCategory == category
+                                                  ? [
+                                                BoxShadow(
+                                                  color: CategoryUtils.getColorForCategory(category).withValues(alpha: 0.5),
+                                                  blurRadius: 12,
+                                                  spreadRadius: 2,
+                                                )
+                                              ]
+                                                  : [],
                                             ),
+                                            child: child,
                                           ),
-                                        ),
-                                        if (percent >= 1)
-                                          Icon(Icons.warning, size: 18, color: Colors.redAccent),
-                                      ],
-                                    ),
-                                    SizedBox(height: 6),
-                                    TweenAnimationBuilder(
-                                      duration: Duration(milliseconds: 600),
-                                      tween: Tween<double>(begin: 0, end: percent),
-                                      builder: (context, double value, _) => LinearProgressIndicator(
-                                        value: value,
-                                        minHeight: 6,
-                                        color: percent >= 1 ? Colors.redAccent : AppColors.primary,
-                                        backgroundColor: Colors.grey[300],
+                                        );
+                                      },
+                                      child: Icon(
+                                        CategoryUtils.getIconForCategory(category),
+                                        color: CategoryUtils.getColorForCategory(category),
+                                        size: 24,
                                       ),
                                     ),
-                                    SizedBox(height: 6),
-                                    Text(
-                                      "৳${LocalizedNumberFormatter.formatNumber(spent.toInt().toString(), context)} / ৳${LocalizedNumberFormatter.formatNumber(limit.toInt().toString(), context)}",
-                                      style: TextStyle(
-                                          fontSize: 13,
-                                          color: statusColor,
-                                          fontWeight: FontWeight.w500),
+                                    SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  CategoryUtils.getLocalizedCategoryName(category, context),
+                                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                                    fontWeight: FontWeight.w600,
+                                                    color: AppColors.primary,
+                                                  ),
+                                                ),
+                                              ),
+                                              if (percent >= 1)
+                                                Icon(Icons.warning, size: 18, color: Colors.redAccent),
+                                            ],
+                                          ),
+                                          SizedBox(height: 6),
+                                          TweenAnimationBuilder(
+                                            duration: Duration(milliseconds: 600),
+                                            tween: Tween<double>(begin: 0, end: percent),
+                                            builder: (context, double value, _) => LinearProgressIndicator(
+                                              value: value,
+                                              minHeight: 6,
+                                              color: percent >= 1 ? Colors.redAccent : AppColors.primary,
+                                              backgroundColor: Colors.grey[300],
+                                            ),
+                                          ),
+                                          SizedBox(height: 6),
+                                          Text(
+                                            "৳${LocalizedNumberFormatter.formatNumber(spent.toInt().toString(), context)} / ৳${LocalizedNumberFormatter.formatNumber(limit.toInt().toString(), context)}",
+                                            style: TextStyle(
+                                                fontSize: 13,
+                                                color: statusColor,
+                                                fontWeight: FontWeight.w500),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ],
                                 ),
                               ),
-                            ],
-                          ),
+                            )
+                          ],
                         ),
-                      )
-                    ],
-                  ),
+                      ),
+                    ),
+                  );
+                }),
+                SizedBox(height: 30),
+                MyButton(
+                  onTap: _speakSummary,
+                  icon: _isSpeaking ? Icons.stop : Icons.play_arrow,
+                  text: _isSpeaking
+                      ? LocaleData.stopSummary.getString(context)
+                      : LocaleData.playSummary.getString(context),
+                  backgroundColor: _isSpeaking ? Colors.redAccent : AppColors.darkBlue,
+                  textColor: Colors.white,
                 ),
-              ),
-            );
-          }),
-          SizedBox(height: 30),
-          MyButton(
-            onTap: _speakSummary,
-            icon: _isSpeaking ? Icons.stop : Icons.play_arrow,
-            text: _isSpeaking
-                ? LocaleData.stopSummary.getString(context)
-                : LocaleData.playSummary.getString(context),
-            backgroundColor: _isSpeaking ? Colors.redAccent : AppColors.darkBlue,
-            textColor: Colors.white,
+                SizedBox(height: 12),
+                MyButton(
+                  onTap: _pickReminderTime,
+                  icon: Icons.alarm,
+                  text: LocaleData.setDailyReminder.getString(context),
+                  backgroundColor: AppColors.darkBlue,
+                  textColor: Colors.white,
+                ),
+                SizedBox(height: 24),
+              ],
+            ),
           ),
-          SizedBox(height: 12),
-          MyButton(
-            onTap: _pickReminderTime,
-            icon: Icons.alarm,
-            text: LocaleData.setDailyReminder.getString(context),
-            backgroundColor: AppColors.darkBlue,
-            textColor: Colors.white,
-          ),
-          SizedBox(height: 24),
-        ],
-      ),
+        );
+      },
     );
   }
 }

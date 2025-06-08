@@ -19,6 +19,7 @@ import 'package:finney/pages/5-learn/quiz/quiz_results_page.dart';
 import 'package:finney/pages/5-learn/financial_learn/savings_coach.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/shared/widgets/common/snack_bar.dart';
+import 'package:finney/shared/widgets/common/settings_notifier.dart';
 
 class Learn extends StatefulWidget {
   const Learn({super.key});
@@ -277,95 +278,116 @@ class _LearnState extends State<Learn> {
         .toList()
         : [];
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FB),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Text(
-          LocaleData.learningHub.getString(context),
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 28,
-            color: AppColors.darkBlue,
-            letterSpacing: 1.2,
+    return ValueListenableBuilder<String>(
+      valueListenable: SettingsNotifier().textSizeNotifier,
+      builder: (context, textSize, child) {
+        double textScaleFactor;
+        switch (textSize) {
+          case 'Small':
+            textScaleFactor = 0.8;
+            break;
+          case 'Large':
+            textScaleFactor = 1.2;
+            break;
+          default:
+            textScaleFactor = 1.0;
+        }
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: TextScaler.linear(textScaleFactor),
           ),
-        ),
-        actions: [
-          if (_selectedTab == 'Lessons' || _selectedTab == 'App Tour')
-            IconButton(
-              icon: const Icon(Icons.refresh, color: AppColors.darkBlue),
-              onPressed: _resetAllProgress,
-              tooltip: 'Reset Progress',
-            ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                _buildTab('Lessons'),
-                _buildTab('App Tour'),
-                _buildTab('Progress'),
-                _buildTab('Quiz'),
+          child: Scaffold(
+            backgroundColor: const Color(0xFFF5F7FB),
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              title: Text(
+                LocaleData.learningHub.getString(context),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 28,
+                  color: AppColors.darkBlue,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              actions: [
+                if (_selectedTab == 'Lessons' || _selectedTab == 'App Tour')
+                  IconButton(
+                    icon: const Icon(Icons.refresh, color: AppColors.darkBlue),
+                    onPressed: _resetAllProgress,
+                    tooltip: 'Reset Progress',
+                  ),
               ],
             ),
-            const SizedBox(height: 16),
-            _buildSearchBar(),
-            const SizedBox(height: 16),
-            Expanded(
-              child: isProgressTab
-                  ? ListView(
-                padding: const EdgeInsets.only(bottom: 24),
+            body: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+              child: Column(
                 children: [
-                  Text(
-                    LocaleData.ongoing.getString(context),
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
+                  Row(
+                    children: [
+                      _buildTab('Lessons'),
+                      _buildTab('App Tour'),
+                      _buildTab('Progress'),
+                      _buildTab('Quiz'),
+                    ],
                   ),
-                  const SizedBox(height: 12),
-                  ...ongoingLessons.map(
-                        (item) => Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: _buildCardItem(item),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    LocaleData.completed.getString(context),
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  ...completedLessons.map(
-                        (item) => Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: _buildCardItem(item),
+                  const SizedBox(height: 16),
+                  _buildSearchBar(),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: isProgressTab
+                        ? ListView(
+                      padding: const EdgeInsets.only(bottom: 24),
+                      children: [
+                        Text(
+                          LocaleData.ongoing.getString(context),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        ...ongoingLessons.map(
+                              (item) => Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: _buildCardItem(item),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        Text(
+                          LocaleData.completed.getString(context),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        ...completedLessons.map(
+                              (item) => Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: _buildCardItem(item),
+                          ),
+                        ),
+                      ],
+                    )
+                        : filteredList.isEmpty
+                        ? Center(
+                      child: Text(
+                        LocaleData.noResultsFound.getString(context),
+                      ),
+                    )
+                        : ListView.separated(
+                      itemCount: filteredList.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 16),
+                      itemBuilder: (context, index) => _buildCardItem(filteredList[index]),
                     ),
                   ),
                 ],
-              )
-                  : filteredList.isEmpty
-                  ? Center(
-                child: Text(
-                  LocaleData.noResultsFound.getString(context),
-                ),
-              )
-                  : ListView.separated(
-                itemCount: filteredList.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 16),
-                itemBuilder: (context, index) => _buildCardItem(filteredList[index]),
               ),
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 

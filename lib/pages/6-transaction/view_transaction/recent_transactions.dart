@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:finney/shared/theme/app_color.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/shared/localization/locales.dart';
+import 'package:finney/shared/widgets/common/settings_notifier.dart';
 
 class RecentTransactions extends StatefulWidget {
   final List<TransactionModel> transactions;
@@ -76,103 +77,125 @@ class _RecentTransactionsState extends State<RecentTransactions> {
   Widget build(BuildContext context) {
     final recentTransactions = widget.transactions.take(5).toList();
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                _isDeleteMode
-                    ? LocaleData.selectItemsToDelete.getString(context)
-                    : LocaleData.transactions.getString(context),
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.darkBlue,
-                ),
-              ),
-              Row(
-                children: [
-                  if (!_isDeleteMode)
-                    IconButton(
-                      icon: const Icon(Icons.delete_outline, color: AppColors.darkBlue),
-                      onPressed: recentTransactions.isEmpty ? null : _toggleDeleteMode,
-                    )
-                  else ...[
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: _toggleDeleteMode,
+    return ValueListenableBuilder<String>(
+      valueListenable: SettingsNotifier().textSizeNotifier,
+      builder: (context, textSize, child) {
+        double textScaleFactor;
+        switch (textSize) {
+          case 'Small':
+            textScaleFactor = 0.8;
+            break;
+          case 'Large':
+            textScaleFactor = 1.2;
+            break;
+          default:
+            textScaleFactor = 1.0;
+        }
+
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: TextScaler.linear(textScaleFactor),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      _isDeleteMode
+                          ? LocaleData.selectItemsToDelete.getString(context)
+                          : LocaleData.transactions.getString(context),
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.darkBlue,
+                      ),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.red),
-                      onPressed: _selectedTransactions.isEmpty ? null : _showDeleteConfirmationDialog,
-                    ),
-                  ],
-                  if (!_isDeleteMode)
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AllTransactionsScreen(
-                              transactions: widget.transactions,
-                              onDeleteTransaction: widget.onDeleteTransaction,
-                              timeRange: widget.timeRange,
-                              onTimeRangeChanged: widget.onTimeRangeChanged,
+                    Row(
+                      children: [
+                        if (!_isDeleteMode)
+                          IconButton(
+                            icon: const Icon(Icons.delete_outline, color: AppColors.darkBlue),
+                            onPressed: recentTransactions.isEmpty ? null : _toggleDeleteMode,
+                          )
+                        else ...[
+                          IconButton(
+                            icon: const Icon(Icons.close),
+                            onPressed: _toggleDeleteMode,
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: _selectedTransactions.isEmpty ? null : _showDeleteConfirmationDialog,
+                          ),
+                        ],
+                        if (!_isDeleteMode)
+                          TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => AllTransactionsScreen(
+                                    transactions: widget.transactions,
+                                    onDeleteTransaction: widget.onDeleteTransaction,
+                                    timeRange: widget.timeRange,
+                                    onTimeRangeChanged: widget.onTimeRangeChanged,
+                                  ),
+                                ),
+                              );
+                            },
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                side: BorderSide(
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ),
+                            child: Text(
+                              LocaleData.seeAll.getString(context),
+                              style: TextStyle(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
-                        );
-                      },
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          side: BorderSide(
-                            color: AppColors.primary,
-                          ),
-                        ),
-                      ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                if (recentTransactions.isEmpty)
+                  Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(20),
                       child: Text(
-                        LocaleData.seeAll.getString(context),
-                        style: TextStyle(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        LocaleData.noTransactionsInThisPeriod.getString(context),
+                        style: TextStyle(color: Colors.grey),
                       ),
                     ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          if (recentTransactions.isEmpty)
-            Center(
-              child: Padding(
-                padding: EdgeInsets.all(20),
-                child: Text(
-                  LocaleData.noTransactionsInThisPeriod.getString(context),
-                  style: TextStyle(color: Colors.grey),
-                ),
-              ),
-            )
-          else
-            TransactionList(
-              transactions: recentTransactions,
-              onDeleteTransaction: widget.onDeleteTransaction,
-              showAll: false,
-              isDeleteMode: _isDeleteMode,
-              selectedTransactions: _selectedTransactions,
-              onTransactionSelected: _toggleTransactionSelection,
+                  )
+                else
+                  TransactionList(
+                    transactions: recentTransactions,
+                    onDeleteTransaction: widget.onDeleteTransaction,
+                    showAll: false,
+                    isDeleteMode: _isDeleteMode,
+                    selectedTransactions: _selectedTransactions,
+                    onTransactionSelected: _toggleTransactionSelection,
+                  ),
+              ],
             ),
-        ],
-      ),
+          ),
+        );
+      },
     );
   }
 }

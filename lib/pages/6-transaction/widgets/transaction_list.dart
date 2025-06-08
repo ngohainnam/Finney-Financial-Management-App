@@ -6,6 +6,7 @@ import 'package:finney/shared/theme/app_color.dart';
 import 'package:finney/pages/6-transaction/widgets/transaction_item.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/shared/localization/locales.dart';
+import 'package:finney/shared/widgets/common/settings_notifier.dart';
 
 class TransactionList extends StatelessWidget {
   final List<TransactionModel> transactions;
@@ -78,43 +79,64 @@ class TransactionList extends StatelessWidget {
       );
     }
 
-    return Column(
-      children: groupedTransactions.entries.map((entry) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Text(
-                _formatDate(entry.key, context),
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.darkBlue,
-                ),
-              ),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                color: AppColors.softGray,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                children: entry.value.map((transaction) {
-                  return TransactionItem(
-                    transaction: transaction,
-                    onDelete: onDeleteTransaction,
-                    isDeleteMode: isDeleteMode,
-                    isSelected: selectedTransactions.contains(transaction),
-                    onSelected: onTransactionSelected,
-                  );
-                }).toList(),
-              ),
-            ),
-            const SizedBox(height: 16),
-          ],
+    return ValueListenableBuilder<String>(
+      valueListenable: SettingsNotifier().textSizeNotifier,
+      builder: (context, textSize, child) {
+        double textScaleFactor;
+        switch (textSize) {
+          case 'Small':
+            textScaleFactor = 0.8;
+            break;
+          case 'Large':
+            textScaleFactor = 1.2;
+            break;
+          default:
+            textScaleFactor = 1.0;
+        }
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: TextScaler.linear(textScaleFactor),
+          ),
+          child: Column(
+            children: groupedTransactions.entries.map((entry) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text(
+                      _formatDate(entry.key, context),
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.darkBlue,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.softGray,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      children: entry.value.map((transaction) {
+                        return TransactionItem(
+                          transaction: transaction,
+                          onDelete: onDeleteTransaction,
+                          isDeleteMode: isDeleteMode,
+                          isSelected: selectedTransactions.contains(transaction),
+                          onSelected: onTransactionSelected,
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              );
+            }).toList(),
+          ),
         );
-      }).toList(),
+      },
     );
   }
 }

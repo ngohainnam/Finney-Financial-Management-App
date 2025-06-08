@@ -8,6 +8,7 @@ import 'package:finney/core/storage/cloud/models/transaction_model.dart';
 import 'package:finney/core/storage/storage_manager.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/shared/localization/locales.dart';
+import 'package:finney/shared/widgets/common/settings_notifier.dart';
 
 abstract class BaseTransactionScreen extends StatefulWidget {
   final Function? onTransactionAdded;
@@ -28,7 +29,7 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
   DateTime _selectedDate = DateTime.now();
   bool _isSaving = false;
   String? _errorMessage;
-  late final TransactionCloudService _transactionService; // Changed to late final
+  late final TransactionCloudService _transactionService;
 
   TextEditingController get amountController => _amountController;
 
@@ -147,219 +148,240 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Text(
-          screenTitle,
-          style: const TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
+    return ValueListenableBuilder<String>(
+      valueListenable: SettingsNotifier().textSizeNotifier,
+      builder: (context, textSize, child) {
+        double textScaleFactor;
+        switch (textSize) {
+          case 'Small':
+            textScaleFactor = 0.8;
+            break;
+          case 'Large':
+            textScaleFactor = 1.2;
+            break;
+          default:
+            textScaleFactor = 1.0;
+        }
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: TextScaler.linear(textScaleFactor),
           ),
-        ),
-        centerTitle: true,
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (_errorMessage != null)
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              color: Colors.red.shade50,
-              child: Row(
-                children: [
-                  const Icon(Icons.error_outline, color: Colors.red, size: 18),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      _errorMessage!,
-                      style: TextStyle(color: Colors.red[700], fontSize: 14),
+          child: Scaffold(
+            backgroundColor: Colors.white,
+            appBar: AppBar(
+              backgroundColor: Colors.white,
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.black),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              title: Text(
+                screenTitle,
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              centerTitle: true,
+            ),
+            body: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (_errorMessage != null)
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    color: Colors.red.shade50,
+                    child: Row(
+                      children: [
+                        const Icon(Icons.error_outline, color: Colors.red, size: 18),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            _errorMessage!,
+                            style: TextStyle(color: Colors.red[700], fontSize: 14),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close, size: 16, color: Colors.red),
+                          onPressed: () => setState(() => _errorMessage = null),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                        ),
+                      ],
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.close, size: 16, color: Colors.red),
-                    onPressed: () => setState(() => _errorMessage = null),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
-                ],
-              ),
-            ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: TextField(
-              controller: _amountController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              style: TextStyle(
-                fontSize: 40,
-                fontWeight: FontWeight.bold,
-                color: amountColor,
-              ),
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.zero,
-                hintText: LocaleData.amountHint.getString(context),
-                prefixText: '৳ ',
-                prefixStyle: TextStyle(
-                  color: amountColor,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 40,
-                ),
-                hintStyle: const TextStyle(
-                  color: Color(0xFF9E9E9E),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 40,
-                ),
-              ),
-              onChanged: (value) {
-                if (_errorMessage != null) {
-                  setState(() {
-                    _errorMessage = null;
-                  });
-                }
-                if (value.isEmpty) {
-                  _amountController.text = '';
-                  return;
-                }
-                String cleanValue = value.replaceAll(RegExp(r'[^\d.]'), '');
-                if (cleanValue.split('.').length > 2) {
-                  cleanValue = cleanValue.substring(0, cleanValue.lastIndexOf('.'));
-                }
-                if (cleanValue != value) {
-                  _amountController.text = cleanValue;
-                  _amountController.selection = TextSelection.fromPosition(
-                    TextPosition(offset: cleanValue.length),
-                  );
-                }
-              },
-            ),
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    LocaleData.category.getString(context),
-                    style: const TextStyle(
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: TextField(
+                    controller: _amountController,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    style: TextStyle(
+                      fontSize: 40,
                       fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                      color: amountColor,
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      childAspectRatio: 1,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 15,
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.zero,
+                      hintText: LocaleData.amountHint.getString(context),
+                      prefixText: '৳ ',
+                      prefixStyle: TextStyle(
+                        color: amountColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 40,
+                      ),
+                      hintStyle: const TextStyle(
+                        color: Color(0xFF9E9E9E),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 40,
+                      ),
                     ),
-                    itemCount: categories.length,
-                    itemBuilder: (context, index) {
-                      final category = categories[index];
-                      final isSelected = _selectedCategory == category.name;
-                      return _buildCategoryItem(
-                        category.name,
-                        category.icon,
-                        category.color,
-                        isSelected,
-                      );
+                    onChanged: (value) {
+                      if (_errorMessage != null) {
+                        setState(() {
+                          _errorMessage = null;
+                        });
+                      }
+                      if (value.isEmpty) {
+                        _amountController.text = '';
+                        return;
+                      }
+                      String cleanValue = value.replaceAll(RegExp(r'[^\d.]'), '');
+                      if (cleanValue.split('.').length > 2) {
+                        cleanValue = cleanValue.substring(0, cleanValue.lastIndexOf('.'));
+                      }
+                      if (cleanValue != value) {
+                        _amountController.text = cleanValue;
+                        _amountController.selection = TextSelection.fromPosition(
+                          TextPosition(offset: cleanValue.length),
+                        );
+                      }
                     },
                   ),
-                  const SizedBox(height: 20),
-                  Text(
-                    LocaleData.date.getString(context),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  InkWell(
-                    onTap: () => _selectDate(context),
-                    child: Container(
-                      padding: const EdgeInsets.all(15),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF5F5F5),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            DateFormat('EEEE').format(_selectedDate),
-                            style: const TextStyle(
-                              color: Color(0xFF424242),
-                              fontWeight: FontWeight.w500,
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          LocaleData.category.getString(context),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            childAspectRatio: 1,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 15,
+                          ),
+                          itemCount: categories.length,
+                          itemBuilder: (context, index) {
+                            final category = categories[index];
+                            final isSelected = _selectedCategory == category.name;
+                            return _buildCategoryItem(
+                              category.name,
+                              category.icon,
+                              category.color,
+                              isSelected,
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          LocaleData.date.getString(context),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        InkWell(
+                          onTap: () => _selectDate(context),
+                          child: Container(
+                            padding: const EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF5F5F5),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  DateFormat('EEEE').format(_selectedDate),
+                                  style: const TextStyle(
+                                    color: Color(0xFF424242),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                Text(
+                                  DateFormat('dd/MM/yyyy').format(_selectedDate),
+                                  style: const TextStyle(
+                                    color: Color(0xFF424242),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          Text(
-                            DateFormat('dd/MM/yyyy').format(_selectedDate),
-                            style: const TextStyle(
-                              color: Color(0xFF424242),
-                              fontWeight: FontWeight.w500,
-                            ),
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          LocaleData.description.getString(context),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
                           ),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(height: 10),
+                        TextField(
+                          controller: _descriptionController,
+                          decoration: InputDecoration(
+                            hintText: LocaleData.descriptionHint.getString(context),
+                            hintStyle: const TextStyle(
+                              color: Color(0xFFBDBDBD),
+                              fontSize: 14,
+                            ),
+                            filled: true,
+                            fillColor: const Color(0xFFF5F5F5),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide.none,
+                            ),
+                            contentPadding: const EdgeInsets.all(15),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  Text(
-                    LocaleData.description.getString(context),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: _descriptionController,
-                    decoration: InputDecoration(
-                      hintText: LocaleData.descriptionHint.getString(context),
-                      hintStyle: const TextStyle(
-                        color: Color(0xFFBDBDBD),
-                        fontSize: 14,
-                      ),
-                      filled: true,
-                      fillColor: const Color(0xFFF5F5F5),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide.none,
-                      ),
-                      contentPadding: const EdgeInsets.all(15),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
+            floatingActionButton: _isSaving
+                ? const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: CircularProgressIndicator(),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: FloatingActionButton(
+                      onPressed: _saveTransaction,
+                      backgroundColor: amountColor,
+                      elevation: 4,
+                      child: const Icon(Icons.check, color: Colors.white),
+                    ),
+                  ),
+            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
           ),
-        ],
-      ),
-      floatingActionButton: _isSaving
-          ? const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: CircularProgressIndicator(),
-            )
-          : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: FloatingActionButton(
-                onPressed: _saveTransaction,
-                backgroundColor: amountColor,
-                elevation: 4,
-                child: const Icon(Icons.check, color: Colors.white),
-              ),
-            ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        );
+      },
     );
   }
 

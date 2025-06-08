@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/shared/localization/locales.dart';
 import 'package:finney/shared/widgets/common/snack_bar.dart';
+import 'package:finney/shared/widgets/common/settings_notifier.dart';
 
 enum ChartViewType { expenses, income }
 
@@ -232,86 +233,107 @@ class _InsightsState extends State<Insights> with SingleTickerProviderStateMixin
         ? _categoryExpenses
         : _categoryIncome;
 
-    return Scaffold(
-      backgroundColor: AppColors.lightBackground,
-      appBar: AppBar(
-        backgroundColor: AppColors.lightBackground,
-        title: Text(
-          LocaleData.insights.getString(context),
-          style: const TextStyle(
-            color: AppColors.darkBlue,
-            fontWeight: FontWeight.bold,
-            fontSize: 28,
-            letterSpacing: 1.2,
+    return ValueListenableBuilder<String>(
+      valueListenable: SettingsNotifier().textSizeNotifier,
+      builder: (context, textSize, child) {
+        double textScaleFactor;
+        switch (textSize) {
+          case 'Small':
+            textScaleFactor = 0.8;
+            break;
+          case 'Large':
+            textScaleFactor = 1.2;
+            break;
+          default:
+            textScaleFactor = 1.0;
+        }
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: TextScaler.linear(textScaleFactor),
           ),
-        ),
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: AppColors.darkBlue,
-          unselectedLabelColor: Colors.grey,
-          indicatorColor: AppColors.darkBlue,
-          tabs: [
-            Tab(
-              icon: const Icon(Icons.bar_chart),
-              text: LocaleData.spendingAnalysis.getString(context),
-            ),
-            Tab(
-              icon: const Icon(Icons.pie_chart),
-              text: LocaleData.categoryBreakdown.getString(context),
-            ),
-          ],
-        ),
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      TimeRangeSelector(
-                        initialTimeRange: _currentTimeRange,
-                        onTimeRangeChanged: _onTimeRangeChanged,
-                        firstTransactionDate: _transactions.isNotEmpty
-                            ? _transactions.map((t) => t.date).reduce((a, b) => a.isBefore(b) ? a : b)
-                            : DateTime.now(),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildToggleButtons(),
-                    ],
-                  ),
+          child: Scaffold(
+            backgroundColor: AppColors.lightBackground,
+            appBar: AppBar(
+              backgroundColor: AppColors.lightBackground,
+              title: Text(
+                LocaleData.insights.getString(context),
+                style: const TextStyle(
+                  color: AppColors.darkBlue,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 28,
+                  letterSpacing: 1.2,
                 ),
-                Expanded(
-                  child: TabBarView(
-                    controller: _tabController,
+              ),
+              bottom: TabBar(
+                controller: _tabController,
+                labelColor: AppColors.darkBlue,
+                unselectedLabelColor: Colors.grey,
+                indicatorColor: AppColors.darkBlue,
+                tabs: [
+                  Tab(
+                    icon: const Icon(Icons.bar_chart),
+                    text: LocaleData.spendingAnalysis.getString(context),
+                  ),
+                  Tab(
+                    icon: const Icon(Icons.pie_chart),
+                    text: LocaleData.categoryBreakdown.getString(context),
+                  ),
+                ],
+              ),
+            ),
+            body: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : Column(
                     children: [
-                      // Bar Chart Tab
-                      SingleChildScrollView(
+                      Padding(
                         padding: const EdgeInsets.all(16.0),
-                        child: UnifiedBarChart(
-                          title: _currentViewType == ChartViewType.expenses
-                              ? LocaleData.expenseAnalysis.getString(context)
-                              : LocaleData.incomeAnalysis.getString(context),
-                          periodExpenses: currentPeriodData,
-                          interval: _chartService.getIntervalForTimeRange(_currentTimeRange),
-                          timeRange: _currentTimeRange,
-                          viewType: _currentViewType,
+                        child: Column(
+                          children: [
+                            TimeRangeSelector(
+                              initialTimeRange: _currentTimeRange,
+                              onTimeRangeChanged: _onTimeRangeChanged,
+                              firstTransactionDate: _transactions.isNotEmpty
+                                  ? _transactions.map((t) => t.date).reduce((a, b) => a.isBefore(b) ? a : b)
+                                  : DateTime.now(),
+                            ),
+                            const SizedBox(height: 16),
+                            _buildToggleButtons(),
+                          ],
                         ),
                       ),
-                      // Pie Chart Tab
-                      SingleChildScrollView(
-                        padding: const EdgeInsets.all(16.0),
-                        child: CategoryPieChart(
-                          categoryData: _chartService.convertCategoryExpensesToMap(currentCategoryData),
-                          viewType: _currentViewType,
+                      Expanded(
+                        child: TabBarView(
+                          controller: _tabController,
+                          children: [
+                            // Bar Chart Tab
+                            SingleChildScrollView(
+                              padding: const EdgeInsets.all(16.0),
+                              child: UnifiedBarChart(
+                                title: _currentViewType == ChartViewType.expenses
+                                    ? LocaleData.expenseAnalysis.getString(context)
+                                    : LocaleData.incomeAnalysis.getString(context),
+                                periodExpenses: currentPeriodData,
+                                interval: _chartService.getIntervalForTimeRange(_currentTimeRange),
+                                timeRange: _currentTimeRange,
+                                viewType: _currentViewType,
+                              ),
+                            ),
+                            // Pie Chart Tab
+                            SingleChildScrollView(
+                              padding: const EdgeInsets.all(16.0),
+                              child: CategoryPieChart(
+                                categoryData: _chartService.convertCategoryExpensesToMap(currentCategoryData),
+                                viewType: _currentViewType,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
-                ),
-              ],
-            ),
+          ),
+        );
+      },
     );
   }
 }
