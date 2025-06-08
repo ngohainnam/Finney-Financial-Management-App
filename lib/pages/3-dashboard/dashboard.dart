@@ -279,7 +279,7 @@ class DashboardState extends State<Dashboard> with RouteAware {
               appBar: AppBar(
                 backgroundColor: AppColors.lightBackground,
                 title: Text(
-                  LocaleData.dashboardTitle.getString(context),
+                  'FINNEY AI',
                   style: const TextStyle(
                     color: AppColors.darkBlue,
                     fontWeight: FontWeight.bold,

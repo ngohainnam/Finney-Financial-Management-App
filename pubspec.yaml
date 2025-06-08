@@ -52,20 +52,22 @@ dependencies:
   android_intent_plus: ^3.1.9
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.13.1
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
 
 flutter:
+  uses-material-design: true
   assets:
     - assets/fonts/
     - lib/shared/images/
     - lib/shared/animations/
-
   fonts:
     - family: NotoSansBengali
       fonts:
         - asset: assets/fonts/NotoSansBengali-VariableFont_wdth,wght.ttf
 
-  generate: true
-  uses-material-design: true
+flutter_launcher_icons:
+  android: true
+  image_path: 'lib/shared/images/logo_launch.png'
