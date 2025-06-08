@@ -37,6 +37,7 @@ class DashboardState extends State<Dashboard> with RouteAware {
   double _currentBalance = 0.0;
   double _monthlyIncome = 0.0;
   double _monthlyExpenseTotal = 0.0;
+  double _initialBalance = 0.0;
 
   List<TransactionModel> _transactions = [];
 
@@ -46,8 +47,13 @@ class DashboardState extends State<Dashboard> with RouteAware {
   void initState() {
     super.initState();
     _transactionService = StorageManager().transactionService;
-    _loadDashboardData();
+    _loadInitialBalance();
     _loadTextSize();
+  }
+
+  Future<void> _loadInitialBalance() async {
+    _initialBalance = await _getInitialBalanceFromOnboarding();
+    _loadDashboardData();
   }
 
   @override
@@ -108,7 +114,7 @@ class DashboardState extends State<Dashboard> with RouteAware {
     setState(() {
       _monthlyIncome = income;
       _monthlyExpenseTotal = expenses;
-      _currentBalance = income - expenses;
+      _currentBalance = _initialBalance + income - expenses;
     });
   }
 
@@ -151,12 +157,7 @@ class DashboardState extends State<Dashboard> with RouteAware {
             }
           }
 
-          double balance = income - expenses;
-
-          // If no transactions, use onboarding balance
-          if (_transactions.isEmpty) {
-            balance = await _getInitialBalanceFromOnboarding();
-          }
+          double balance = _initialBalance + income - expenses;
 
           setState(() {
             _monthlyIncome = income;

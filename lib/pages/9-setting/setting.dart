@@ -8,7 +8,6 @@ import 'package:finney/shared/theme/app_color.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/shared/widgets/common/snack_bar.dart';
 import 'package:finney/shared/widgets/common/settings_notifier.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'widgets/profile_dialog.dart';
 import 'widgets/setting_option.dart';
@@ -22,10 +21,7 @@ class Setting extends StatefulWidget {
 
 class _SettingState extends State<Setting> {
   String fullName = '';
-  String phoneNumber = '';
-  String address = '';
   String email = '';
-  String userId = '';
   String selectedLanguage = 'Bengali';
   String selectedTextSize = 'Medium';
 
@@ -33,6 +29,17 @@ class _SettingState extends State<Setting> {
   void initState() {
     super.initState();
     _loadUserData();
+    _loadFirebaseUser();
+  }
+
+  Future<void> _loadFirebaseUser() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      setState(() {
+        fullName = user.displayName ?? '';
+        email = user.email ?? '';
+      });
+    }
   }
 
   Future<void> _loadUserData() async {
@@ -40,14 +47,8 @@ class _SettingState extends State<Setting> {
       final prefs = await SharedPreferences.getInstance();
       final loadedLanguage = prefs.getString('language') ?? 'bn';
       final loadedTextSize = prefs.getString('textSize') ?? 'Medium';
-      debugPrint('Loaded language: $loadedLanguage, textSize: $loadedTextSize');
       if (mounted) {
         setState(() {
-          fullName = prefs.getString('name') ?? '';
-          phoneNumber = prefs.getString('phone') ?? '';
-          address = prefs.getString('address') ?? '';
-          email = prefs.getString('email') ?? '';
-          userId = prefs.getString('userId') ?? '';
           selectedLanguage = loadedLanguage == 'en' ? 'English' : 'Bengali';
           selectedTextSize = loadedTextSize;
         });
@@ -60,26 +61,17 @@ class _SettingState extends State<Setting> {
   }
 
   Future<bool> _saveUserData({
-    required String name,
-    required String phone,
-    required String address,
     required String textSize,
     required String language,
   }) async {
     try {
-      debugPrint('Saving user data: name=$name, textSize=$textSize, language=$language');
       final prefs = await SharedPreferences.getInstance();
       String languageCode = language == 'English' ? 'en' : 'bn';
-      await prefs.setString('name', name);
-      await prefs.setString('phone', phone);
-      await prefs.setString('address', address);
-      await prefs.setString('email', email);
       await prefs.setString('textSize', textSize);
       await prefs.setString('language', languageCode);
 
       SettingsNotifier().updateTextSize(textSize);
       FlutterLocalization.instance.translate(languageCode);
-      debugPrint('Saved language: $languageCode, textSize: $textSize');
       return true;
     } catch (e) {
       debugPrint('Error saving user data: $e');
@@ -92,35 +84,7 @@ class _SettingState extends State<Setting> {
       context: context,
       builder: (context) => ProfileDialog(
         initialName: fullName,
-        initialPhone: phoneNumber,
-        initialAddress: address,
         email: email,
-        userId: userId,
-        onSave: (name, phone, address) async {
-          final success = await _saveUserData(
-            name: name,
-            phone: phone,
-            address: address,
-            textSize: selectedTextSize,
-            language: selectedLanguage,
-          );
-          if (success && mounted) {
-            setState(() {
-              fullName = name;
-              phoneNumber = phone;
-              address = address;
-            });
-            AppSnackBar.showSuccess(
-              context,
-              message: LocaleData.save.getString(context),
-            );
-          } else if (mounted) {
-            AppSnackBar.showError(
-              context,
-              message: LocaleData.errorSavingData.getString(context),
-            );
-          }
-        },
       ),
     );
   }
@@ -140,8 +104,7 @@ class _SettingState extends State<Setting> {
   }
 
   Future<void> _signOut() async {
-  try {
-      final userId = FirebaseAuth.instance.currentUser?.uid;
+    try {
       await FirebaseAuth.instance.signOut();
       final prefs = await SharedPreferences.getInstance();
       final language = prefs.getString('language');
@@ -149,9 +112,6 @@ class _SettingState extends State<Setting> {
       if (language != null) {
         await prefs.setString('language', language);
       }
-      final storage = FlutterSecureStorage();
-      await storage.delete(key: 'other_key_if_any');
-      debugPrint('Sign-out complete, PIN preserved for user: $userId');
       AppSnackBar.showSuccess(
         context,
         message: LocaleData.logOut.getString(context),
@@ -188,7 +148,6 @@ class _SettingState extends State<Setting> {
             textScaleFactor = 1.0;
         }
 
-        // Map internal values to localized display strings
         final languageOptions = {
           'English': LocaleData.languageEnglish.getString(context),
           'Bengali': LocaleData.languageBengali.getString(context),
@@ -199,7 +158,6 @@ class _SettingState extends State<Setting> {
           'Large': LocaleData.large.getString(context),
         };
 
-        // Find the display value for the current selectedLanguage and selectedTextSize
         final selectedLanguageDisplay = languageOptions.entries
             .firstWhere((entry) => entry.key == selectedLanguage)
             .value;
@@ -277,7 +235,7 @@ class _SettingState extends State<Setting> {
                                     color: Colors.white,
                                   ),
                                   textAlign: TextAlign.center,
-                                ),                                
+                                ),
                                 const SizedBox(height: 10),
                                 InkWell(
                                   borderRadius: BorderRadius.circular(15),
@@ -339,18 +297,13 @@ class _SettingState extends State<Setting> {
                                   items: languageOptions.values.toList(),
                                   onChanged: (val) async {
                                     if (val != null) {
-                                      // Map display string back to internal value
                                       final newLanguage = languageOptions.entries
                                           .firstWhere((entry) => entry.value == val)
                                           .key;
-                                      debugPrint('Selected language: $newLanguage');
                                       setState(() {
                                         selectedLanguage = newLanguage;
                                       });
                                       final success = await _saveUserData(
-                                        name: fullName,
-                                        phone: phoneNumber,
-                                        address: address,
                                         textSize: selectedTextSize,
                                         language: newLanguage,
                                       );
@@ -368,15 +321,7 @@ class _SettingState extends State<Setting> {
                                     }
                                   },
                                 ),
-                                Center(
-                                  child: SizedBox(
-                                    width: 360,
-                                    child: Divider(
-                                      color: Colors.grey,
-                                      thickness: 1,
-                                    ),
-                                  ),
-                                ),
+  
                                 DropdownSettingOption(
                                   icon: Icons.text_fields,
                                   title: LocaleData.textSize.getString(context),
@@ -384,18 +329,13 @@ class _SettingState extends State<Setting> {
                                   items: textSizeOptions.values.toList(),
                                   onChanged: (val) async {
                                     if (val != null) {
-                                      // Map display string back to internal value
                                       final newTextSize = textSizeOptions.entries
                                           .firstWhere((entry) => entry.value == val)
                                           .key;
-                                      debugPrint('Selected text size: $newTextSize');
                                       setState(() {
                                         selectedTextSize = newTextSize;
                                       });
                                       final success = await _saveUserData(
-                                        name: fullName,
-                                        phone: phoneNumber,
-                                        address: address,
                                         textSize: newTextSize,
                                         language: selectedLanguage,
                                       );
@@ -454,15 +394,7 @@ class _SettingState extends State<Setting> {
                                   subtitle: LocaleData.setPin.getString(context),
                                   onTap: _showSecuritySettings,
                                 ),
-                                Center(
-                                  child: SizedBox(
-                                    width: 360,
-                                    child: Divider(
-                                      color: Colors.grey,
-                                      thickness: 1,
-                                    ),
-                                  ),
-                                ),
+
                                 const SizedBox(height: 10),
                                 SettingOption(
                                   icon: Icons.help,

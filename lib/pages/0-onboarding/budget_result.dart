@@ -1,8 +1,11 @@
+import 'package:finney/shared/localization/locales.dart';
+import 'package:finney/shared/localization/localized_number_formatter.dart';
 import 'package:finney/shared/widgets/common/my_button.dart';
 import 'package:flutter/material.dart';
 import 'package:finney/shared/theme/app_color.dart';
 import 'package:finney/pages/3-dashboard/dashboard.dart';
 import 'package:finney/shared/category.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 
 class BudgetResultPage extends StatelessWidget {
   final Map<String, double> budgetLimits;
@@ -15,7 +18,6 @@ class BudgetResultPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final categoryOrder = CategoryUtils.expenseCategories;
-
     double totalLimit = budgetLimits.values.fold(0.0, (a, b) => a + b);
 
     return Scaffold(
@@ -23,18 +25,22 @@ class BudgetResultPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: AppColors.lightBackground,
         elevation: 0,
-        title: const Text("Budget Suggestion", style: TextStyle(
-          color: AppColors.darkBlue,
-          fontWeight: FontWeight.bold,
-          fontSize: 28,
-          letterSpacing: 1.2,)),
+        title: Text(
+          LocaleData.budgetSuggestion.getString(context),
+          style: const TextStyle(
+            color: AppColors.darkBlue,
+            fontWeight: FontWeight.bold,
+            fontSize: 28,
+            letterSpacing: 1.2,
+          ),
+        ),
         iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           Text(
-            "Your Monthly Budget Limits",
+            LocaleData.yourMonthlyBudgetLimits.getString(context),
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
           const SizedBox(height: 12),
@@ -42,22 +48,22 @@ class BudgetResultPage extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             margin: const EdgeInsets.only(bottom: 8),
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
+              color: AppColors.primary.withAlpha(25),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "Total Budget Limit",
-                  style: TextStyle(
+                Text(
+                  LocaleData.totalBudgetLimit.getString(context),
+                  style: const TextStyle(
                     fontSize: 14,
                     color: Colors.black54,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "৳${totalLimit.toInt()}",
+                  "৳${LocalizedNumberFormatter.formatNumber(totalLimit.toInt().toString(), context)}",
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
@@ -121,7 +127,7 @@ class BudgetResultPage extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              "৳${limit.toInt()}",
+                              "৳${LocalizedNumberFormatter.formatNumber(limit.toInt().toString(), context)}",
                               style: const TextStyle(
                                 fontSize: 15,
                                 color: AppColors.darkBlue,
@@ -137,7 +143,7 @@ class BudgetResultPage extends StatelessWidget {
               ),
             );
           }),
-          const SizedBox(height: 30),     
+          const SizedBox(height: 30),
           MyButton(
             onTap: () {
               Navigator.pushReplacement(
@@ -145,7 +151,7 @@ class BudgetResultPage extends StatelessWidget {
                 MaterialPageRoute(builder: (_) => const Dashboard()),
               );
             },
-            text: "Finish",
+            text: LocaleData.finish.getString(context),
             backgroundColor: AppColors.darkBlue,
           ),
         ],

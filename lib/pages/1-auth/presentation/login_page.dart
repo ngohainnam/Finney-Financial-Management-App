@@ -50,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
         final userModel = UserModel(
           id: user.uid,
           email: user.email ?? '',
-          name: user.displayName ?? 'Unknown',
+          name: user.displayName ?? '',
         );
 
         await StorageManager().userCloudService.setCurrentUser(userModel);
@@ -58,7 +58,7 @@ class _LoginPageState extends State<LoginPage> {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('email', user.email ?? '');
         await prefs.setString('userId', user.uid);
-        await prefs.setString('name', user.displayName ?? 'Unknown');
+        await prefs.setString('name', user.displayName ?? '');
 
         final storage = FlutterSecureStorage();
         final pin = await storage.read(key: 'pin_${user.uid}');
@@ -80,13 +80,13 @@ class _LoginPageState extends State<LoginPage> {
       } else {
         if (mounted) Navigator.pop(context);
         if (mounted) {
-          AppSnackBar.showError(context, message: 'Failed to retrieve user data.');
+          AppSnackBar.showError(context, message: LocaleData.userNotFoundError.getString(context));
         }
       }
     } catch (e) {
       if (mounted) Navigator.pop(context);
       if (mounted) {
-        AppSnackBar.showError(context, message: 'Incorrect email/password.');
+        AppSnackBar.showError(context, message: LocaleData.loginError.getString(context));
       }
     }
   }

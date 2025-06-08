@@ -9,9 +9,29 @@ mixin LocaleData {
   static const String phoneNumber = 'phoneNumber';
   static const String address = 'address';
   static const String email = 'email';
+  static const String onboardingPersonalizeTitle = 'onboardingPersonalizeTitle';
+  static const String onboardingAgeHint = 'onboardingAgeHint';
+  static const String onboardingJobHint = 'onboardingJobHint';
+  static const String onboardingIncomeHint = 'onboardingIncomeHint';
+  static const String onboardingBalanceHint = 'onboardingBalanceHint';
+  static const String onboardingNeedsTitle = 'onboardingNeedsTitle';
+  static const String onboardingNeedsDesc = 'onboardingNeedsDesc';
+  static const String onboardingWantsTitle = 'onboardingWantsTitle';
+  static const String onboardingWantsDesc = 'onboardingWantsDesc';
+  static const String onboardingSavingsTitle = 'onboardingSavingsTitle';
+  static const String onboardingSavingsDesc = 'onboardingSavingsDesc';
+  static const String onboardingInfo = 'onboardingInfo';
+  static const String onboardingContinue = 'onboardingContinue';
+  static const String onboardingFillAll = 'onboardingFillAll';
+  static const String onboardingValidAge = 'onboardingValidAge';
+  static const String onboardingValidIncome = 'onboardingValidIncome';
+  static const String onboardingValidBalance = 'onboardingValidBalance';
+  static const String onboardingJobLetters = 'onboardingJobLetters';
   static const String userId = 'userId';
   static const String pinVerified = 'pinVerified';
   static const String edit = 'edit';
+  static const String age = 'age';
+  static const String job = 'job';
   static const String save = 'save';
   static const String close = 'close';
   static const String selectTime = 'selectTime';
@@ -103,6 +123,10 @@ mixin LocaleData {
   static const String features = 'features';
   static const String prediction = 'prediction';
   static const String reminder = 'reminder';
+  static const String budgetSuggestion = 'budgetSuggestion';
+  static const String yourMonthlyBudgetLimits = 'yourMonthlyBudgetLimits';
+  static const String totalBudgetLimit = 'totalBudgetLimit';
+  static const String finish = 'finish';
 
   // Chatbot page keys
   static const String dashboardTitle = 'dashboardTitle';
@@ -118,6 +142,11 @@ mixin LocaleData {
   // New Learn page keys
   static const String learnReset = 'learnReset';
   static const String learnNoResults = 'learnNoResults';
+  static const String registrationFailed = 'registrationFailed';
+  static const String emailAlreadyInUse = 'emailAlreadyInUse';
+  static const String invalidEmailFormat = 'invalidEmailFormat';
+  static const String weakPassword = 'weakPassword';
+  static const String registrationError = 'registrationError';
 
   static const String financialLearning = 'financialLearning';
   static const String beginner = 'beginner';
@@ -167,6 +196,18 @@ mixin LocaleData {
   static const String coachPraiseGreat = 'coachPraiseGreat';
   static const String never = 'never';
   static const String sometimes = 'sometimes';
+  static const String onboardingWelcomeTitle = 'onboardingWelcomeTitle';
+  static const String onboardingWelcomeDesc = 'onboardingWelcomeDesc';
+  static const String onboardingTrackTitle = 'onboardingTrackTitle';
+  static const String onboardingTrackDesc = 'onboardingTrackDesc';
+  static const String onboardingBudgetTitle = 'onboardingBudgetTitle';
+  static const String onboardingBudgetDesc = 'onboardingBudgetDesc';
+  static const String onboardingAdviceTitle = 'onboardingAdviceTitle';
+  static const String onboardingAdviceDesc = 'onboardingAdviceDesc';
+  static const String onboardingInsightsTitle = 'onboardingInsightsTitle';
+  static const String onboardingInsightsDesc = 'onboardingInsightsDesc';
+  static const String onboardingLearnTitle = 'onboardingLearnTitle';
+  static const String onboardingLearnDesc = 'onboardingLearnDesc';
   static const String no = 'no';
   static const String maybe = 'maybe';
   static const String coachAdviceTitle = 'coachAdviceTitle';
@@ -493,6 +534,7 @@ mixin LocaleData {
   static const String description = 'description';
   static const String descriptionHint = 'descriptionHint';
   static const String amountHint = 'amountHint';
+  static const String pleaseEnterName = 'pleaseEnterName';
   static const String pleaseEnterPositiveAmount = 'pleaseEnterPositiveAmount';
   static const String pleaseEnterSavingGoalName = 'pleaseEnterSavingGoalName';
   static const String saveGoal = 'saveGoal';
@@ -525,6 +567,7 @@ mixin LocaleData {
   static const String setTargetDates = 'setTargetDates';
   static const String setTargetDatesDescription = 'setTargetDatesDescription';
   static const String gotIt = 'gotIt';
+  static const String nameHint = 'nameHint';
   static const String savingsAddedSuccessfully = 'savingsAddedSuccessfully';
   static const String insufficientBalance = 'insufficientBalance';
   static const String errorAddingSavings = 'errorAddingSavings';
@@ -776,7 +819,7 @@ mixin LocaleData {
   static const String notMember = 'not_member';
   static const String registerNow = 'register_now';
   static const String loginError = 'login_error';
-  static const String userNotFoundError = 'user_not_found_error';
+  static const String userNotFoundError = 'userNotFoundError';
   // RegisterPage keys
   static const String registerTitle = 'register_title';
   static const String confirmPasswordHint = 'confirm_password_hint';
@@ -950,7 +993,6 @@ mixin LocaleData {
   static const String goodEffort = "👍 Good Effort";
   static const String tryAgain = "🔄 Try Again";
   static const String next = 'next';
-  static const String finish = 'finish';
 
   //**************************************************************************** */
   static const Map<String, String> en = {
@@ -980,6 +1022,10 @@ mixin LocaleData {
     "📘 Keep going! Review the Learn section and try again.",
     feedbackMessageGood: "👍 Good job! You’re on the right path!",
     feedbackMessageExcellent: "🎉 Excellent! You’re a money master!",
+    budgetSuggestion: 'Budget Suggestion',
+    yourMonthlyBudgetLimits: 'Your Monthly Budget Limits',
+    totalBudgetLimit: 'Total Budget Limit',
+    finish: 'Finish',
 
     restartQuiz: "Restart Quiz",
     savingMoneyVideo1Title: 'Making Saving a Habit',
@@ -1097,6 +1143,7 @@ mixin LocaleData {
     dashboardTitle: 'Finney AI',
     chatbotHelp: 'Help',
     chatbotClearChat: 'Clear Chat',
+    userNotFoundError: 'Failed to retrieve user data.',
     welcomeMessage: 'Welcome to Finney AI! How can I assist you today?',
     suggestedQuestion1: 'What is budgeting?',
     suggestedQuestion2: 'How can I save money effectively?',
@@ -1191,6 +1238,7 @@ mixin LocaleData {
     amountMustBePositive: 'Amount must be positive',
     amountExceedsTarget: 'Please enter a smaller amount.',
     add: 'Add',
+    confirmPasswordHint: 'Confirm Password',
     deleteGoal: 'Delete Goal',
     confirmDeleteGoal: 'Are you sure you want to delete "%s"?',
     addSavingGoal: 'Add Saving Goal',
@@ -1256,6 +1304,7 @@ mixin LocaleData {
     gift: 'Gift',
     noTransactionsYet: 'No transactions yet',
     today: 'Today',
+    pleaseEnterName: 'Please enter your name',
     yesterday: 'Yesterday',
     dashboardHelpTitle: 'How to use the Dashboard',
     dashboardHelpSubtitle: 'Track your finances easily',
@@ -1286,10 +1335,34 @@ mixin LocaleData {
     quizFinish: 'Finish',
     selectDate: 'Select Date',
     pinReset: 'PIN is reset',
+    'onboardingPersonalizeTitle': 'Personalize',
+    'onboardingAgeHint': 'Your age',
+    'onboardingJobHint': 'Your job',
+    'onboardingIncomeHint': 'Monthly income (Taka)',
+    'onboardingBalanceHint': 'What is your current balance?',
+    'onboardingNeedsTitle': '50% for Needs',
+    'onboardingNeedsDesc': 'Essentials like Food, Utilities, Transport, Health',
+    'onboardingWantsTitle': '30% for Wants',
+    'onboardingWantsDesc': 'Fun & lifestyle: Shopping, Entertainment, Others',
+    'onboardingSavingsTitle': '20% for Savings',
+    'onboardingSavingsDesc': 'Savings, investments, and future goals',
+    'onboardingInfo': 'We use the information you provide to make your budget suggestion.',
+    'onboardingContinue': 'Continue',
+    'onboardingFillAll': 'Please fill in all fields.',
+    'onboardingValidAge': 'Please enter a valid age.',
+    'onboardingValidIncome': 'Please enter a valid monthly income.',
+    'onboardingValidBalance': 'Please enter a valid current balance.',
+    'onboardingJobLetters': 'Job should only contain letters.',
     quizTryAgain: 'Try Again',
+    'registrationFailed': 'Registration failed',
+    'emailAlreadyInUse': 'This email is already in use.',
+    'invalidEmailFormat': 'Invalid email format.',
+    'weakPassword': 'The password is too weak.',
+    'registrationError': 'Registration error:',
     quizQuestion1: 'What is the main benefit of compound interest?',
     quizQuestion1Answer1: 'Money grows faster over time',
     quizQuestion1Answer2: 'It reduces your taxes',
+    nameHint: 'Enter your full name',
     quizQuestion1Answer3: 'It\'s safer than regular interest',
     quizQuestion2: 'What does diversification in investing mean?',
     quizQuestion2Answer1: 'Putting all money in one stock',
@@ -1361,6 +1434,18 @@ mixin LocaleData {
     intermediateQuizQuestion2Answer1: '20%',
     intermediateQuizQuestion2Answer2: '30%',
     intermediateQuizQuestion2Answer3: '50%',
+    'onboardingWelcomeTitle': 'Welcome to Finney!',
+    'onboardingWelcomeDesc': 'Your AI financial assistant for managing your money easily.',
+    'onboardingTrackTitle': 'Track Expenses',
+    'onboardingTrackDesc': 'Record your daily expenses and see where your money goes.',
+    'onboardingBudgetTitle': 'Set Budgets',
+    'onboardingBudgetDesc': 'Set monthly limits for each category and get reminders.',
+    'onboardingAdviceTitle': 'AI Advice',
+    'onboardingAdviceDesc': 'Get personalized financial advice powered by AI.',
+    'onboardingInsightsTitle': 'AI Insights',
+    'onboardingInsightsDesc': 'Analyze your spending patterns and get insights to save more money.',
+    'onboardingLearnTitle': 'Learning Hub',
+    'onboardingLearnDesc': 'Access a library of videos and quizzes to improve your financial and digital literacy.',
     intermediateQuizQuestion3: 'What is a good credit score range?',
     intermediateQuizQuestion3Answer1: '300-500',
     intermediateQuizQuestion3Answer2: '670-850',
@@ -1438,15 +1523,13 @@ mixin LocaleData {
     loginTitle: 'Login to your Account',
     passwordHint: 'Password',
     forgotPassword: 'Forgot Password?',
-    signInButton: 'Sign In',
+    signInButton: 'Sign In Now',
     continueWith: 'Or continue with',
     notMember: 'Not a member?',
     registerNow: 'Register now',
     loginError: 'Incorrect email/password. Please check again.',
-    userNotFoundError: 'User details not found in local storage.',
     registerTitle: 'Create your Account',
-    confirmPasswordHint: 'Confirm Password',
-    signUpButton: 'Sign Up',
+    signUpButton: 'Sign Up Now',
     alreadyMember: 'Already a member?',
     loginNow: 'Log in now',
     passwordStrong: '✅ Strong password',
@@ -1555,6 +1638,8 @@ mixin LocaleData {
     quizScore: 'Score: %s / %s',
     quizBack: 'Back to Quiz',
     quizReview: 'Review Your Answers',
+    age: 'Age',
+    job: 'Job',
     quizClearConfirm: 'Are you sure you want to clear all quiz results?',
     quizNoResults: 'No quiz results found.',
     quizResults: 'Quiz Results',
@@ -1723,8 +1808,7 @@ mixin LocaleData {
     quizQ30A4: 'Salary doubles',
     reviewAnswers: 'Review Answers',
     backToQuiz: 'Back to Quiz',
-    'next': 'Next',
-    'finish': 'Finish',
+    next: 'Next',
 
     dashboard: 'Dashboard',
     expenseTracking: 'Expense Tracking',
@@ -1872,10 +1956,23 @@ mixin LocaleData {
     userId: 'ব্যবহারকারীর আইডি',
     edit: 'সম্পাদনা',
     save: 'সংরক্ষণ',
+    'onboardingWelcomeTitle': 'ফিনিতে স্বাগতম!',
+    'onboardingWelcomeDesc': 'সহজেই টাকা ম্যানেজ করতে আপনার এআই ফিনান্সিয়াল সহকারী।',
+    'onboardingTrackTitle': 'খরচ ট্র্যাক করুন',
+    'onboardingTrackDesc': 'প্রতিদিনের খরচ রেকর্ড করুন এবং কোথায় টাকা যাচ্ছে দেখুন।',
+    'onboardingBudgetTitle': 'বাজেট সেট করুন',
+    'onboardingBudgetDesc': 'প্রতি ক্যাটাগরিতে মাসিক সীমা ঠিক করুন এবং রিমাইন্ডার পান।',
+    'onboardingAdviceTitle': 'এআই পরামর্শ',
+    'onboardingAdviceDesc': 'এআই দ্বারা চালিত ব্যক্তিগত আর্থিক পরামর্শ নিন।',
+    'onboardingInsightsTitle': 'এআই ইনসাইট',
+    'onboardingInsightsDesc': 'আপনার খরচের ধরন বিশ্লেষণ করুন এবং আরও সঞ্চয়ের জন্য ইনসাইট পান।',
+    'onboardingLearnTitle': 'লার্নিং হাব',
+    'onboardingLearnDesc': 'আর্থিক ও ডিজিটাল দক্ষতা বাড়াতে ভিডিও ও কুইজের লাইব্রেরি ব্যবহার করুন।',
     close: 'বন্ধ',
     appearance: 'চেহারা',
     language: 'ভাষা',
     languageEnglish: 'ইংরেজি',
+    registerTitle: 'অ্যাকাউন্ট তৈরি করুন',
     languageBengali: 'বাংলা',
     currency: 'মুদ্রা',
     currencyBDT: 'বাংলাদেশী টাকা (৳)',
@@ -1901,6 +1998,7 @@ mixin LocaleData {
     financialBasics: 'আর্থিক মৌলিক বিষয়',
     askFinneyAI: 'যেকোনো সাহায্যের জন্য ফিনি এআই-কে জিজ্ঞাসা করুন',
     moneyManagement: 'অর্থ ব্যবস্থাপনা',
+    userNotFoundError: 'ব্যবহারকারীর তথ্য পুনরুদ্ধার করা যায়নি।',
     moneyManagementSubtitle:
     'আপনার অর্থ ট্র্যাক, পরিকল্পনা এবং নিয়ন্ত্রণ করুন',
     savingBudgeting: 'সঞ্চয় ও বাজেটিং',
@@ -1947,6 +2045,24 @@ mixin LocaleData {
     resourceSafetyArticle1: 'ইনভেস্টোপিডিয়া: আর্থিক নিরাপত্তা টিপস',
     resourceSafetyArticle2: 'মানিস্মার্ট: প্রতারণা থেকে নিজেকে রক্ষা করুন',
     dashboardTitle: 'ফিনি এআই',
+    'onboardingPersonalizeTitle': 'ব্যক্তিগতকরণ',
+    'onboardingAgeHint': 'আপনার বয়স',
+    'onboardingJobHint': 'আপনার পেশা',
+    'onboardingIncomeHint': 'মাসিক আয় (টাকা)',
+    'onboardingBalanceHint': 'আপনার বর্তমান ব্যালেন্স কত?',
+    'onboardingNeedsTitle': 'প্রয়োজনের জন্য ৫০%',
+    'onboardingNeedsDesc': 'খাদ্য, ইউটিলিটি, পরিবহন, স্বাস্থ্য ইত্যাদি',
+    'onboardingWantsTitle': 'চাহিদার জন্য ৩০%',
+    'onboardingWantsDesc': 'বিনোদন, কেনাকাটা, অন্যান্য',
+    'onboardingSavingsTitle': 'সঞ্চয়ের জন্য ২০%',
+    'onboardingSavingsDesc': 'সঞ্চয়, বিনিয়োগ ও ভবিষ্যৎ লক্ষ্য',
+    'onboardingInfo': 'আপনার দেওয়া তথ্য ব্যবহার করে বাজেট সাজেশন তৈরি করা হয়।',
+    'onboardingContinue': 'চালিয়ে যান',
+    'onboardingFillAll': 'সব ঘর পূরণ করুন।',
+    'onboardingValidAge': 'সঠিক বয়স লিখুন।',
+    'onboardingValidIncome': 'সঠিক মাসিক আয় লিখুন।',
+    'onboardingValidBalance': 'সঠিক বর্তমান ব্যালেন্স লিখুন।',
+    'onboardingJobLetters': 'পেশায় শুধু অক্ষর থাকতে হবে।',
     chatbotHelp: 'সহায়তা',
     chatbotClearChat: 'চ্যাট মুছুন',
     welcomeMessage:
@@ -2011,12 +2127,15 @@ mixin LocaleData {
     expenseAnalysis: 'খরচ বিশ্লেষণ',
     incomeAnalysis: 'আয় বিশ্লেষণ',
     transactions: 'লেনদেন',
+    
+    nameHint: 'আপনার পুরো নাম লিখুন।',
     selectItemsToDelete: 'নির্বাচিত আইটেমগুলি মুছুন',
     noTransactionsInThisPeriod: 'এই সময়কালে কোনো লেনদেন নেই',
     seeAll: 'সব দেখুন',
     deleteTransactions: 'লেনদেন মুছুন',
     confirmDeleteTransactions: 'আপনি কি নিশ্চিত যে %dটি লেনদেন মুছতে চান?',
     delete: 'মুছুন',
+    passwordStrong: '✅ শক্তিশালী পাসওয়ার্ড',
     errorLoadingTransactions: 'লেনদেন লোড করতে ত্রুটি',
     confirmDeleteAction:
     'এই ক্রিয়াটি পূর্বাবস্থায় ফেরানো যাবে না। আপনি কি লেনদেন (গুলি) মুছে ফেলার বিষয়ে নিশ্চিত?',
@@ -2047,7 +2166,11 @@ mixin LocaleData {
     savingGoalPurpose: 'সঞ্চয় লক্ষ্যের উদ্দেশ্য',
     savingGoalHint: 'যেমন নতুন গাড়ির জন্য সঞ্চয়...',
     description: 'বিবরণ',
+    forgotPassword: 'পাসওয়ার্ড ভুলে গেছেন?',
     descriptionHint: 'বিবরণ লিখুন (ঐচ্ছিক)',
+    loginNow: 'এখন লগইন করুন',
+    notMember: 'সদস্য নন',
+    pleaseEnterName: 'অনুগ্রহ করে আপনার নাম লিখুন',
     amountHint: '0.00',
     pleaseEnterPositiveAmount: 'অনুগ্রহ করে একটি ধনাত্মক পরিমাণ লিখুন',
     pleaseEnterSavingGoalName: 'অনুগ্রহ করে একটি সঞ্চয় লক্ষ্যের নাম লিখুন',
@@ -2121,6 +2244,7 @@ mixin LocaleData {
     noIncomeData: 'এই সময়ের জন্য কোনো আয় তথ্য নেই',
     pagination: 'পৃষ্ঠা %d এর %d',
     hideAssistant: 'সহকারী লুকান',
+    invalidGmailError: 'দয়া করে একটি বৈধ জিমেইল ঠিকানা লিখুন।',
     askAboutChart: 'এই চার্ট সম্পর্কে জিজ্ঞাসা করুন',
     askAboutChartHint: 'এই চার্ট সম্পর্কে জিজ্ঞাসা করুন...',
     assistant: 'সহকারী',
@@ -2135,11 +2259,17 @@ mixin LocaleData {
     quizScore: 'আপনার স্কোর: %s/%s',
     quizFinish: 'শেষ',
     quizTryAgain: 'আবার চেষ্টা করুন',
+    'registrationFailed': 'নিবন্ধন ব্যর্থ হয়েছে',
+    'emailAlreadyInUse': 'এই ইমেইলটি ইতিমধ্যে ব্যবহৃত হচ্ছে।',
+    'invalidEmailFormat': 'ইমেইল ফরম্যাট সঠিক নয়।',
+    'weakPassword': 'পাসওয়ার্ডটি খুব দুর্বল।',
+    'registrationError': 'নিবন্ধন ত্রুটি:',
     quizQuestion1: 'চক্রবৃদ্ধি সুদের প্রধান সুবিধা কী?',
     quizQuestion1Answer1: 'টাকা সময়ের সাথে দ্রুত বৃদ্ধি পায়',
     quizQuestion1Answer2: 'এটি আপনার কর হ্রাস করে',
     quizQuestion1Answer3: 'এটি নিয়মিত সুদের চেয়ে নিরাপদ',
     quizQuestion2: 'বিনিয়োগে বৈচিত্র্যকরণ বলতে কী বোঝায়?',
+    passwordsNotMatchError: 'পাসওয়ার্ড মিলছে না।',
     quizQuestion2Answer1: 'সব টাকা একটি স্টকে রাখা',
     quizQuestion2Answer2: 'বিভিন্ন সম্পদে বিনিয়োগ ছড়িয়ে দেওয়া',
     quizQuestion2Answer3: 'শুধুমাত্র যা জানেন তাতে বিনিয়োগ করা',
@@ -2185,6 +2315,10 @@ mixin LocaleData {
     beginnerQuizQuestion3Answer1: '5%',
     beginnerQuizQuestion3Answer2: '20%',
     beginnerQuizQuestion3Answer3: '50%',
+    loginTitle: 'ফিনি এআই-এ স্বাগতম',
+    emailHint: 'আপনার ইমেল লিখুন',
+    passwordHint: 'আপনার পাসওয়ার্ড লিখুন',
+    registerNow: 'এখনই নিবন্ধন করুন',
     beginnerScreenTitle: 'প্রাথমিক আর্থিক দক্ষতা',
     understandingMoneyTitle: 'টাকা বোঝা',
     understandingMoneyPoint1: 'টাকা কী এবং এটি কীভাবে কাজ করে',
@@ -2263,6 +2397,7 @@ mixin LocaleData {
     voiceSttNotAvailable: 'এই ডিভাইসে স্পিচ রিকগনিশন উপলব্ধ নয়',
     transactionPreviewTitle: 'লেনদেনের শিরোনাম',
     transactionPreviewCancel: 'বাতিল',
+    loginError: 'ভুল ইমেল/পাসওয়ার্ড। অনুগ্রহ করে আবার চেক করুন।',
     transactionPreviewConfirm: 'নিশ্চিত করুন',
     chatInputHint: 'আমাকে একটি আর্থিক প্রশ্ন জিজ্ঞাসা করুন...',
     nonFinancialQuestion:
@@ -2296,6 +2431,7 @@ mixin LocaleData {
     editLimitHint: 'নতুন সীমা লিখুন',
     editLimitCancel: 'বাতিল করুন',
     editLimitSave: 'সংরক্ষণ করুন',
+    signInButton: 'সাইন ইন করুন',
     totalSpent: 'মোট খরচ',
     saveHabitTitle: 'সেভিং এর অভ্যাস গড়ে তোলা',
     saveHabitDesc:
@@ -2323,6 +2459,7 @@ mixin LocaleData {
     coachQ5: 'আপনি কি নিডস আর ওয়ান্টস-এর পার্থক্য সহজে করতে পারেন?',
     coachQ6: 'কোন খাতে আপনার সবচেয়ে বেশি টাকা খরচ হয়?',
     coachQ7: 'আপনি কি আপনার খরচ কোথায় যায় সেটা ট্র্যাক করেন?',
+    alreadyMember: 'আগে থেকেই সদস্য?',
     coachQ8: 'আপনি কি আপনার খরচের অভ্যাস বদলাতে ইচ্ছুক?',
     coachQ9: 'আপনি কি প্রায়ই প্ল্যান ছাড়া খরচ করেন?',
     coachQ10: 'এক্সট্রা টাকা পেলে আপনি সঞ্চয় করেন না খরচ?',
@@ -2348,6 +2485,9 @@ mixin LocaleData {
     learningHub: 'লার্নহাব',
     ongoing: 'চলমান',
     completed: 'সম্পন্ন',
+    age: 'বয়স',
+    job: 'পেশা',
+    confirmPasswordHint: 'পাসওয়ার্ড নিশ্চিত করুন',
     noResultsFound: 'কোনও ফলাফল পাওয়া যায়নি।',
     tourBudgetTitle: 'বাজেটের মধ্যে থাকুন',
     tourBudgetDesc:
@@ -2408,6 +2548,7 @@ mixin LocaleData {
     quizQ2A1: 'ড্যাশবোর্ড',
     quizQ2A2: 'চ্যাটবট',
     quizQ2A3: 'লার্ন',
+    signUpButton: 'নিবন্ধন করুন',
     quizQ2A4: 'সেটিংস',
     quizQ3: 'বাজেট সাধারণত কী কাজে লাগে?',
     quizQ3A1: 'খরচ ট্র্যাক করা',
@@ -2428,6 +2569,10 @@ mixin LocaleData {
     quizQ6A1: 'দোকান বন্ধ হয়ে যেতে পারে',
     quizQ6A2: 'আকস্মিক খরচ খরচ এড়াতে সাহায্য করে',
     quizQ6A3: 'দাম কমতে পারে',
+    budgetSuggestion: 'বাজেট পরামর্শ',
+    yourMonthlyBudgetLimits: 'আপনার মাসিক বাজেট সীমা',
+    totalBudgetLimit: 'মোট বাজেট সীমা',
+    finish: 'শেষ করুন',
     quizQ6A4: 'আপনি হয়তো টাকা পাবেন',
     quizQ7: 'বাজেটিংয়ে "ওয়ান্ট" বলতে কী বোঝায়?',
     quizQ7A1: 'প্রয়োজনীয় খাবার',
@@ -2510,6 +2655,8 @@ mixin LocaleData {
     quizQ22A2: 'আয়ের পরে',
     quizQ22A3: 'খরচের পরে',
     quizQ22A4: 'ঋণ নিলে',
+    passwordWeak: '❌ উপরের, নীচের, সংখ্যা এবং প্রতীক সহ ১২+ অক্ষর ব্যবহার করুন',
+    weakPasswordError: 'পাসওয়ার্ড কমপক্ষে ১২ অক্ষরের হতে হবে এবং এতে বড় হাতের, ছোট হাতের, সংখ্যা এবং প্রতীক থাকতে হবে।',
     quizQ23: 'বাজেটিং কিভাবে সাহায্য করে?',
     quizQ23A1: 'বেশি খরচ করা',
     quizQ23A2: 'টাকা ভালোভাবে ম্যানেজ করা',
@@ -2550,8 +2697,7 @@ mixin LocaleData {
     quizQ30A2: 'সঞ্চয় বাড়ে',
     quizQ30A3: 'সম্পদ বাড়ে',
     quizQ30A4: 'বেতন দ্বিগুণ হয়',
-    'next': 'পরবর্তী',
-    'finish': 'শেষ করুন',
+    next: 'পরবর্তী',
 
     reviewAnswers: 'উত্তরগুলো পর্যালোচনা করুন',
     backToQuiz: 'কুইজে ফিরে যান',
