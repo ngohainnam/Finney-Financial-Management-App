@@ -24,7 +24,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmedController = TextEditingController();
-  final nameController = TextEditingController(); // Added name field controller
+  final nameController = TextEditingController();
 
   String _passwordHint = '';
   Color _hintColor = Colors.grey;
@@ -65,7 +65,7 @@ class _RegisterPageState extends State<RegisterPage> {
       Navigator.pop(context);
       AppSnackBar.showError(
         context, 
-        message: 'Please enter your name'
+        message: LocaleData.pleaseEnterName.getString(context)
       );
       return;
     }
@@ -125,20 +125,20 @@ class _RegisterPageState extends State<RegisterPage> {
     } on FirebaseAuthException catch (e) {
       if (mounted) {
         Navigator.pop(context);
-        String errorMessage = 'Registration failed';
+        String errorMessage = LocaleData.registrationFailed.getString(context);
         
         switch (e.code) {
           case 'email-already-in-use':
-            errorMessage = 'This email is already in use.';
+            errorMessage = LocaleData.emailAlreadyInUse.getString(context);
             break;
           case 'invalid-email':
-            errorMessage = 'Invalid email format.';
+            errorMessage = LocaleData.invalidEmailFormat.getString(context);
             break;
           case 'weak-password':
-            errorMessage = 'The password is too weak.';
+            errorMessage = LocaleData.weakPassword.getString(context);
             break;
           default:
-            errorMessage = 'Registration error: ${e.message}';
+            errorMessage = '${LocaleData.registrationFailed.getString(context)} ${e.message}';
         }
         
         AppSnackBar.showError(context, message: errorMessage);
@@ -148,7 +148,7 @@ class _RegisterPageState extends State<RegisterPage> {
         Navigator.pop(context);
         AppSnackBar.showError(
           context, 
-          message: 'Error: $e'
+          message: '${LocaleData.error.getString(context)} $e'
         );
       }
     }
@@ -186,7 +186,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 // Name field
                 MyTextField(
                   controller: nameController,
-                  hintText: 'Full Name',
+                  hintText: LocaleData.nameHint.getString(context),
                   obscureText: false,
                 ),
 

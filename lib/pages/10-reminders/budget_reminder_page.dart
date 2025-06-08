@@ -12,6 +12,7 @@ import 'package:android_intent_plus/android_intent.dart';
 import 'package:android_intent_plus/flag.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/shared/localization/locales.dart';
+import 'package:finney/shared/localization/localized_number_formatter.dart';
 import 'package:finney/shared/category.dart'; 
 
 class BudgetReminderPage extends StatefulWidget {
@@ -253,8 +254,12 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
       final int spent = data['spent'].toInt();
       final int limit = data['limit'].toInt();
 
-      final spentText = isBengali ? _bn(spent) : numberToWords(spent);
-      final limitText = isBengali ? _bn(limit) : numberToWords(limit);
+      final spentText = isBengali
+          ? LocalizedNumberFormatter.formatNumber(spent.toString(), context)
+          : numberToWords(spent);
+      final limitText = isBengali
+          ? LocalizedNumberFormatter.formatNumber(limit.toString(), context)
+          : numberToWords(limit);
 
       final message = isBengali
           ? "আপনি $categoryName বিভাগে $spentText টাকা খরচ করেছেন, বরাদ্দ ছিল $limitText টাকা।"
@@ -272,8 +277,7 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
   }
 
   String _bn(int value) {
-    const digits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
-    return value.toString().split('').map((d) => digits[int.parse(d)]).join();
+    return LocalizedNumberFormatter.formatNumber(value.toString(), context);
   }
 
   Future<void> _pickReminderTime() async {
@@ -417,7 +421,7 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
                     double totalLimit = _categoryData.values
                         .map((e) => (e['limit'] ?? 0.0) as double)
                         .fold(0.0, (a, b) => a + b);
-                    return "৳${totalSpent.toInt()} / ৳${totalLimit.toInt()}";
+                    return "৳${LocalizedNumberFormatter.formatNumber(totalSpent.toInt().toString(), context)} / ৳${LocalizedNumberFormatter.formatNumber(totalLimit.toInt().toString(), context)}";
                   }(),
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
@@ -545,7 +549,7 @@ class _BudgetReminderPageState extends State<BudgetReminderPage> {
                                     ),
                                     SizedBox(height: 6),
                                     Text(
-                                      "৳${spent.toInt()} / ৳${limit.toInt()}",
+                                      "৳${LocalizedNumberFormatter.formatNumber(spent.toInt().toString(), context)} / ৳${LocalizedNumberFormatter.formatNumber(limit.toInt().toString(), context)}",
                                       style: TextStyle(
                                           fontSize: 13,
                                           color: statusColor,

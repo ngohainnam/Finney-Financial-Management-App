@@ -7,6 +7,8 @@ import 'package:finney/shared/theme/app_color.dart';
 import 'package:finney/shared/category.dart';
 import 'package:finney/pages/0-onboarding/budget_result.dart';
 import 'package:finney/shared/widgets/common/snack_bar.dart';
+import 'package:finney/shared/localization/locales.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 
 class OnboardingQuestionsPage extends StatefulWidget {
   const OnboardingQuestionsPage({super.key});
@@ -36,23 +38,23 @@ class _OnboardingQuestionsPageState extends State<OnboardingQuestionsPage> {
         jobText.isEmpty ||
         incomeText.isEmpty ||
         balanceText.isEmpty) {
-      AppSnackBar.showError(context, message: "Please fill in all fields.");
+      AppSnackBar.showError(context, message: LocaleData.onboardingFillAll.getString(context));
       return;
     }
     if (int.tryParse(ageText) == null || int.parse(ageText) <= 0) {
-      AppSnackBar.showError(context, message: "Please enter a valid age.");
+      AppSnackBar.showError(context, message: LocaleData.onboardingValidAge.getString(context));
       return;
     }
     if (double.tryParse(incomeText) == null || double.parse(incomeText) <= 0) {
-      AppSnackBar.showError(context, message: "Please enter a valid monthly income.");
+      AppSnackBar.showError(context, message: LocaleData.onboardingValidIncome.getString(context));
       return;
     }
     if (double.tryParse(balanceText) == null || double.parse(balanceText) < 0) {
-      AppSnackBar.showError(context, message: "Please enter a valid current balance.");
+      AppSnackBar.showError(context, message: LocaleData.onboardingValidBalance.getString(context));
       return;
     }
     if (jobText.contains(RegExp(r'\d'))) {
-      AppSnackBar.showError(context, message: "Job should only contain letters.");
+      AppSnackBar.showError(context, message: LocaleData.onboardingJobLetters.getString(context));
       return;
     }
 
@@ -129,12 +131,15 @@ class _OnboardingQuestionsPageState extends State<OnboardingQuestionsPage> {
         backgroundColor: AppColors.lightBackground,
         elevation: 0,
         centerTitle: true,
-        title: const Text("Personalize", style: TextStyle(
-          color: AppColors.darkBlue,
-          fontWeight: FontWeight.bold,
-          fontSize: 28,
-          letterSpacing: 1.2,
-        )),
+        title: Text(
+          LocaleData.onboardingPersonalizeTitle.getString(context),
+          style: const TextStyle(
+            color: AppColors.darkBlue,
+            fontWeight: FontWeight.bold,
+            fontSize: 28,
+            letterSpacing: 1.2,
+          ),
+        ),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
@@ -146,25 +151,25 @@ class _OnboardingQuestionsPageState extends State<OnboardingQuestionsPage> {
                   children: [
                     MyTextField(
                       controller: _ageController,
-                      hintText: "Your age",
+                      hintText: LocaleData.onboardingAgeHint.getString(context),
                       obscureText: false,
                       keyboardType: TextInputType.number,
                     ),
                     MyTextField(
                       controller: _jobController,
-                      hintText: "Your job",
+                      hintText: LocaleData.onboardingJobHint.getString(context),
                       obscureText: false,
                       keyboardType: TextInputType.text,
                     ),
                     MyTextField(
                       controller: _incomeController,
-                      hintText: "Monthly income (Taka)",
+                      hintText: LocaleData.onboardingIncomeHint.getString(context),
                       obscureText: false,
                       keyboardType: TextInputType.number,
                     ),
                     MyTextField(
                       controller: _balanceController,
-                      hintText: "What is your current balance?",
+                      hintText: LocaleData.onboardingBalanceHint.getString(context),
                       obscureText: false,
                       keyboardType: TextInputType.number,
                     ),
@@ -192,7 +197,7 @@ class _OnboardingQuestionsPageState extends State<OnboardingQuestionsPage> {
                                 Icon(Icons.shopping_basket, color: Colors.blue[700]),
                                 const SizedBox(width: 10),
                                 Text(
-                                  "50% for Needs",
+                                  LocaleData.onboardingNeedsTitle.getString(context),
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -205,7 +210,7 @@ class _OnboardingQuestionsPageState extends State<OnboardingQuestionsPage> {
                             Padding(
                               padding: const EdgeInsets.only(left: 34),
                               child: Text(
-                                "Essentials like Food, Utilities, Transport, Health",
+                                LocaleData.onboardingNeedsDesc.getString(context),
                                 style: TextStyle(fontSize: 14, color: AppColors.darkBlue),
                                 textAlign: TextAlign.center,
                               ),
@@ -217,7 +222,7 @@ class _OnboardingQuestionsPageState extends State<OnboardingQuestionsPage> {
                                 Icon(Icons.celebration, color: Colors.orange[800]),
                                 const SizedBox(width: 10),
                                 Text(
-                                  "30% for Wants",
+                                  LocaleData.onboardingWantsTitle.getString(context),
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -230,7 +235,7 @@ class _OnboardingQuestionsPageState extends State<OnboardingQuestionsPage> {
                             Padding(
                               padding: const EdgeInsets.only(left: 34),
                               child: Text(
-                                "Fun & lifestyle: Shopping, Entertainment, Others",
+                                LocaleData.onboardingWantsDesc.getString(context),
                                 style: TextStyle(fontSize: 14, color: AppColors.darkBlue),
                                 textAlign: TextAlign.center,
                               ),
@@ -242,7 +247,7 @@ class _OnboardingQuestionsPageState extends State<OnboardingQuestionsPage> {
                                 Icon(Icons.savings, color: Colors.green[700]),
                                 const SizedBox(width: 10),
                                 Text(
-                                  "20% for Savings",
+                                  LocaleData.onboardingSavingsTitle.getString(context),
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -255,7 +260,7 @@ class _OnboardingQuestionsPageState extends State<OnboardingQuestionsPage> {
                             Padding(
                               padding: const EdgeInsets.only(left: 34),
                               child: Text(
-                                "Savings, investments, and future goals",
+                                LocaleData.onboardingSavingsDesc.getString(context),
                                 style: TextStyle(fontSize: 14, color: AppColors.darkBlue),
                                 textAlign: TextAlign.center,
                               ),
@@ -268,10 +273,10 @@ class _OnboardingQuestionsPageState extends State<OnboardingQuestionsPage> {
                               children: [
                                 Icon(Icons.info_outline, color: AppColors.darkBlue, size: 20),
                                 const SizedBox(width: 8),
-                                const Expanded(
+                                Expanded(
                                   child: Text(
-                                    "We use the information you provide to make your budget suggestion.",
-                                    style: TextStyle(fontSize: 14, color: Colors.black87),
+                                    LocaleData.onboardingInfo.getString(context),
+                                    style: const TextStyle(fontSize: 14, color: Colors.black87),
                                     textAlign: TextAlign.center,
                                   ),
                                 ),
@@ -284,7 +289,7 @@ class _OnboardingQuestionsPageState extends State<OnboardingQuestionsPage> {
                     const SizedBox(height: 32),
                     MyButton(
                       onTap: _submit,
-                      text: "Continue",
+                      text: LocaleData.onboardingContinue.getString(context),
                       backgroundColor: AppColors.darkBlue,
                     ),
                   ],
