@@ -131,7 +131,6 @@ Widget build(BuildContext context) {
           onTransactionAdded: (updatedTransaction) {
             onUpdate?.call(
               transaction.copyWith(
-                name: updatedTransaction.name,
                 category: updatedTransaction.category,
                 amount: updatedTransaction.amount,
                 date: updatedTransaction.date,
@@ -145,7 +144,6 @@ Widget build(BuildContext context) {
           onTransactionAdded: (updatedTransaction) {
             onUpdate?.call(
               transaction.copyWith(
-                name: updatedTransaction.name,
                 category: updatedTransaction.category,
                 amount: updatedTransaction.amount,
                 date: updatedTransaction.date,

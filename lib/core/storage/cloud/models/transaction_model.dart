@@ -46,7 +46,6 @@ class TransactionModel {
 
   TransactionModel copyWith({
     String? id,
-    String? name,
     String? category,
     double? amount,
     DateTime? date,
