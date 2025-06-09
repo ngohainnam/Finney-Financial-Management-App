@@ -1,5 +1,5 @@
 import 'package:finney/core/storage/cloud/models/transaction_model.dart';
-import 'package:finney/pages/3-dashboard/widgets/delete_transaction_dialog.dart';
+import 'package:finney/shared/widgets/common/app_dialog.dart';
 import 'package:finney/pages/6-transaction/view_transaction/all_transactions.dart';
 import 'package:finney/pages/6-transaction/widgets/transaction_list.dart';
 import 'package:finney/pages/7-insights/components/time_selector.dart';
@@ -53,7 +53,7 @@ class _RecentTransactionsState extends State<RecentTransactions> {
   Future<void> _showDeleteConfirmationDialog() async {
     if (_selectedTransactions.isEmpty) return;
 
-    final confirmed = await DeleteTransactionDialog.show(
+    final confirmed = await AppDialog.show(
       context,
       message: LocaleData.confirmDeleteAction
           .getString(context)

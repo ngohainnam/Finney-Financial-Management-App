@@ -296,7 +296,7 @@ class _ChangePinPageState extends State<ChangePinPage> {
                 _buildPinDots(dots),
                 const SizedBox(height: 40),
                 _isLoading
-                    ? const CircularProgressIndicator()
+                    ? const CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2)
                     : _buildKeypad(),
               ],
             ),

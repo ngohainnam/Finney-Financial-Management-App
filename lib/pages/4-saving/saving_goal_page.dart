@@ -86,7 +86,7 @@ class _SavingGoalPageState extends State<SavingGoalPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const CircularProgressIndicator(),
+                        const CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2),
                         const SizedBox(height: 20),
                         Text(
                           LocaleData.loadingGoals.getString(context),

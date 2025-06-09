@@ -33,9 +33,7 @@ class _LoginPageState extends State<LoginPage> {
     showDialog(
       context: context,
       builder: (_) => const Center(
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
-        ),
+        child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2)
       ),
     );
 

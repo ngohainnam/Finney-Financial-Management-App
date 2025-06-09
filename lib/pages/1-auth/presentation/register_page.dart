@@ -1,3 +1,4 @@
+import 'package:finney/pages/1-auth/presentation/policy.dart';
 import 'package:finney/shared/path/app_images.dart';
 import 'package:finney/shared/theme/app_color.dart';
 import 'package:finney/shared/widgets/common/my_button.dart';
@@ -8,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:finney/core/storage/storage_manager.dart';
 import 'package:finney/core/storage/cloud/models/user_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'google_sign_in.dart';
 import 'package:finney/shared/localization/locales.dart';
 import 'package:flutter_localization/flutter_localization.dart';
@@ -29,6 +31,7 @@ class _RegisterPageState extends State<RegisterPage> {
   String _passwordHint = '';
   Color _hintColor = Colors.grey;
   bool _obscurePassword = true;
+  bool _agreedToPolicy = false;
 
   bool isValidGmail(String email) {
     final gmailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@gmail\.com$');
@@ -41,7 +44,6 @@ class _RegisterPageState extends State<RegisterPage> {
     final lowerCaseValid = password.contains(RegExp(r'[a-z]'));
     final numberValid = password.contains(RegExp(r'[0-9]'));
     final symbolValid = password.contains(RegExp(r'[!@#\$%^&*(),.?":{}|<>]'));
-
     return lengthValid && upperCaseValid && lowerCaseValid && numberValid && symbolValid;
   }
 
@@ -50,7 +52,7 @@ class _RegisterPageState extends State<RegisterPage> {
       context: context,
       builder: (context) {
         return const Center(
-          child: CircularProgressIndicator(),
+          child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2),
         );
       },
     );
@@ -58,67 +60,80 @@ class _RegisterPageState extends State<RegisterPage> {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
     final confirmPassword = confirmedController.text.trim();
-    final name = nameController.text.trim(); // Get name value
+    final name = nameController.text.trim();
 
-    // Validate name field
+    // 1. Name check
     if (name.isEmpty) {
       Navigator.pop(context);
       AppSnackBar.showError(
-        context, 
-        message: LocaleData.pleaseEnterName.getString(context)
+        context,
+        message: LocaleData.pleaseEnterName.getString(context),
       );
       return;
     }
 
+    // 2. Email check
     if (!isValidGmail(email)) {
       Navigator.pop(context);
       AppSnackBar.showError(
-        context, 
-        message: LocaleData.invalidGmailError.getString(context)
+        context,
+        message: LocaleData.invalidGmailError.getString(context),
       );
       return;
     }
 
+    // 3. Password match check
     if (password != confirmPassword) {
       Navigator.pop(context);
       AppSnackBar.showError(
-        context, 
-        message: LocaleData.passwordsNotMatchError.getString(context)
+        context,
+        message: LocaleData.passwordsNotMatchError.getString(context),
       );
       return;
     }
 
+    // 4. Password strength check
     if (!isPasswordStrong(password)) {
       Navigator.pop(context);
       AppSnackBar.showError(
         context,
-        message: LocaleData.weakPasswordError.getString(context)
+        message: LocaleData.weakPasswordError.getString(context),
+      );
+      return;
+    }
+
+    // 5. Policy agreement check (last)
+    if (!_agreedToPolicy) {
+      Navigator.pop(context);
+      AppSnackBar.showError(
+        context,
+        message: 'Please read and agree to the Terms & Privacy Policy.',
       );
       return;
     }
 
     try {
-      // Create user with email and password
       UserCredential credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      // Update the display name
       await credential.user?.updateDisplayName(name);
 
       User? user = FirebaseAuth.instance.currentUser;
 
       if (user != null) {
-        // Create UserModel
         final userModel = UserModel(
           id: user.uid,
           name: name,
           email: email,
         );
-
-        // Save user to Firestore
         await StorageManager().userCloudService.setCurrentUser(userModel);
+
+        // Ensure onboarding field is set for new users
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+          'onboarding': null,
+        }, SetOptions(merge: true));
       }
 
       if (mounted) Navigator.pop(context);
@@ -126,7 +141,7 @@ class _RegisterPageState extends State<RegisterPage> {
       if (mounted) {
         Navigator.pop(context);
         String errorMessage = LocaleData.registrationFailed.getString(context);
-        
+
         switch (e.code) {
           case 'email-already-in-use':
             errorMessage = LocaleData.emailAlreadyInUse.getString(context);
@@ -140,18 +155,24 @@ class _RegisterPageState extends State<RegisterPage> {
           default:
             errorMessage = '${LocaleData.registrationFailed.getString(context)} ${e.message}';
         }
-        
+
         AppSnackBar.showError(context, message: errorMessage);
       }
     } catch (e) {
       if (mounted) {
         Navigator.pop(context);
         AppSnackBar.showError(
-          context, 
-          message: '${LocaleData.error.getString(context)} $e'
+          context,
+          message: '${LocaleData.error.getString(context)} $e',
         );
       }
     }
+  }
+
+  void _showPolicyDialog() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => const PolicyPage()),
+    );
   }
 
   @override
@@ -183,7 +204,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
 
-                // Name field
                 MyTextField(
                   controller: nameController,
                   hintText: LocaleData.nameHint.getString(context),
@@ -221,16 +241,17 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
 
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      _passwordHint,
-                      style: TextStyle(color: _hintColor, fontSize: 12),
+                if (_passwordHint.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        _passwordHint,
+                        style: TextStyle(color: _hintColor, fontSize: 12),
+                      ),
                     ),
                   ),
-                ),
 
                 MyTextField(
                   controller: confirmedController,
@@ -238,7 +259,46 @@ class _RegisterPageState extends State<RegisterPage> {
                   obscureText: true,
                 ),
 
-                const SizedBox(height: 25),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: CheckboxListTile(
+                    value: _agreedToPolicy,
+                    onChanged: (value) {
+                      setState(() {
+                        _agreedToPolicy = value ?? false;
+                      });
+                    },
+                    activeColor: AppColors.primary,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    contentPadding: EdgeInsets.zero,
+                    title: RichText(
+                      text: TextSpan(
+                        style: TextStyle(
+                          color: AppColors.darkBlue,
+                          fontSize: 14,
+                        ),
+                        children: [
+                          const TextSpan(text: 'I agree to the '),
+                          WidgetSpan(
+                            alignment: PlaceholderAlignment.middle,
+                            child: GestureDetector(
+                              onTap: _showPolicyDialog,
+                              child: Text(
+                                'Terms & Privacy Policy',
+                                style: TextStyle(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.underline,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
 
                 MyButton(
                   text: LocaleData.signUpButton.getString(context),
@@ -282,7 +342,7 @@ class _RegisterPageState extends State<RegisterPage> {
       ),
     );
   }
-  
+
   @override
   void dispose() {
     emailController.dispose();

@@ -4,7 +4,7 @@ import 'package:finney/core/storage/cloud/models/transaction_model.dart';
 import 'package:finney/core/storage/cloud/service/transaction_cloud_service.dart';
 import 'package:finney/core/storage/storage_manager.dart';
 import 'package:finney/pages/6-transaction/widgets/transaction_list.dart';
-import 'package:finney/pages/3-dashboard/widgets/delete_transaction_dialog.dart';
+import 'package:finney/shared/widgets/common/app_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:finney/shared/localization/locales.dart';
@@ -79,7 +79,7 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
     final selectedTransactions = _getSelectedTransactions(transactions);
     if (selectedTransactions.isEmpty) return;
 
-    final confirmed = await DeleteTransactionDialog.show(
+    final confirmed = await AppDialog.show(
       context,
       message: LocaleData.confirmDeleteAction
         .getString(context)
@@ -212,7 +212,7 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
                         );
                       }
                       if (!snapshot.hasData) {
-                        return const Center(child: CircularProgressIndicator());
+                        return const Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2));
                       }
                       final allTransactions = snapshot.data!;
                       final filteredTransactions = _filterTransactionsByTimeRange(allTransactions);

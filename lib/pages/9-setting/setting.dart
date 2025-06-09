@@ -1,4 +1,5 @@
 import 'package:finney/pages/9-setting/change_pin.page.dart';
+import 'package:finney/pages/9-setting/widgets/delete_account.dart';
 import 'package:finney/shared/localization/locales.dart';
 import 'package:finney/pages/9-setting/language_selection.dart';
 import 'package:finney/pages/9-setting/widgets/dropdown_setting.dart';
@@ -322,7 +323,6 @@ class _SettingState extends State<Setting> {
                                     }
                                   },
                                 ),
-  
                                 DropdownSettingOption(
                                   icon: Icons.text_fields,
                                   title: LocaleData.textSize.getString(context),
@@ -395,7 +395,6 @@ class _SettingState extends State<Setting> {
                                   subtitle: LocaleData.setPin.getString(context),
                                   onTap: _showSecuritySettings,
                                 ),
-
                                 const SizedBox(height: 10),
                                 SettingOption(
                                   icon: Icons.help,
@@ -416,39 +415,75 @@ class _SettingState extends State<Setting> {
                             decoration: const BoxDecoration(
                               color: Colors.white,
                             ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 5),
-                              child: InkWell(
-                                onTap: _signOut,
-                                child: Container(
-                                  margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                                  decoration: BoxDecoration(
-                                    color: Colors.red,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        const Icon(
-                                          Icons.logout,
-                                          color: Colors.white,
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 5),
+                                  child: InkWell(
+                                    onTap: _signOut,
+                                    child: Container(
+                                      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.red,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 12),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            const Icon(
+                                              Icons.logout,
+                                              color: Colors.white,
+                                            ),
+                                            const SizedBox(width: 10),
+                                            Text(
+                                              LocaleData.logOut.getString(context),
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        const SizedBox(width: 10),
-                                        Text(
-                                          LocaleData.logOut.getString(context),
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
+
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 5),
+                                  child: InkWell(
+                                    onTap: () => deleteAccount(context),
+                                    child: Container(
+                                      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[400], // Make the button grey
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 12),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            const Icon(Icons.delete_forever, color: Colors.white),
+                                            const SizedBox(width: 10),
+                                            Text(
+                                              LocaleData.deleteAccount.getString(context),
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),

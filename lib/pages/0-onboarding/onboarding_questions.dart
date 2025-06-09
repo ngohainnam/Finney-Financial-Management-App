@@ -9,6 +9,7 @@ import 'package:finney/pages/0-onboarding/budget_result.dart';
 import 'package:finney/shared/widgets/common/snack_bar.dart';
 import 'package:finney/shared/localization/locales.dart';
 import 'package:flutter_localization/flutter_localization.dart';
+import 'package:finney/shared/widgets/common/app_dialog.dart';
 
 class OnboardingQuestionsPage extends StatefulWidget {
   const OnboardingQuestionsPage({super.key});
@@ -58,11 +59,24 @@ class _OnboardingQuestionsPageState extends State<OnboardingQuestionsPage> {
       return;
     }
 
+    final income = double.parse(incomeText);
+
+    // Warn if income is unrealistically low
+    if (income < 100) {
+      final proceed = await AppDialog.show(
+        context,
+        title: "Unrealistic Income",
+        message: "Your income is very low, which can make the 50-30-20 rule inaccurate or impractical. Do you want to continue anyway?",
+        iconColor: Colors.redAccent,
+        confirmText: LocaleData.dialogOk.getString(context),
+      );
+      if (proceed != true) return;
+    }
+
     setState(() => _loading = true);
 
     final age = int.parse(ageText);
     final job = jobText;
-    final income = double.parse(incomeText);
     final balance = double.parse(balanceText);
 
     // Save user info
@@ -142,7 +156,7 @@ class _OnboardingQuestionsPageState extends State<OnboardingQuestionsPage> {
         ),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2))
           : SingleChildScrollView(
               padding: const EdgeInsets.all(24),
               child: Form(

@@ -107,7 +107,7 @@ class _MyAppState extends State<MyApp> {
           primaryColor: AppColors.primary,
           fontFamily: 'NotoSerifBengali',
         ),
-        home: const Scaffold(body: Center(child: CircularProgressIndicator())),
+        home: const Scaffold(body: Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2))),
       );
     }
 
@@ -137,14 +137,14 @@ class _MyAppState extends State<MyApp> {
               stream: FirebaseAuth.instance.authStateChanges(),
               builder: (context, authSnapshot) {
                 if (authSnapshot.connectionState == ConnectionState.waiting) {
-                  return const Scaffold(body: Center(child: CircularProgressIndicator()));
+                  return const Scaffold(body: Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2)));
                 }
                 if (authSnapshot.hasData) {
                   return FutureBuilder<Widget>(
                     future: _getInitialPage(authSnapshot.data!),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Scaffold(body: Center(child: CircularProgressIndicator()));
+                        return const Scaffold(body: Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2)));
                       }
                       return snapshot.data ?? const AuthPage();
                     },

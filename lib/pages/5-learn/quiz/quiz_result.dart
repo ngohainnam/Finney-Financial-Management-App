@@ -1,3 +1,4 @@
+import 'package:finney/shared/theme/app_color.dart';
 import 'package:flutter/material.dart';
 import '../../../core/storage/storage_manager.dart';
 import '../../../core/storage/cloud/models/learning_model.dart';
@@ -113,7 +114,7 @@ class _QuizResultPageState extends State<QuizResultPage> {
                       strokeWidth: 12,
                       backgroundColor: Colors.grey.shade200,
                       valueColor: const AlwaysStoppedAnimation<Color>(
-                        Colors.blueAccent,
+                        AppColors.primary,
                       ),
                     ),
                   ),

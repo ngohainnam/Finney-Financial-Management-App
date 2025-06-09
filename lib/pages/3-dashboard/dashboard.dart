@@ -291,7 +291,7 @@ class DashboardState extends State<Dashboard> with RouteAware {
                 actions: [],
               ),
               body: _isLoading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? const Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2))
                   : Stack(
                       children: [
                         Column(

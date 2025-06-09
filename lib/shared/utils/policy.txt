@@ -1,0 +1,42 @@
+Terms and Conditions
+Last Updated: 10 June 2025
+
+1. Introduction
+Welcome to Finney AI. By creating an account and using our money tracking app (“the App”), you agree to these Terms and Conditions. If you do not accept these terms, please refrain from using the App.
+
+2. Account Registration
+You must provide accurate and up-to-date information during registration. You are responsible for safeguarding your login credentials and for all activities under your account. Notify us immediately if you suspect unauthorized access.
+
+3. User Conduct
+You agree to use the App in compliance with all applicable laws and must not:
+
+Use the App for unlawful purposes.
+
+Attempt to interfere with or reverse-engineer any part of the App.
+
+Upload harmful content or impersonate others.
+
+4. Intellectual Property
+All content, features, and technology of the App are owned by Finney AI and protected by applicable laws. You may not copy, modify, or redistribute any part of the App without prior written consent.
+Any feedback or input you provide may be used by Finney AI without obligation or attribution.
+
+5. Account Termination
+You may request account deletion at any time. We reserve the right to suspend or terminate accounts that violate these terms or compromise the integrity of the App or its users.
+
+6. Disclaimer and Liability
+The App is provided “as is” without warranties of any kind. We do not guarantee uninterrupted or error-free service. To the fullest extent permitted by law, Finney AI is not liable for any indirect or consequential damages arising from your use of the App.
+
+7. Data and Privacy
+Your expense data is stored securely in our Firebase database and may be processed using Large Language Models (LLMs) to generate financial insights.
+Your data will not be used to train AI systems or shared with advertisers.
+We apply security measures to protect your information and offer data deletion upon request.
+Refer to our [Privacy Policy] for full details.
+
+8. Financial Disclaimer
+Advice or suggestions offered in the App are generated automatically and should not be considered professional financial guidance. Always consult a qualified advisor for personal financial decisions.
+
+9. Modifications
+We may update these Terms at any time. Continued use of the App after updates indicates your acceptance of the revised terms. The effective date is shown at the top of this document.
+
+10. Contact
+For questions or support, contact us at:

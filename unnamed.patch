@@ -14369,11 +14369,11 @@ new file mode 100644
 +import 'package:flutter_localization/flutter_localization.dart';
 +import 'package:finney/shared/localization/locales.dart';
 +
-+class DeleteTransactionDialog extends StatelessWidget {
++class AppDialog extends StatelessWidget {
 +  final String title;
 +  final String message;
 +  
-+  DeleteTransactionDialog({
++  AppDialog({
 +  super.key,
 +  String? title,
 +  String? message,
@@ -14388,7 +14388,7 @@ new file mode 100644
 +  }) async {
 +    return await showDialog<bool>(
 +      context: context,
-+      builder: (context) => DeleteTransactionDialog(
++      builder: (context) => AppDialog(
 +        context: context,
 +        title: title,
 +        message: message,
@@ -16150,7 +16150,7 @@ new file mode 100644
 +    final selectedTransactions = _getSelectedTransactions(transactions);
 +    if (selectedTransactions.isEmpty) return;
 +
-+    final confirmed = await DeleteTransactionDialog.show(
++    final confirmed = await AppDialog.show(
 +      context,
 +      message: LocaleData.confirmDeleteAction
 +        .getString(context)

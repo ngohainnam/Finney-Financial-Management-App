@@ -367,7 +367,7 @@ abstract class BaseTransactionScreenState<T extends BaseTransactionScreen>
             floatingActionButton: _isSaving
                 ? const Padding(
                     padding: EdgeInsets.all(16.0),
-                    child: CircularProgressIndicator(),
+                    child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2),
                   )
                 : Padding(
                     padding: const EdgeInsets.all(16.0),

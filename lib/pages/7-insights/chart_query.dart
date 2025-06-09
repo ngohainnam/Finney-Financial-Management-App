@@ -178,7 +178,7 @@ class _ChartQueryState extends State<ChartQuery> {
                               child: SizedBox(
                                 height: 20,
                                 width: 20,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2),
                               ),
                             )
                           : Column(

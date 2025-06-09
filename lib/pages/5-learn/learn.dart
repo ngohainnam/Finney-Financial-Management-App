@@ -323,7 +323,9 @@ class _LearnState extends State<Learn> {
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
               child: Column(
                 children: [
-                  Row(
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
                     children: [
                       _buildTab('Lessons'),
                       _buildTab('App Tour'),
@@ -410,16 +412,21 @@ class _LearnState extends State<Learn> {
       child: GestureDetector(
         onTap: () => setState(() => _selectedTab = label),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          constraints: const BoxConstraints(minWidth: 60, maxWidth: 120), 
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           decoration: BoxDecoration(
             color: isActive ? Colors.blueAccent : Colors.transparent,
             borderRadius: BorderRadius.circular(20),
           ),
-          child: Text(
-            localizedLabel,
-            style: TextStyle(
-              color: isActive ? Colors.white : Colors.grey,
-              fontWeight: FontWeight.w600,
+          child: Center(
+            child: Text(
+              localizedLabel,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
+              style: TextStyle(
+                color: isActive ? Colors.white : Colors.grey,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ),

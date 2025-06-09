@@ -314,7 +314,7 @@ class _ChatbotState extends State<Chatbot> {
             children: [
               Expanded(
                 child: _isLoadingMessages 
-                  ? const Center(child: CircularProgressIndicator())
+                  ? const Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2))
                   : showWelcomeScreen 
                     ? WelcomeScreen(
                         suggestedQuestions: suggestedQuestions,

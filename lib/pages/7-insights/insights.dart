@@ -282,7 +282,7 @@ class _InsightsState extends State<Insights> with SingleTickerProviderStateMixin
               ),
             ),
             body: _isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? const Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2))
                 : Column(
                     children: [
                       Padding(

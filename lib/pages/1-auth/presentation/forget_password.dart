@@ -24,9 +24,7 @@ class ForgotPasswordPageState extends State<ForgotPasswordPage> {
       context: context,
       builder: (context) {
         return Center(
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
-          ),
+          child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2)
         );
       },
     );

@@ -147,6 +147,7 @@ mixin LocaleData {
   static const String invalidEmailFormat = 'invalidEmailFormat';
   static const String weakPassword = 'weakPassword';
   static const String registrationError = 'registrationError';
+  static const String deleteAccountError = 'deleteAccountError';
 
   static const String financialLearning = 'financialLearning';
   static const String beginner = 'beginner';
@@ -993,6 +994,9 @@ mixin LocaleData {
   static const String goodEffort = "👍 Good Effort";
   static const String tryAgain = "🔄 Try Again";
   static const String next = 'next';
+  static const String deleteAccount = 'deleteAccount';
+  static const String deleteAccountConfirm = 'deleteAccountConfirm';
+  static const String accountDeleted = 'Account deleted successfully.';
 
   //**************************************************************************** */
   static const Map<String, String> en = {
@@ -1316,8 +1320,11 @@ mixin LocaleData {
     'Monitor weekly spending patterns and category breakdown',
     dashboardHelpRefresh: 'Pull down to refresh your financial data',
     total: 'Total',
-    noExpenseData: 'No expense data for this period',
-    noIncomeData: 'No income data for this period',
+    noExpenseData: 'No data for this period',
+    noIncomeData: 'No data for this period',
+    deleteAccount: "Delete Account",
+    deleteAccountConfirm: "Are you sure you want to delete your account? This action cannot be undone.",
+    accountDeleted: "Account deleted successfully.",
     pagination: 'Page %d of %d',
     hideAssistant: 'Hide Assistant',
     askAboutChart: 'Ask about this chart',
@@ -1598,6 +1605,7 @@ mixin LocaleData {
     coachPraiseGreat: 'Great job! You are saving a lot. ',
     never: 'Never',
     sometimes: 'Sometimes',
+    deleteAccountError: 'Failed. Try to log out and log back in before deleting your account.',
     no: 'No',
     maybe: 'Maybe',
     coachAdviceTitle: 'Your Savings Coach Advice',
@@ -2248,6 +2256,9 @@ mixin LocaleData {
     askAboutChart: 'এই চার্ট সম্পর্কে জিজ্ঞাসা করুন',
     askAboutChartHint: 'এই চার্ট সম্পর্কে জিজ্ঞাসা করুন...',
     assistant: 'সহকারী',
+    deleteAccount: "অ্যাকাউন্ট মুছে ফেলুন",
+    deleteAccountConfirm: "আপনি কি নিশ্চিতভাবে আপনার অ্যাকাউন্ট মুছে ফেলতে চান? এই কাজটি আর ফিরিয়ে আনা যাবে না।",
+    accountDeleted: "অ্যাকাউন্ট সফলভাবে মুছে ফেলা হয়েছে।",
     queryError: 'দুঃখিত, আমি সেই প্রশ্নটি প্রক্রিয়া করতে পারিনি।',
     queryErrorWithMessage: 'দুঃখিত, একটি ত্রুটি ঘটেছে: %s',
     chartContext:
@@ -2513,7 +2524,7 @@ mixin LocaleData {
     tourReportDesc:
     'আপনার আর্থিক রিপোর্ট কীভাবে পড়বেন এবং বোঝাবেন তা শিখুন যাতে ভালো সিদ্ধান্ত নিতে পারেন।',
     tourReportTitle: 'রিপোর্ট',
-
+    deleteAccountError: 'ব্যর্থ হয়েছে। আপনার অ্যাকাউন্ট মুছে ফেলার আগে লগ আউট করে আবার লগ ইন করার চেষ্টা করুন।',
     tourSavingsTitle: 'সেভিংস গোল',
     tourSavingsDesc:
     'অ্যাপের ফিচার ব্যবহার করে কীভাবে সঞ্চয়ের লক্ষ্য নির্ধারণ, ট্র্যাক এবং অর্জন করবেন তা শিখুন।',
