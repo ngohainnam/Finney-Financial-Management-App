@@ -210,8 +210,9 @@ class _SettingState extends State<Setting> {
                                 LocaleData.settings.getString(context),
                                 style: const TextStyle(
                                   color: Colors.white,
-                                  fontSize: 24,
+                                  fontSize: 28,
                                   fontWeight: FontWeight.bold,
+                                  letterSpacing: 1.2,
                                 ),
                               ),
                               const Expanded(child: SizedBox.shrink()),

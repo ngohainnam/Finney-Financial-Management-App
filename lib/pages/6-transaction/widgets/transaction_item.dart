@@ -154,7 +154,6 @@ class TransactionItem extends StatelessWidget {
                 onTransactionAdded: (updatedTransaction) {
                   onUpdate?.call(
                     transaction.copyWith(
-                      name: updatedTransaction.name,
                       category: updatedTransaction.category,
                       amount: updatedTransaction.amount,
                       date: updatedTransaction.date,
@@ -168,7 +167,6 @@ class TransactionItem extends StatelessWidget {
                 onTransactionAdded: (updatedTransaction) {
                   onUpdate?.call(
                     transaction.copyWith(
-                      name: updatedTransaction.name,
                       category: updatedTransaction.category,
                       amount: updatedTransaction.amount,
                       date: updatedTransaction.date,
