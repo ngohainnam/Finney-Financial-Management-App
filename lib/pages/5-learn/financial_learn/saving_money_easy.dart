@@ -37,12 +37,12 @@ class _SavingMoneyEasyState extends State<SavingMoneyEasy> {
       {
         'title': LocaleData.savingMoneyVideo1Title.getString(context),
         'description': LocaleData.savingMoneyVideo1Subtitle.getString(context),
-        'videoId': 'RUz9yjgnGi8',
+        'videoId': 'owUZhBRgZso',
       },
       {
         'title': LocaleData.savingMoneyVideo2Title.getString(context),
         'description': LocaleData.savingMoneyVideo2Subtitle.getString(context),
-        'videoId': 'QNu4u0XsIoM',
+        'videoId': 'BooMNcGZELQ',
       },
     ];
 

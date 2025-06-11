@@ -173,6 +173,7 @@ mixin LocaleData {
   static const String spendLandDesc = 'spendLandDesc';
   static const String smartSpendingTips = 'smartSpendingTips';
 
+  // Savings Coach Questions
   static const String coachQ1 = 'coachQ1';
   static const String coachQ2 = 'coachQ2';
   static const String coachQ3 = 'coachQ3';
@@ -184,10 +185,124 @@ mixin LocaleData {
   static const String coachQ9 = 'coachQ9';
   static const String coachQ10 = 'coachQ10';
   static const String coachQ11 = 'coachQ11';
+  static const String coachQ12 = 'coachQ12';
+  static const String coachQ13 = 'coachQ13';
+  static const String coachQ14 = 'coachQ14';
+  static const String coachQ15 = 'coachQ15';
+  static const String coachQ16 = 'coachQ16';
+  static const String coachQ17 = 'coachQ17';
+  static const String coachQ18 = 'coachQ18';
+  static const String coachQ19 = 'coachQ19';
+  static const String coachQ20 = 'coachQ20';
+  static const String coachQ21 = 'coachQ21';
+  static const String coachQ22 = 'coachQ22';
+  static const String coachQ23 = 'coachQ23';
+  static const String coachQ24 = 'coachQ24';
+  static const String coachQ25 = 'coachQ25';
 
-  static const String coachOptBoth = 'coachOptBoth';
-  static const String coachOptSaveBig = 'coachOptSaveBig';
-  static const String coachOptTreats = 'coachOptTreats';
+  static const String coachOpt1A = 'coachOpt1A';
+  static const String coachOpt1B = 'coachOpt1B';
+  static const String coachOpt1C = 'coachOpt1C';
+
+  static const String coachOpt2A = 'coachOpt2A';
+  static const String coachOpt2B = 'coachOpt2B';
+  static const String coachOpt2C = 'coachOpt2C';
+
+  static const String coachOpt3A = 'coachOpt3A';
+  static const String coachOpt3B = 'coachOpt3B';
+  static const String coachOpt3C = 'coachOpt3C';
+
+  static const String coachOpt4A = 'coachOpt4A';
+  static const String coachOpt4B = 'coachOpt4B';
+  static const String coachOpt4C = 'coachOpt4C';
+
+  static const String coachOpt5A = 'coachOpt5A';
+  static const String coachOpt5B = 'coachOpt5B';
+  static const String coachOpt5C = 'coachOpt5C';
+
+  static const String coachOpt6A = 'coachOpt6A';
+  static const String coachOpt6B = 'coachOpt6B';
+  static const String coachOpt6C = 'coachOpt6C';
+
+  static const String coachOpt7A = 'coachOpt7A';
+  static const String coachOpt7B = 'coachOpt7B';
+  static const String coachOpt7C = 'coachOpt7C';
+
+  static const String coachOpt8A = 'coachOpt8A';
+  static const String coachOpt8B = 'coachOpt8B';
+  static const String coachOpt8C = 'coachOpt8C';
+
+  static const String coachOpt9A = 'coachOpt9A';
+  static const String coachOpt9B = 'coachOpt9B';
+  static const String coachOpt9C = 'coachOpt9C';
+
+  static const String coachOpt10A = 'coachOpt10A';
+  static const String coachOpt10B = 'coachOpt10B';
+  static const String coachOpt10C = 'coachOpt10C';
+
+  static const String coachOpt11A = 'coachOpt11A';
+  static const String coachOpt11B = 'coachOpt11B';
+  static const String coachOpt11C = 'coachOpt11C';
+
+  static const String coachOpt12A = 'coachOpt12A';
+  static const String coachOpt12B = 'coachOpt12B';
+  static const String coachOpt12C = 'coachOpt12C';
+
+  static const String coachOpt13A = 'coachOpt13A';
+  static const String coachOpt13B = 'coachOpt13B';
+  static const String coachOpt13C = 'coachOpt13C';
+
+  static const String coachOpt14A = 'coachOpt14A';
+  static const String coachOpt14B = 'coachOpt14B';
+  static const String coachOpt14C = 'coachOpt14C';
+
+  static const String coachOpt15A = 'coachOpt15A';
+  static const String coachOpt15B = 'coachOpt15B';
+  static const String coachOpt15C = 'coachOpt15C';
+
+  static const String coachOpt16A = 'coachOpt16A';
+  static const String coachOpt16B = 'coachOpt16B';
+  static const String coachOpt16C = 'coachOpt16C';
+
+  static const String coachOpt17A = 'coachOpt17A';
+  static const String coachOpt17B = 'coachOpt17B';
+  static const String coachOpt17C = 'coachOpt17C';
+
+  static const String coachOpt18A = 'coachOpt18A';
+  static const String coachOpt18B = 'coachOpt18B';
+  static const String coachOpt18C = 'coachOpt18C';
+
+  static const String coachOpt19A = 'coachOpt19A';
+  static const String coachOpt19B = 'coachOpt19B';
+  static const String coachOpt19C = 'coachOpt19C';
+
+  static const String coachOpt20A = 'coachOpt20A';
+  static const String coachOpt20B = 'coachOpt20B';
+  static const String coachOpt20C = 'coachOpt20C';
+
+  static const String coachOpt21A = 'coachOpt21A';
+  static const String coachOpt21B = 'coachOpt21B';
+  static const String coachOpt21C = 'coachOpt21C';
+
+  static const String coachOpt22A = 'coachOpt22A';
+  static const String coachOpt22B = 'coachOpt22B';
+  static const String coachOpt22C = 'coachOpt22C';
+
+  static const String coachOpt23A = 'coachOpt23A';
+  static const String coachOpt23B = 'coachOpt23B';
+  static const String coachOpt23C = 'coachOpt23C';
+
+  static const String coachOpt24A = 'coachOpt24A';
+  static const String coachOpt24B = 'coachOpt24B';
+  static const String coachOpt24C = 'coachOpt24C';
+
+  static const String coachOpt25A = 'coachOpt25A';
+  static const String coachOpt25B = 'coachOpt25B';
+  static const String coachOpt25C = 'coachOpt25C';
+
+  static const String coachAdviceLow = 'coachAdviceLow';
+  static const String coachAdviceMid = 'coachAdviceMid';
+  static const String coachAdviceHigh = 'coachAdviceHigh';
 
   static const String coachPraiseHabit = 'coachPraiseHabit';
   static const String coachRestart = 'coachRestart';
@@ -431,6 +546,78 @@ mixin LocaleData {
   static const String quizQ30A2 = 'quizQ30A2';
   static const String quizQ30A3 = 'quizQ30A3';
   static const String quizQ30A4 = 'quizQ30A4';
+
+  static const String quizQ31 = 'quizQ31';
+  static const String quizQ31A1 = 'quizQ31A1';
+  static const String quizQ31A2 = 'quizQ31A2';
+  static const String quizQ31A3 = 'quizQ31A3';
+  static const String quizQ31A4 = 'quizQ31A4';
+
+  static const String quizQ32 = 'quizQ32';
+  static const String quizQ32A1 = 'quizQ32A1';
+  static const String quizQ32A2 = 'quizQ32A2';
+  static const String quizQ32A3 = 'quizQ32A3';
+  static const String quizQ32A4 = 'quizQ32A4';
+
+  static const String quizQ33 = 'quizQ33';
+  static const String quizQ33A1 = 'quizQ33A1';
+  static const String quizQ33A2 = 'quizQ33A2';
+  static const String quizQ33A3 = 'quizQ33A3';
+  static const String quizQ33A4 = 'quizQ33A4';
+
+  static const String quizQ34 = 'quizQ34';
+  static const String quizQ34A1 = 'quizQ34A1';
+  static const String quizQ34A2 = 'quizQ34A2';
+  static const String quizQ34A3 = 'quizQ34A3';
+  static const String quizQ34A4 = 'quizQ34A4';
+
+  static const String quizQ35 = 'quizQ35';
+  static const String quizQ35A1 = 'quizQ35A1';
+  static const String quizQ35A2 = 'quizQ35A2';
+  static const String quizQ35A3 = 'quizQ35A3';
+  static const String quizQ35A4 = 'quizQ35A4';
+
+  static const String quizQ36 = 'quizQ36';
+  static const String quizQ36A1 = 'quizQ36A1';
+  static const String quizQ36A2 = 'quizQ36A2';
+  static const String quizQ36A3 = 'quizQ36A3';
+  static const String quizQ36A4 = 'quizQ36A4';
+
+  static const String quizQ37 = 'quizQ37';
+  static const String quizQ37A1 = 'quizQ37A1';
+  static const String quizQ37A2 = 'quizQ37A2';
+  static const String quizQ37A3 = 'quizQ37A3';
+  static const String quizQ37A4 = 'quizQ37A4';
+
+  static const String quizQ38 = 'quizQ38';
+  static const String quizQ38A1 = 'quizQ38A1';
+  static const String quizQ38A2 = 'quizQ38A2';
+  static const String quizQ38A3 = 'quizQ38A3';
+  static const String quizQ38A4 = 'quizQ38A4';
+
+  static const String quizQ39 = 'quizQ39';
+  static const String quizQ39A1 = 'quizQ39A1';
+  static const String quizQ39A2 = 'quizQ39A2';
+  static const String quizQ39A3 = 'quizQ39A3';
+  static const String quizQ39A4 = 'quizQ39A4';
+
+  static const String quizQ40 = 'quizQ40';
+  static const String quizQ40A1 = 'quizQ40A1';
+  static const String quizQ40A2 = 'quizQ40A2';
+  static const String quizQ40A3 = 'quizQ40A3';
+  static const String quizQ40A4 = 'quizQ40A4';
+
+  static const String quizQ41 = 'quizQ41';
+  static const String quizQ41A1 = 'quizQ41A1';
+  static const String quizQ41A2 = 'quizQ41A2';
+  static const String quizQ41A3 = 'quizQ41A3';
+  static const String quizQ41A4 = 'quizQ41A4';
+
+  static const String quizQ42 = 'quizQ42';
+  static const String quizQ42A1 = 'quizQ42A1';
+  static const String quizQ42A2 = 'quizQ42A2';
+  static const String quizQ42A3 = 'quizQ42A3';
+  static const String quizQ42A4 = 'quizQ42A4';
 
   static const String quizLoadError = 'quizLoadError';
   static const String quizResetSuccess = 'quizResetSuccess';
@@ -911,57 +1098,33 @@ mixin LocaleData {
   static const String taketheQuizSubtitle = 'Test your knowledge';
   static const String viewQuizResult = 'View Quiz Result';
   static const String quizResultSubtitle = 'See your scores';
-  //Smart spending tips videos screen
-  static const String spendingVideo1Title =
-      'Manage, Grow, Invest & Protect Money';
-  static const String spendingVideo1Subtitle =
-      'No matter how much you earn, if you manage it well, grow it, invest it, and protect it, your future will be secure.';
-  static const String spendingVideo2Title = 'Smart Investment: Buy Land';
-  static const String spendingVideo2Subtitle =
-      "Land is a safe and profitable investment. Check papers and location before you buy. It’s more flexible than flats or crypto.";
 
-  static const String simpleBudgetingvideo1Title =
-      'Smart Monthly Income Allocation';
-  static const String simpleBudgetingvideo1Subtitle =
-      'Spend 55% on needs, 10% on long-term investments, 10% for future goals, 10% to improve your skills, and 15% for fun or charity.';
-  static const String simpleBudgetingvideo2Title =
-      "Investing in Yourself Pays Off Most";
-  static const String simpleBudgetingvideo2Subtitle =
-      'Instead of starting a business with 10,000 Taka, improve your skills. Read books, take online courses, and find ways to earn using your knowledge.';
-  static const String savingMoneyVideo1Title = 'Making Saving a Habit';
+
+
+  static const String savingMoneyVideo1Title = 'What is Saving?';
   static const String savingMoneyVideo1Subtitle =
-      "It’s smart to save money regularly and turn it into a habit. The best way is to plan your savings before you spend.";
-  static const String savingMoneyVideo2Title = 'Why Saving Is Important';
+      "Learn why saving even a small amount regularly can create a safety net for unexpected events and future growth.";
+  static const String savingMoneyVideo2Title = 'How to save regularly?';
   static const String savingMoneyVideo2Subtitle =
-      "Saving money for emergencies is super important. If you keep some money aside as soon as you get paid, your future will feel more secure.";
+      "Discover practical ways to build a consistent saving habit by analyzing expenses, making smarter choices, and using a simple budget.";
 
-  //Saving Coach
 
-  static const String coachOptMoneyBoss = 'coachOptMoneyBoss';
-  static const String coachOptDoingOkay = 'coachOptDoingOkay';
-  static const String coachOptNeedsWork = 'coachOptNeedsWork';
-  static const String coachOpt0_200 = 'coachOpt0_200';
-  static const String coachOpt200_500 = 'coachOpt200_500';
-  static const String coachOpt500plus = 'coachOpt500plus';
-  static const String coachOpt0_1000 = 'coachOpt0_1000';
-  static const String coachOpt1000_2000 = 'coachOpt1000_2000';
-  static const String coachOpt2000plus = 'coachOpt2000plus';
-  static const String coachOpt100 = 'coachOpt100';
-  static const String coachOpt500 = 'coachOpt500';
-  static const String coachOpt1000plus = 'coachOpt1000plus';
-  static const String coachOptAlways = 'coachOptAlways';
-  static const String coachOptSometimes = 'coachOptSometimes';
-  static const String coachOptNotReally = 'coachOptNotReally';
-  static const String coachOptFood = 'coachOptFood';
-  static const String coachOptShopping = 'coachOptShopping';
-  static const String coachOptEntertainment = 'coachOptEntertainment';
-  static const String coachOptNever = 'coachOptNever';
-  static const String coachOptYes = 'coachOptYes';
-  static const String coachOptMaybe = 'coachOptMaybe';
-  static const String coachOptNo = 'coachOptNo';
-  static const String coachOptRarely = 'coachOptRarely';
-  static const String coachOptSaveIt = 'coachOptSaveIt';
-  static const String coachOptSpendIt = 'coachOptSpendIt';
+  static const String simpleBudgetingvideo1Title = 'What is budgeting?';
+  static const String simpleBudgetingvideo1Subtitle =
+      'This video explains why budgeting gives you control over your income, helps avoid overspending, and builds financial confidence.';
+  static const String simpleBudgetingvideo2Title = "How to create a budget?";
+  static const String simpleBudgetingvideo2Subtitle =
+      'Learn how to build a realistic monthly budget using simple methods like the 50/30/20 rule and expense breakdowns.';
+
+
+  static const String spendingVideo1Title = 'What is Spending?';
+  static const String spendingVideo1Subtitle =
+      'Learn how daily spending habits — from needs to wants — impact your savings, and how tracking your expenses gives you more control.';
+  static const String spendingVideo2Title = 'How to Spend Smartly';
+  static const String spendingVideo2Subtitle =
+      'Discover practical ways to plan your expenses, avoid impulse buying, and build self-control for long-term financial stability.';
+
+
 
   static const String coachOptNotSure = 'coachOptNotSure';
   static const String coachOtherHint = 'coachOtherHint';
@@ -1032,24 +1195,27 @@ mixin LocaleData {
     finish: 'Finish',
 
     restartQuiz: "Restart Quiz",
-    savingMoneyVideo1Title: 'Making Saving a Habit',
-    savingMoneyVideo1Subtitle:
-    "It’s smart to save money regularly and turn it into a habit. The best way is to plan your savings before you spend.",
-    savingMoneyVideo2Title: 'Why Saving Is Important',
-    savingMoneyVideo2Subtitle:
-    "Saving money for emergencies is super important. If you keep some money aside as soon as you get paid, your future will feel more secure.",
-    simpleBudgetingvideo1Title: 'Smart Monthly Income Allocation',
-    simpleBudgetingvideo1Subtitle:
-    'Spend 55% on needs, 10% on long-term investments, 10% for future goals, 10% to improve your skills, and 15% for fun or charity.',
-    simpleBudgetingvideo2Title: "Investing in Yourself Pays Off Most",
-    simpleBudgetingvideo2Subtitle:
-    'Instead of starting a business with 10,000 Taka, improve your skills. Read books, take online courses, and find ways to earn using your knowledge.',
-    spendingVideo2Title: "Smart Investment: Buy Land",
-    spendingVideo2Subtitle:
-    "Land is a safe and profitable investment. Check papers and location before you buy. It’s more flexible than flats or crypto.",
-    spendingVideo1Subtitle:
-    "No matter how much you earn, if you manage it well, grow it, invest it, and protect it, your future will be secure.",
-    spendingVideo1Title: "Manage, Grow, Invest & Protect Money",
+
+    savingMoneyVideo1Title: 'What is Saving?',
+    savingMoneyVideo1Subtitle: 'Learn why saving even a small amount regularly can create a safety net for unexpected events and future growth.',
+
+    savingMoneyVideo2Title: 'How to save regularly?',
+    savingMoneyVideo2Subtitle: 'Discover practical ways to build a consistent saving habit by analyzing expenses, making smarter choices, and using a simple budget.',
+
+
+    simpleBudgetingvideo1Title: 'What is budgeting?',
+    simpleBudgetingvideo1Subtitle: 'This video explains why budgeting gives you control over your income, helps avoid overspending, and builds financial confidence.',
+
+    simpleBudgetingvideo2Title: 'How to create a budget?',
+    simpleBudgetingvideo2Subtitle: 'Learn how to build a realistic monthly budget using simple methods like the 50/30/20 rule and expense breakdowns.',
+
+
+    spendingVideo1Title: 'What is Spending?',
+    spendingVideo1Subtitle: 'Understand how your daily spending habits affect your money. Learn the difference between needs and wants, and how tracking expenses builds control.',
+
+    spendingVideo2Title: 'How to Spend Smartly',
+    spendingVideo2Subtitle: 'Learn how to plan expenses, avoid mood-based purchases, and build self-control to make your spending habits smarter and more stable.',
+
     apptourDashSubtitle: "Explore the main overview",
     searchTextfiedText: "Search for topics..",
     expenseTrackingSubtite: "Track your daily spending",
@@ -1587,18 +1753,133 @@ mixin LocaleData {
     spendLandTitle: 'Smart Investment: Buy Land',
     spendLandDesc:
     'Land is a safe and profitable investment. Check papers and location before you buy. It’s more flexible than flats or crypto.',
-    coachQ1:
-    'How good are you with managing your money? Boss level or still figuring it out?',
-    coachQ2: 'How much money do you usually save each month?',
-    coachQ3: 'How much do you usually spend each month?',
-    coachQ4: 'In a perfect world, how much would you love to save monthly?',
-    coachQ5: 'Can you easily tell needs apart from wants?',
-    coachQ6: 'What category eats up most of your money?',
-    coachQ7: 'Do you track where your money goes?',
-    coachQ8: 'Are you willing to adjust your spending habits?',
-    coachQ9: 'Do you often spend money without planning?',
-    coachQ10: 'When you get extra cash, do you save it or spend it?',
-    coachQ11: 'Would you rather save for a big goal or enjoy small treats now?',
+    //Saving Coach
+    coachQ1: "Do you clearly know how much you spent personally in the last week?",
+    coachQ2: "Do you know the exact amount you spent, not just a guess?",
+    coachQ3: "Do you know exactly how much money your household has for daily spending right now?",
+    coachQ4: "Are you confident about the exact amount your household can spend today?",
+    coachQ5: "When you receive money, do you plan ahead for how to use it?",
+    coachQ6: "Do you always create a spending plan before using your money?",
+    coachQ7: "After paying for essentials, do you usually have money left over?",
+    coachQ8: "Do you regularly have extra money after covering your daily expenses?",
+    coachQ9: "Do you make sure you never run out of money for food or basic needs?",
+    coachQ10: "Are you good at avoiding money shortages for basics?",
+    coachQ11: "Do you avoid borrowing money for food or basic needs?",
+    coachQ12: "Do you rarely need to borrow for essential expenses?",
+    coachQ13: "Do you avoid borrowing money just to repay other debts?",
+    coachQ14: "Do you manage your debts well without needing more loans?",
+    coachQ15: "Do you try to save money for the future regularly?",
+    coachQ16: "Is saving money a consistent habit for you?",
+    coachQ17: "Would you say you are disciplined when it comes to managing money?",
+    coachQ18: "Do you learn lessons from other people’s financial mistakes?",
+    coachQ19: "If you had an emergency expense of 5,000 Taka tomorrow, could you handle it without borrowing?",
+    coachQ20: "Have you taken steps to prepare for emergency expenses?",
+    coachQ21: "Do you focus more on planning for the future than spending for today?",
+    coachQ22: "Do you set financial goals or money plans often?",
+    coachQ23: "Do you feel confident about handling your finances?",
+    coachQ24: "Do you take time to reflect on your past money decisions to improve?",
+    coachQ25: "Do you feel in control of your financial future?",
+
+    coachOpt1A: 'Yes',
+    coachOpt1B: 'Not sure',
+    coachOpt1C: 'No',
+
+    coachOpt2A: 'I know the exact amount',
+    coachOpt2B: 'I have a rough idea',
+    coachOpt2C: 'I don’t remember',
+
+    coachOpt3A: 'Yes',
+    coachOpt3B: 'Not sure',
+    coachOpt3C: 'No',
+
+    coachOpt4A: 'I know exactly',
+    coachOpt4B: 'I have an idea',
+    coachOpt4C: 'I don’t keep track',
+
+    coachOpt5A: 'Yes',
+    coachOpt5B: 'Sometimes',
+    coachOpt5C: 'No',
+
+    coachOpt6A: 'Always',
+    coachOpt6B: 'Sometimes',
+    coachOpt6C: 'No',
+
+    coachOpt7A: 'Yes',
+    coachOpt7B: 'Sometimes',
+    coachOpt7C: 'No',
+
+    coachOpt8A: 'Regularly',
+    coachOpt8B: 'Sometimes',
+    coachOpt8C: 'No',
+
+    coachOpt9A: 'Yes',
+    coachOpt9B: 'Sometimes',
+    coachOpt9C: 'No',
+
+    coachOpt10A: 'Always',
+    coachOpt10B: 'Sometimes',
+    coachOpt10C: 'No',
+
+    coachOpt11A: 'No',
+    coachOpt11B: 'Sometimes',
+    coachOpt11C: 'Yes',
+
+    coachOpt12A: 'No',
+    coachOpt12B: 'Sometimes',
+    coachOpt12C: 'Regularly',
+
+    coachOpt13A: 'No',
+    coachOpt13B: 'Sometimes',
+    coachOpt13C: 'Yes',
+
+    coachOpt14A: 'Yes',
+    coachOpt14B: 'Sometimes',
+    coachOpt14C: 'No',
+
+    coachOpt15A: 'Yes',
+    coachOpt15B: 'Sometimes',
+    coachOpt15C: 'No',
+
+    coachOpt16A: 'Regularly',
+    coachOpt16B: 'Sometimes',
+    coachOpt16C: 'No',
+
+    coachOpt17A: 'Strongly agree',
+    coachOpt17B: 'Somewhat agree',
+    coachOpt17C: 'Disagree',
+
+    coachOpt18A: 'Strongly agree',
+    coachOpt18B: 'Somewhat agree',
+    coachOpt18C: 'Disagree',
+
+    coachOpt19A: 'Yes',
+    coachOpt19B: 'Maybe',
+    coachOpt19C: 'No',
+
+    coachOpt20A: 'Yes, I have prepared',
+    coachOpt20B: 'Not yet, thinking about it',
+    coachOpt20C: 'No, not at all',
+
+    coachOpt21A: 'Strongly agree',
+    coachOpt21B: 'Somewhat agree',
+    coachOpt21C: 'Disagree',
+
+    coachOpt22A: 'Regularly',
+    coachOpt22B: 'Sometimes',
+    coachOpt22C: 'Never',
+
+    coachOpt23A: 'Very confident',
+    coachOpt23B: 'Somewhat confident',
+    coachOpt23C: 'Not confident',
+
+    coachOpt24A: 'Often',
+    coachOpt24B: 'Sometimes',
+    coachOpt24C: 'Never',
+
+    coachOpt25A: 'Yes, fully',
+    coachOpt25B: 'Partially',
+    coachOpt25C: 'Not at all',
+
     coachSavingSmall:
     'You are saving a small amount. Try to increase your savings bit by bit! ',
     coachOnYourWay: 'You are on your way! Keep building your savings habit. ',
@@ -1609,9 +1890,11 @@ mixin LocaleData {
     no: 'No',
     maybe: 'Maybe',
     coachAdviceTitle: 'Your Savings Coach Advice',
-    coachOptBoth: 'A bit of both',
-    coachOptSaveBig: 'Save for big goal',
-    coachOptTreats: 'Enjoy small treats',
+
+    coachAdviceLow: "You're just starting your savings journey. Right now, you're likely facing challenges with planning or keeping track of your money. That's totally okay, many people begin here. Focus on building simple habits like noting your expenses and setting small goals.",
+    coachAdviceMid: "You're on the right path! You’ve already picked up some good habits, but there’s room to grow. Try to be more consistent and reflect on where your money goes. A few tweaks could help you save more.",
+    coachAdviceHigh: "You’ve got strong money habits and great financial awareness. Keep doing what you’re doing. You're well on your way to financial stability. Now focus on long-term goals like investing or building an emergency fund.",
+
     coachPraiseHabit: 'Great saving habit!',
     coachRestart: 'Restart Savings Coach',
     learnNoResults: 'No results found.',
@@ -1814,6 +2097,78 @@ mixin LocaleData {
     quizQ30A2: 'Savings increase',
     quizQ30A3: 'Net worth grows',
     quizQ30A4: 'Salary doubles',
+
+    quizQ31: 'Add 4 and 3. What is the result?',
+    quizQ31A1: '6',
+    quizQ31A2: '7',
+    quizQ31A3: '8',
+    quizQ31A4: '9',
+
+    quizQ32: 'You have 2,000 Taka, and your friend gives you 5,000 more. How much money do you have in total?',
+    quizQ32A1: '6,000',
+    quizQ32A2: '7,000',
+    quizQ32A3: '8,000',
+    quizQ32A4: '5,500',
+
+    quizQ33: 'Add 35 and 82. What is the result?',
+    quizQ33A1: '115',
+    quizQ33A2: '117',
+    quizQ33A3: '112',
+    quizQ33A4: '110',
+
+    quizQ34: 'You have 4,800 Taka, and your friend gives you 5,800 Taka. How much money do you have in total?',
+    quizQ34A1: '10,000',
+    quizQ34A2: '10,600',
+    quizQ34A3: '11,000',
+    quizQ34A4: '11,800',
+
+    quizQ35: 'What is 3 times 6?',
+    quizQ35A1: '18',
+    quizQ35A2: '12',
+    quizQ35A3: '24',
+    quizQ35A4: '9',
+
+    quizQ36: 'You have 4 friends and want to give 4 mangos to each. How many mangos do you need?',
+    quizQ36A1: '8',
+    quizQ36A2: '12',
+    quizQ36A3: '16',
+    quizQ36A4: '20',
+
+    quizQ37: 'What is one-tenth (1/10) of 400?',
+    quizQ37A1: '20',
+    quizQ37A2: '30',
+    quizQ37A3: '40',
+    quizQ37A4: '50',
+
+    quizQ38: 'A bag of rice costs 37 Taka. You pay with a 100 Taka note. How much change will you get back?',
+    quizQ38A1: '73 Taka',
+    quizQ38A2: '67 Taka',
+    quizQ38A3: '63 Taka',
+    quizQ38A4: '70 Taka',
+
+    quizQ39: 'You borrow 100 Taka with 2% monthly interest and don’t repay for 3 months. Will you owe:',
+    quizQ39A1: 'Less than 102 Taka',
+    quizQ39A2: 'Exactly 102 Taka',
+    quizQ39A3: 'More than 102 Taka',
+    quizQ39A4: 'Don’t know',
+
+    quizQ40: 'You save 1,000 Taka with 1% interest in a year. But prices rise by 2%. After one year, can you buy:',
+    quizQ40A1: 'More things than before',
+    quizQ40A2: 'Fewer things than before',
+    quizQ40A3: 'Same as before',
+    quizQ40A4: 'Don’t know',
+
+    quizQ41: 'Is it riskier to plant only one plant instead of growing many plants?',
+    quizQ41A1: 'Yes',
+    quizQ41A2: 'No',
+    quizQ41A3: 'Both are risky',
+    quizQ41A4: 'Don’t know',
+
+    quizQ42: 'You need to borrow 500 Taka. Two people offer you loan.\n\nPerson A: You pay back 600 in one month.\n\nPerson B: You pay back 500 plus 15% interest.\nWhich loan is cheaper for you?',
+    quizQ42A1: 'Person A',
+    quizQ42A2: 'Person B',
+    quizQ42A3: 'Person C',
+    quizQ42A4: 'Both cost the same',
     reviewAnswers: 'Review Answers',
     backToQuiz: 'Back to Quiz',
     next: 'Next',
@@ -1843,31 +2198,6 @@ mixin LocaleData {
     viewQuizResult: "View Quiz Result",
     quizResultSubtitle: "See your scores",
 
-    coachOptMoneyBoss: 'Money boss',
-    coachOptDoingOkay: 'Doing okay',
-    coachOptNeedsWork: 'Needs work',
-    coachOpt0_200: '\$0-\$200',
-    coachOpt200_500: '\$200-\$500',
-    coachOpt500plus: '\$500+',
-    coachOpt0_1000: '\$0-\$1000',
-    coachOpt1000_2000: '\$1000-\$2000',
-    coachOpt2000plus: '\$2000+',
-    coachOpt100: '\$100',
-    coachOpt500: '\$500',
-    coachOpt1000plus: '\$1000+',
-    coachOptAlways: 'Always',
-    coachOptSometimes: 'Sometimes',
-    coachOptNotReally: 'Not really',
-    coachOptFood: 'Food',
-    coachOptShopping: 'Shopping',
-    coachOptEntertainment: 'Entertainment',
-    coachOptNever: 'Never',
-    coachOptYes: 'Yes',
-    coachOptMaybe: 'Maybe',
-    coachOptNo: 'No',
-    coachOptRarely: 'Rarely',
-    coachOptSaveIt: 'Save it',
-    coachOptSpendIt: 'Spend it',
 
     coachOptNotSure: 'Not sure',
     coachOtherHint: 'Other (please specify)',
@@ -1920,25 +2250,29 @@ mixin LocaleData {
     chatbotTitle: "ফিনির AI সহকারী",
     feedbackMessageExcellent: "🎉 অসাধারণ! আপনি অর্থ ব্যবস্থাপনায় মাস্টার!",
     restartQuiz: 'কুইজ পুনরায় চালু করুন',
-    savingMoneyVideo2Title: "সেভিং কেন জরুরি",
-    savingMoneyVideo2Subtitle:
-    "হঠাৎ প্রয়োজনে টাকা সেভ থাকা খুবই জরুরি। ইনকাম পাওয়ার সাথে সাথেই যদি কিছু টাকা আলাদা করে রাখেন, আপনার ভবিষ্যৎ অনেক বেশি সুরক্ষিত থাকবে।",
 
-    savingMoneyVideo1Title: "সেভ করা অভ্যাসে পরিণত করুন",
-    savingMoneyVideo1Subtitle:
-    "নিয়মিত সেভ করা চালিয়ে গেলে সেটা একটা ভালো অভ্যাসে পরিণত হয়। খরচের আগেই সেভিংস প্ল্যান করাটাই সবচেয়ে বুদ্ধিমানের কাজ।",
-    simpleBudgetingvideo1Title: "স্মার্ট মাসিক ইনকাম ভাগ করা",
-    simpleBudgetingvideo1Subtitle:
-    "৫৫% প্রয়োজনীয় জিনিসে, ১০% লং-টার্ম ইনভেস্টমেন্টে, ১০% ভবিষ্যতের লক্ষ্য পূরণে, ১০% নিজের স্কিল বাড়াতে, আর ১৫% ফান বা দান খয়রাতে খরচ করুন।",
-    simpleBudgetingvideo2Title: "নিজের উপর ইনভেস্ট করাই সবচেয়ে কাজের",
-    simpleBudgetingvideo2Subtitle:
-    "১০,০০০ টাকা দিয়ে বিজনেস শুরু না করে আগে নিজের স্কিল বাড়ান। বই পড়ুন, অনলাইন কোর্স করুন, আর নিজের জ্ঞান দিয়ে ইনকাম করার উপায় খুঁজে বের করুন।",
-    spendingVideo2Title: "স্মার্ট ইনভেস্টমেন্ট: জমি কিনুন",
-    spendingVideo2Subtitle:
-    "জমি একটা সেফ আর লাভজনক ইনভেস্টমেন্ট। কেনার আগে কাগজপত্র আর লোকেশন ভালো করে দেখে নিন। এটা ফ্ল্যাট বা ক্রিপ্টোর চেয়ে অনেক বেশি ফ্লেক্সিবল।",
-    spendingVideo1Subtitle:
-    "আপনি যতই আয় করুন না কেন — ঠিকভাবে ম্যানেজ, বাড়ানো, ইনভেস্ট আর নিরাপদ রাখলে ভবিষ্যৎ হবে সুরক্ষিত।",
-    spendingVideo1Title: "টাকা ম্যানেজ, বাড়ান, ইনভেস্ট আর সুরক্ষা দিন",
+    savingMoneyVideo1Title: "সেভিং বলতে কী বোঝায়?",
+    savingMoneyVideo1Subtitle: "এই ভিডিওতে দেখানো হয়েছে কেন অল্প টাকা হলেও নিয়মিত সেভ করা ভবিষ্যতের জন্য সেফটি নেট তৈরি করে।",
+
+    savingMoneyVideo2Title: "কিভাবে নিয়মিতভাবে টাকা সেভ করবেন?",
+    savingMoneyVideo2Subtitle: "এই ভিডিওতে খরচ বিশ্লেষণ, বাজেট তৈরি এবং অপ্রয়োজনীয় খরচ কমিয়ে কিভাবে নিয়মিত সেভ করা যায় তা দেখানো হয়েছে।",
+
+
+    simpleBudgetingvideo1Title: "বাজেটিং বলতে কী বোঝায়?",
+    simpleBudgetingvideo1Subtitle: "এই ভিডিওতে দেখানো হয়েছে কিভাবে বাজেট করলে মাস শেষে টাকার টানাপোড়েন কমে যায় এবং খরচে নিয়ন্ত্রণ আসে।",
+
+    simpleBudgetingvideo2Title: "কিভাবে একটি বাজেট তৈরি করবেন?",
+    simpleBudgetingvideo2Subtitle: "এই ভিডিওতে ৫০/৩০/২০ রুল এবং সহজ কৌশল ব্যবহার করে কীভাবে মাসিক বাজেট বানানো যায় তা দেখানো হয়েছে।",
+
+
+    spendingVideo1Title: "খরচ বলতে কী বোঝায়?",
+    spendingVideo1Subtitle: "আপনার দৈনন্দিন খরচের অভ্যাস কীভাবে টাকার উপর প্রভাব ফেলে তা বুঝুন। প্রয়োজন আর ইচ্ছার পার্থক্য এবং খরচ ট্র্যাক করলে কীভাবে নিয়ন্ত্রণ আসে তা শিখুন।",
+
+    spendingVideo2Title: "কিভাবে স্মার্টভাবে টাকা খরচ করবেন",
+    spendingVideo2Subtitle: "খরচের পরিকল্পনা, মুড-ভিত্তিক খরচ এড়ানো এবং নিজের উপর নিয়ন্ত্রণ গড়ে তোলার উপায় শিখুন যাতে খরচের অভ্যাস হয় আরও স্মার্ট ও স্থিতিশীল।",
+
+
+
     apptourDashSubtitle: "প্রধান ওভারভিউ অন্বেষণ করুন",
     searchTextfiedText: "অনুসন্ধান করুন..",
     expenseTrackingSubtite: "আপনার দৈনিক খরচ ট্র্যাক করুন",
@@ -2135,7 +2469,7 @@ mixin LocaleData {
     expenseAnalysis: 'খরচ বিশ্লেষণ',
     incomeAnalysis: 'আয় বিশ্লেষণ',
     transactions: 'লেনদেন',
-    
+
     nameHint: 'আপনার পুরো নাম লিখুন।',
     selectItemsToDelete: 'নির্বাচিত আইটেমগুলি মুছুন',
     noTransactionsInThisPeriod: 'এই সময়কালে কোনো লেনদেন নেই',
@@ -2463,19 +2797,7 @@ mixin LocaleData {
     spendLandTitle: 'স্মার্ট বিনিয়োগ: জমি কিনুন',
     spendLandDesc:
     'জমি একটি নিরাপদ ও লাভজনক বিনিয়োগ। কেনার আগে কাগজপত্র ও লোকেশন যাচাই করুন। এটি ফ্ল্যাট বা ক্রিপ্টোর চেয়ে বেশি ফ্লেক্সিবল।',
-    coachQ1: 'টাকা ব্যবস্থাপনায় আপনি কতটা ভালো? বস লেভেল, নাকি এখনও শিখছেন?',
-    coachQ2: 'সাধারণত আপনি মাসে কত টাকা সঞ্চয় করেন?',
-    coachQ3: 'আপনি মাসে সাধারণত কত খরচ করেন?',
-    coachQ4: 'সেরা অবস্থায়, আপনি মাসে কত সঞ্চয় করতে চাইতেন?',
-    coachQ5: 'আপনি কি নিডস আর ওয়ান্টস-এর পার্থক্য সহজে করতে পারেন?',
-    coachQ6: 'কোন খাতে আপনার সবচেয়ে বেশি টাকা খরচ হয়?',
-    coachQ7: 'আপনি কি আপনার খরচ কোথায় যায় সেটা ট্র্যাক করেন?',
-    alreadyMember: 'আগে থেকেই সদস্য?',
-    coachQ8: 'আপনি কি আপনার খরচের অভ্যাস বদলাতে ইচ্ছুক?',
-    coachQ9: 'আপনি কি প্রায়ই প্ল্যান ছাড়া খরচ করেন?',
-    coachQ10: 'এক্সট্রা টাকা পেলে আপনি সঞ্চয় করেন না খরচ?',
-    coachQ11:
-    'আপনি কি বড় কোনো লক্ষ্য পূরণের জন্য সঞ্চয় করতে চান, নাকি এখনই ছোট আনন্দ উপভোগ করতে চান?',
+
     coachSavingSmall:
     'আপনি কম সঞ্চয় করছেন। একটু একটু করে সঞ্চয় বাড়ানোর চেষ্টা করুন! ',
     coachOnYourWay: 'আপনি সঠিক পথে আছেন! সঞ্চয়ের অভ্যাস গড়ে তুলুন। ',
@@ -2484,10 +2806,9 @@ mixin LocaleData {
     sometimes: 'মাঝে মাঝে',
     no: 'না',
     maybe: 'হয়তো',
-    coachAdviceTitle: 'আপনার সেভিংস কোচের পরামর্শ',
-    coachOptBoth: 'দুটোই একটু একটু',
-    coachOptSaveBig: 'বড় লক্ষ্য পূরণের জন্য সঞ্চয়',
-    coachOptTreats: 'এখনই একটু মজা',
+
+
+
     coachPraiseHabit: 'চমৎকার সঞ্চয়ের অভ্যাস!',
     coachRestart: 'সেভিং কোচ আবার শুরু করুন',
     learnReset: 'লার্নিং অগ্রগতি রিসেট হয়েছে।',
@@ -2708,6 +3029,79 @@ mixin LocaleData {
     quizQ30A2: 'সঞ্চয় বাড়ে',
     quizQ30A3: 'সম্পদ বাড়ে',
     quizQ30A4: 'বেতন দ্বিগুণ হয়',
+
+    quizQ31: '৪ আর ৩ যোগ করলে কত হয়?',
+    quizQ31A1: '৬',
+    quizQ31A2: '৭',
+    quizQ31A3: '৮',
+    quizQ31A4: '৯',
+
+    quizQ32: 'তোমার কাছে ২,০০০ টাকা আছে, বন্ধু ৫,০০০ টাকা দেয়। মোট কত টাকা হলো?',
+    quizQ32A1: '৬,০০০',
+    quizQ32A2: '৭,০০০',
+    quizQ32A3: '৮,০০০',
+    quizQ32A4: '৫,৫০০',
+
+    quizQ33: '৩৫ আর ৮২ যোগ করলে কত হয়?',
+    quizQ33A1: '১১৫',
+    quizQ33A2: '১১৭',
+    quizQ33A3: '১১২',
+    quizQ33A4: '১১০',
+
+    quizQ34: 'তোমার কাছে ৪,৮০০ টাকা আছে, বন্ধু ৫,৮০০ টাকা দেয়। মোট কত টাকা হলো?',
+    quizQ34A1: '১০,০০০',
+    quizQ34A2: '১০,৬০০',
+    quizQ34A3: '১১,০০০',
+    quizQ34A4: '১১,৮০০',
+
+    quizQ35: '৩ গুণ ৬ কত?',
+    quizQ35A1: '১৮',
+    quizQ35A2: '১২',
+    quizQ35A3: '২৪',
+    quizQ35A4: '৯',
+
+    quizQ36: '৪ জন বন্ধুকে ৪টি করে আম দিতে চাও। মোট কত আম লাগবে?',
+    quizQ36A1: '৮',
+    quizQ36A2: '১২',
+    quizQ36A3: '১৬',
+    quizQ36A4: '২০',
+
+    quizQ37: '৪০০ এর ১/১০ (এক দশমাংশ) কত?',
+    quizQ37A1: '২০',
+    quizQ37A2: '৩০',
+    quizQ37A3: '৪০',
+    quizQ37A4: '৫০',
+
+    quizQ38: 'চালের দাম ৩৭ টাকা। তুমি ১০০ টাকার নোট দিলে কত টাকা ফেরত পাবে?',
+    quizQ38A1: '৭৩ টাকা',
+    quizQ38A2: '৬৭ টাকা',
+    quizQ38A3: '৬৩ টাকা',
+    quizQ38A4: '৭০ টাকা',
+
+    quizQ39: '১০০ টাকা ঋণ নিলে আর ৩ মাসে সুদ ২% হারে না দিলে, তোমার দিতে হবে:',
+    quizQ39A1: '১০২ টাকার কম',
+    quizQ39A2: 'সরাসরি ১০২ টাকা',
+    quizQ39A3: '১০২ টাকার বেশি',
+    quizQ39A4: 'জানি না',
+
+    quizQ40: '১% সুদে ১,০০০ টাকা জমিয়েছো, কিন্তু জিনিসের দাম বেড়েছে ২%। এক বছর পর তুমি:',
+    quizQ40A1: 'আগের চেয়ে বেশি কিনতে পারবে',
+    quizQ40A2: 'আগের চেয়ে কম কিনতে পারবে',
+    quizQ40A3: 'একই পরিমাণে কিনতে পারবে',
+    quizQ40A4: 'জানি না',
+
+    quizQ41: 'একটা গাছ লাগানো আর অনেক গাছ লাগানোর মধ্যে কোনটা বেশি ঝুঁকিপূর্ণ?',
+    quizQ41A1: 'হ্যাঁ, একটা গাছ ঝুঁকিপূর্ণ',
+    quizQ41A2: 'না, ঝুঁকি নেই',
+    quizQ41A3: 'দুটোই ঝুঁকিপূর্ণ',
+    quizQ41A4: 'জানি না',
+
+    quizQ42: 'তোমাকে ৫০০ টাকা ঋণ নিতে হবে।\n\nব্যক্তি A: এক মাস পর ৬০০ টাকা ফেরত দিতে হবে।\n\nব্যক্তি B: ১৫% সুদে ৫০০ টাকা ফেরত দিতে হবে।\nকে কম খরচের?',
+    quizQ42A1: 'ব্যক্তি A',
+    quizQ42A2: 'ব্যক্তি B',
+    quizQ42A3: 'ব্যক্তি C',
+    quizQ42A4: 'দুটোই সমান',
+
     next: 'পরবর্তী',
 
     reviewAnswers: 'উত্তরগুলো পর্যালোচনা করুন',
@@ -2732,31 +3126,138 @@ mixin LocaleData {
     viewQuizResult: "কুইজ ফলাফল দেখুন",
     quizResultSubtitle: "আপনার স্কোর দেখুন",
 
-    coachOptMoneyBoss: 'টাকার বস',
-    coachOptDoingOkay: 'ভালো আছি',
-    coachOptNeedsWork: 'উন্নতি দরকার',
-    coachOpt0_200: '৳০-৳২০০',
-    coachOpt200_500: '৳২০০-৳৫০০',
-    coachOpt500plus: '৳৫০০+',
-    coachOpt0_1000: '৳০-৳১০০০',
-    coachOpt1000_2000: '৳১০০০-৳২০০০',
-    coachOpt2000plus: '৳২০০০+',
-    coachOpt100: '৳১০০',
-    coachOpt500: '৳৫০০',
-    coachOpt1000plus: '৳১০০০+',
-    coachOptAlways: 'সবসময়',
-    coachOptSometimes: 'মাঝে মাঝে',
-    coachOptNotReally: 'একদম না',
-    coachOptFood: 'খাবার',
-    coachOptShopping: 'শপিং',
-    coachOptEntertainment: 'বিনোদন',
-    coachOptNever: 'কখনোই না',
-    coachOptYes: 'হ্যাঁ',
-    coachOptMaybe: 'হয়তো',
-    coachOptNo: 'না',
-    coachOptRarely: 'কমই হয়',
-    coachOptSaveIt: 'সঞ্চয় করি',
-    coachOptSpendIt: 'খরচ করি',
+    coachAdviceLow: "আপনি সবে শুরু করছেন। প্রথমে খরচ কোথায় যায় সেটা বুঝুন, ছোট ছোট লক্ষ্য ঠিক করুন, এবং নিয়মিত ট্র্যাক করতে শুরু করুন। ধীরে ধীরে আপনি আরও আত্মবিশ্বাসী হয়ে উঠবেন।",
+
+    coachAdviceMid: "আপনার অভ্যাস মোটামুটি ঠিক আছে, তবে আরও ভালো করা সম্ভব। নিয়মিত পরিকল্পনা এবং সেভিংসে নজর দিন। একটু মনোযোগ দিলেই আপনি আরও ভালো অবস্থানে পৌঁছাতে পারবেন।",
+
+    coachAdviceHigh: "অসাধারণ! আপনি আপনার টাকার ব্যাপারে দায়িত্বশীল। এখন আপনি আরও বড় লক্ষ্য ঠিক করতে পারেন, যেমন ইনভেস্টমেন্ট বা ইমারজেন্সি ফান্ড তৈরি।",
+    coachAdviceTitle: 'আপনার সেভিংস কোচের পরামর্শ',
+
+    coachQ1: 'গত সপ্তাহে আপনি ব্যক্তিগতভাবে কত টাকা খরচ করেছেন তা কি আপনি পরিষ্কারভাবে জানেন?',
+    coachQ2: 'আপনি কি অনুমানের পরিবর্তে ঠিক কত টাকা খরচ করেছেন তা জানেন?',
+    coachQ3: 'আপনার পরিবারে বর্তমানে দৈনন্দিন খরচের জন্য কত টাকা আছে তা কি আপনি জানেন?',
+    coachQ4: 'আপনি কি আজ কত টাকা খরচ করতে পারেন তা নিয়ে আত্মবিশ্বাসী?',
+    coachQ5: 'আপনি কি টাকা হাতে পাওয়ার আগেই তার ব্যবহার নিয়ে পরিকল্পনা করেন?',
+    coachQ6: 'আপনি কি সবসময় খরচের আগে একটি পরিকল্পনা তৈরি করেন?',
+    coachQ7: 'প্রয়োজনীয় খরচ মেটানোর পর কি সাধারণত আপনার কিছু টাকা বেঁচে থাকে?',
+    coachQ8: 'আপনি কি নিয়মিত খরচের পর কিছু টাকা বাঁচাতে পারেন?',
+    coachQ9: 'আপনি কি সবসময় নিশ্চিত করেন যে খাবার বা মৌলিক প্রয়োজনে টাকা শেষ না হয়?',
+    coachQ10: 'আপনি কি মৌলিক চাহিদার জন্য টাকা সংকটে পড়া এড়াতে পারেন?',
+    coachQ11: 'আপনি কি খাবার বা প্রয়োজনীয় জিনিসের জন্য ঋণ না নিয়ে চলতে পারেন?',
+    coachQ12: 'আপনি কি সাধারণত প্রয়োজনে ঋণ না নিয়েই খরচ মেটাতে পারেন?',
+    coachQ13: 'আপনি কি ঋণ শোধে নতুন ঋণ না নিয়ে দায়িত্বশীলভাবে ব্যবস্থাপনা করেন?',
+    coachQ14: 'আপনি কি অতিরিক্ত ঋণ ছাড়া আপনার ঋণ ঠিকভাবে পরিচালনা করেন?',
+    coachQ15: 'আপনি কি নিয়মিত ভবিষ্যতের জন্য সঞ্চয় করার চেষ্টা করেন?',
+    coachQ16: 'আপনার কি প্রতিনিয়ত সঞ্চয় করার অভ্যাস আছে?',
+    coachQ17: '“আমি অর্থ ব্যবস্থাপনায় শৃঙ্খলিত।” আপনি কি একমত?',
+    coachQ18: '“আমি অন্যের আর্থিক ভুল থেকে শিক্ষা নিই।” আপনি কি একমত?',
+    coachQ19: 'আগামীকাল যদি জরুরি ৫,০০০ টাকা খরচ আসে, আপনি কি তা ঋণ ছাড়াই সামলাতে পারবেন?',
+    coachQ20: 'আপনি কি এরকম জরুরি খরচের জন্য আগে থেকেই প্রস্তুতি নিয়েছেন?',
+    coachQ21: '“আমি ভবিষ্যতের জন্য পরিকল্পনাকে বেশি গুরুত্ব দিই।” আপনি কি একমত?',
+    coachQ22: 'আপনি কি নিয়মিত অর্থনৈতিক লক্ষ্য বা পরিকল্পনা তৈরি করেন?',
+    coachQ23: 'আপনি কি আপনার অর্থ পরিচালনা নিয়ে আত্মবিশ্বাসী?',
+    coachQ24: 'আপনি কি আপনার আগের খরচগুলো নিয়ে ভাবেন ও তা থেকে শিক্ষা নেন?',
+    coachQ25: 'আপনি কি আপনার আর্থিক ভবিষ্যৎ নিয়ে নিয়ন্ত্রণ অনুভব করেন?',
+
+    coachOpt1A: 'হ্যাঁ',
+    coachOpt1B: 'নিশ্চিত নই',
+    coachOpt1C: 'না',
+
+    coachOpt2A: 'সঠিক পরিমাণ জানি',
+    coachOpt2B: 'আনুমানিক ধারণা আছে',
+    coachOpt2C: 'মনে নেই',
+
+    coachOpt3A: 'হ্যাঁ',
+    coachOpt3B: 'নিশ্চিত নই',
+    coachOpt3C: 'না',
+
+    coachOpt4A: 'সঠিকভাবে জানি',
+    coachOpt4B: 'আনুমানিক জানি',
+    coachOpt4C: 'টাকা হিসাব রাখি না',
+
+    coachOpt5A: 'হ্যাঁ',
+    coachOpt5B: 'মাঝে মাঝে',
+    coachOpt5C: 'না',
+
+    coachOpt6A: 'সবসময়',
+    coachOpt6B: 'মাঝে মাঝে',
+    coachOpt6C: 'না',
+
+    coachOpt7A: 'হ্যাঁ',
+    coachOpt7B: 'মাঝে মাঝে',
+    coachOpt7C: 'না',
+
+    coachOpt8A: 'নিয়মিত',
+    coachOpt8B: 'মাঝে মাঝে',
+    coachOpt8C: 'না',
+
+    coachOpt9A: 'হ্যাঁ',
+    coachOpt9B: 'মাঝে মাঝে',
+    coachOpt9C: 'না',
+
+    coachOpt10A: 'নিয়মিত',
+    coachOpt10B: 'মাঝে মাঝে',
+    coachOpt10C: 'না',
+
+    coachOpt11A: 'না',
+    coachOpt11B: 'মাঝে মাঝে',
+    coachOpt11C: 'হ্যাঁ',
+
+    coachOpt12A: 'না',
+    coachOpt12B: 'মাঝে মাঝে',
+    coachOpt12C: 'নিয়মিত',
+
+    coachOpt13A: 'না',
+    coachOpt13B: 'মাঝে মাঝে',
+    coachOpt13C: 'হ্যাঁ',
+
+    coachOpt14A: 'হ্যাঁ',
+    coachOpt14B: 'মাঝে মাঝে',
+    coachOpt14C: 'না',
+
+    coachOpt15A: 'হ্যাঁ',
+    coachOpt15B: 'মাঝে মাঝে',
+    coachOpt15C: 'না',
+
+    coachOpt16A: 'নিয়মিত',
+    coachOpt16B: 'মাঝে মাঝে',
+    coachOpt16C: 'না',
+
+    coachOpt17A: 'পুরোপুরি একমত',
+    coachOpt17B: 'আংশিক একমত',
+    coachOpt17C: 'একদমই না',
+
+    coachOpt18A: 'পুরোপুরি একমত',
+    coachOpt18B: 'আংশিক একমত',
+    coachOpt18C: 'একদমই না',
+
+    coachOpt19A: 'হ্যাঁ',
+    coachOpt19B: 'হয়তো',
+    coachOpt19C: 'না',
+
+    coachOpt20A: 'হ্যাঁ, প্রস্তুতি নিয়েছি',
+    coachOpt20B: 'না, ভাবছি কেবল',
+    coachOpt20C: 'না, একেবারেই না',
+
+    coachOpt21A: 'পুরোপুরি একমত',
+    coachOpt21B: 'আংশিক একমত',
+    coachOpt21C: 'একদমই না',
+
+    coachOpt22A: 'নিয়মিত',
+    coachOpt22B: 'মাঝে মাঝে',
+    coachOpt22C: 'কখনোই না',
+
+    coachOpt23A: 'খুব আত্মবিশ্বাসী',
+    coachOpt23B: 'কিছুটা আত্মবিশ্বাসী',
+    coachOpt23C: 'আত্মবিশ্বাস নেই',
+
+    coachOpt24A: 'প্রায়ই',
+    coachOpt24B: 'মাঝে মাঝে',
+    coachOpt24C: 'না',
+
+    coachOpt25A: 'হ্যাঁ, পুরোপুরি',
+    coachOpt25B: 'আংশিকভাবে',
+    coachOpt25C: 'একদম না',
 
     coachOptNotSure: 'নিশ্চিত নই',
     coachOtherHint: 'অন্যান্য (অনুগ্রহ করে উল্লেখ করুন)',

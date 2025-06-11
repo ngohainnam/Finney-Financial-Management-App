@@ -22,7 +22,7 @@ class _ExpenseTrackingEduPageState extends State<ExpenseTrackingEduPage> {
   void initState() {
     super.initState();
     _controller = YoutubePlayerController(
-      initialVideoId: 'u7xEwHzZwpM',
+      initialVideoId: 'pddOyPRQGZ0',
       flags: const YoutubePlayerFlags(autoPlay: false),
     );
     _loadCompletionStatus();

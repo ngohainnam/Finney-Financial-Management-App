@@ -22,7 +22,7 @@ class _LearnhubModuleEduPageState extends State<LearnhubModuleEduPage> {
   void initState() {
     super.initState();
     _controller = YoutubePlayerController(
-      initialVideoId: 'dQw4w9WgXcQ',
+      initialVideoId: 'W3DnBIZxITY',
       flags: const YoutubePlayerFlags(autoPlay: false),
     );
     _loadCompletionStatus();

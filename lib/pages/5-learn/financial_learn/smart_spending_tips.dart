@@ -37,12 +37,12 @@ class _SmartSpendingTipsState extends State<SmartSpendingTips> {
       {
         'title': LocaleData.spendingVideo1Title.getString(context),
         'description': LocaleData.spendingVideo1Subtitle.getString(context),
-        'videoId': 'Vwb07EXFgfA',
+        'videoId': 'luO36EZ7TdU',
       },
       {
         'title': LocaleData.spendingVideo2Title.getString(context),
         'description': LocaleData.spendingVideo2Subtitle.getString(context),
-        'videoId': 'f-FMn43hR34',
+        'videoId': 'KsXBJdskfvQ',
       },
     ];
 

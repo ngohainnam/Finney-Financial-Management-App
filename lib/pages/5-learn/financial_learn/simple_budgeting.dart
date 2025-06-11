@@ -37,12 +37,12 @@ class _SimpleBudgetingState extends State<SimpleBudgeting> {
       {
         'title': LocaleData.simpleBudgetingvideo1Title.getString(context),
         'description': LocaleData.simpleBudgetingvideo1Subtitle.getString(context),
-        'videoId': 'ycPRDF4WOhw',
+        'videoId': 'Bjhl7LH_3wU',
       },
       {
         'title': LocaleData.simpleBudgetingvideo2Title.getString(context),
         'description': LocaleData.simpleBudgetingvideo2Subtitle.getString(context),
-        'videoId': 'ngVpfw8K7K8',
+        'videoId': 'xB1-CN-uGbg',
       },
     ];
 

@@ -25,7 +25,7 @@ class _BudgetReminderEduPageState extends State<BudgetReminderEduPage> {
     super.initState();
 
     _controller = YoutubePlayerController(
-      initialVideoId: 'dQw4w9WgXcQ',
+      initialVideoId: '6tTuFy2qOlw',
 
       flags: const YoutubePlayerFlags(autoPlay: false),
     );

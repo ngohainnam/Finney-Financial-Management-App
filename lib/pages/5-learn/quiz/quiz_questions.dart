@@ -1,8 +1,6 @@
-
 import 'package:finney/shared/localization/locales.dart';
 import 'package:flutter/material.dart';
 import 'package:finney/pages/5-learn/string_extension.dart';
-
 
 class QuizQuestion {
   final String question;
@@ -316,5 +314,128 @@ List<QuizQuestion> quizQuestions(BuildContext context) => [
       LocaleData.quizQ30A4.getString(context),
     ],
     correctAnswerIndex: 0,
+  ),
+
+// Appended 31–42 kept as-is
+  QuizQuestion(
+    question: LocaleData.quizQ31.getString(context),
+    options: [
+      LocaleData.quizQ31A1.getString(context),
+      LocaleData.quizQ31A2.getString(context),
+      LocaleData.quizQ31A3.getString(context),
+      LocaleData.quizQ31A4.getString(context),
+    ],
+    correctAnswerIndex: 1,
+  ),
+  QuizQuestion(
+    question: LocaleData.quizQ32.getString(context),
+    options: [
+      LocaleData.quizQ32A1.getString(context),
+      LocaleData.quizQ32A2.getString(context),
+      LocaleData.quizQ32A3.getString(context),
+      LocaleData.quizQ32A4.getString(context),
+    ],
+    correctAnswerIndex: 1,
+  ),
+  QuizQuestion(
+    question: LocaleData.quizQ33.getString(context),
+    options: [
+      LocaleData.quizQ33A1.getString(context),
+      LocaleData.quizQ33A2.getString(context),
+      LocaleData.quizQ33A3.getString(context),
+      LocaleData.quizQ33A4.getString(context),
+    ],
+    correctAnswerIndex: 0,
+  ),
+  QuizQuestion(
+    question: LocaleData.quizQ34.getString(context),
+    options: [
+      LocaleData.quizQ34A1.getString(context),
+      LocaleData.quizQ34A2.getString(context),
+      LocaleData.quizQ34A3.getString(context),
+      LocaleData.quizQ34A4.getString(context),
+    ],
+    correctAnswerIndex: 1,
+  ),
+  QuizQuestion(
+    question: LocaleData.quizQ35.getString(context),
+    options: [
+      LocaleData.quizQ35A1.getString(context),
+      LocaleData.quizQ35A2.getString(context),
+      LocaleData.quizQ35A3.getString(context),
+      LocaleData.quizQ35A4.getString(context),
+    ],
+    correctAnswerIndex: 0,
+  ),
+  QuizQuestion(
+    question: LocaleData.quizQ36.getString(context),
+    options: [
+      LocaleData.quizQ36A1.getString(context),
+      LocaleData.quizQ36A2.getString(context),
+      LocaleData.quizQ36A3.getString(context),
+      LocaleData.quizQ36A4.getString(context),
+    ],
+    correctAnswerIndex: 2,
+  ),
+  QuizQuestion(
+    question: LocaleData.quizQ37.getString(context),
+    options: [
+      LocaleData.quizQ37A1.getString(context),
+      LocaleData.quizQ37A2.getString(context),
+      LocaleData.quizQ37A3.getString(context),
+      LocaleData.quizQ37A4.getString(context),
+    ],
+    correctAnswerIndex: 2,
+  ),
+  QuizQuestion(
+    question: LocaleData.quizQ38.getString(context),
+    options: [
+      LocaleData.quizQ38A1.getString(context),
+      LocaleData.quizQ38A2.getString(context),
+      LocaleData.quizQ38A3.getString(context),
+      LocaleData.quizQ38A4.getString(context),
+    ],
+    correctAnswerIndex: 0,
+  ),
+  QuizQuestion(
+    question: LocaleData.quizQ39.getString(context),
+    options: [
+      LocaleData.quizQ39A1.getString(context),
+      LocaleData.quizQ39A2.getString(context),
+      LocaleData.quizQ39A3.getString(context),
+      LocaleData.quizQ39A4.getString(context),
+    ],
+    correctAnswerIndex: 2,
+  ),
+  QuizQuestion(
+    question: LocaleData.quizQ40.getString(context),
+    options: [
+      LocaleData.quizQ40A1.getString(context),
+      LocaleData.quizQ40A2.getString(context),
+      LocaleData.quizQ40A3.getString(context),
+      LocaleData.quizQ40A4.getString(context),
+    ],
+
+    correctAnswerIndex: 1,
+  ),
+  QuizQuestion(
+    question: LocaleData.quizQ41.getString(context),
+    options: [
+      LocaleData.quizQ41A1.getString(context),
+      LocaleData.quizQ41A2.getString(context),
+      LocaleData.quizQ41A3.getString(context),
+      LocaleData.quizQ41A4.getString(context),
+    ],
+    correctAnswerIndex: 0,
+  ),
+  QuizQuestion(
+    question: LocaleData.quizQ42.getString(context),
+    options: [
+      LocaleData.quizQ42A1.getString(context),
+      LocaleData.quizQ42A2.getString(context),
+      LocaleData.quizQ42A3.getString(context),
+      LocaleData.quizQ42A4.getString(context),
+    ],
+    correctAnswerIndex: 1,
   ),
 ];

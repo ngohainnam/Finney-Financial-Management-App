@@ -15,7 +15,7 @@ class _SavingGoalsEduPageState extends State<SavingGoalsEduPage> {
   final String lessonKey = 'saving_goals_edu';
   final Color cardColor = Color(0xFFC5CAE9);
 
-  final String videoId = '_OACmawAagI';
+  final String videoId = '426pPV2zVzs';
 
   late YoutubePlayerController _controller;
   bool _completed = false;

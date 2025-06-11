@@ -22,7 +22,7 @@ class _ChatbotEduPageState extends State<ChatbotEduPage> {
   void initState() {
     super.initState();
     _controller = YoutubePlayerController(
-      initialVideoId: '7F17urdKZM8',
+      initialVideoId: 'gIA1KTkpSzU',
       flags: const YoutubePlayerFlags(autoPlay: false),
     );
     _loadCompletionStatus();

@@ -1,6 +1,5 @@
 import 'package:finney/shared/localization/locales.dart';
 import 'package:finney/pages/5-learn/string_extension.dart';
-import 'package:finney/shared/theme/app_color.dart';
 import 'package:flutter/material.dart';
 import '../../../core/storage/storage_manager.dart';
 import '../../../core/storage/cloud/models/learning_model.dart';
@@ -116,7 +115,7 @@ class _QuizResultsPageState extends State<QuizResultsPage> {
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2))
+          ? const Center(child: CircularProgressIndicator())
           : _error != null
           ? Center(
         child: Text(_error!, style: const TextStyle(color: Colors.red)),

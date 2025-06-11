@@ -29,7 +29,7 @@ class _QuizPageState extends State<QuizPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     selectedQuestions = List.from(quizQuestions(context))..shuffle();
-    selectedQuestions = selectedQuestions.take(10).toList();
+    selectedQuestions = selectedQuestions.take(15).toList();
     _userAnswers = List.filled(selectedQuestions.length, null);
   }
 

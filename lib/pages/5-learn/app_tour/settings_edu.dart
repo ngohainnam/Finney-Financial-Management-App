@@ -22,7 +22,7 @@ class _SettingsEduPageState extends State<SettingsEduPage> {
   void initState() {
     super.initState();
     _controller = YoutubePlayerController(
-      initialVideoId: 'cUsQxFwfJYM',
+      initialVideoId: '-X7ecEvgFbI',
       flags: const YoutubePlayerFlags(autoPlay: false),
     );
     _loadCompletionStatus();
