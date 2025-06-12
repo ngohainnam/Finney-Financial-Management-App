@@ -7,7 +7,7 @@ import 'package:finney/shared/widgets/common/snack_bar.dart';
 import 'package:finney/pages/1-auth/widgets/my_textfield.dart';
 import 'package:finney/shared/localization/locales.dart';
 import 'package:flutter_localization/flutter_localization.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -19,54 +19,71 @@ class ForgotPasswordPage extends StatefulWidget {
 class ForgotPasswordPageState extends State<ForgotPasswordPage> {
   final emailController = TextEditingController();
 
+  Future<bool> checkEmailExists(String email) async {
+    var querySnapshot = await FirebaseFirestore.instance.collection('users')
+        .where('email', isEqualTo: email)
+        .get();
+
+    return querySnapshot.docs.isNotEmpty;
+  }
+
   void sendPasswordResetEmail() async {
     showDialog(
       context: context,
       builder: (context) {
         return Center(
-          child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2)
+          child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2),
         );
       },
     );
 
     try {
-      await FirebaseAuth.instance.sendPasswordResetEmail(email: emailController.text.trim());
-      Navigator.pop(context);
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text(
-              LocaleData.forgotPasswordTitle.getString(context),
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            content: Text(
-              LocaleData.passwordResetSuccess.getString(context),
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text(
-                  LocaleData.dialogOk.getString(context),
-                  style: Theme.of(context).textTheme.labelLarge,
-                ),
+      bool emailExists = await checkEmailExists(emailController.text.trim());
+
+      if (emailExists) {
+        await FirebaseAuth.instance.sendPasswordResetEmail(email: emailController.text.trim());
+        Navigator.pop(context);
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text(
+                LocaleData.forgotPasswordTitle.getString(context),
+                style: Theme.of(context).textTheme.headlineSmall,
               ),
-            ],
-          );
-        },
-      );
+              content: Text(
+                LocaleData.passwordResetSuccess.getString(context),
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    LocaleData.dialogOk.getString(context),
+                    style: Theme.of(context).textTheme.labelLarge,
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        Navigator.pop(context);
+        AppSnackBar.showError(
+          context, 
+          message: LocaleData.emailNotRegistered.getString(context),
+        );
+      }
     } catch (e) {
-      Navigator.pop(context); 
+      Navigator.pop(context);
       AppSnackBar.showError(
         context, 
         message: LocaleData.passwordResetError.getString(context),
       );
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -79,12 +96,8 @@ class ForgotPasswordPageState extends State<ForgotPasswordPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const SizedBox(height: 50),
-            
-                //logo
                 Image.asset(AppImages.appLogo),
-            
                 const SizedBox(height: 50),
-                
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
                   child: Align(
@@ -113,7 +126,7 @@ class ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 const SizedBox(height: 50),
                 GestureDetector(
                   onTap: () {
-                    Navigator.pop(context); // Navigate back to login page
+                    Navigator.pop(context);
                   },
                   child: Text(
                     LocaleData.backToLogin.getString(context),
@@ -130,10 +143,10 @@ class ForgotPasswordPageState extends State<ForgotPasswordPage> {
       ),
     );
   }
+
   @override
   void dispose() {
     emailController.dispose();
     super.dispose();
   }
 }
-
