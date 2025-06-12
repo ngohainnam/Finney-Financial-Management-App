@@ -259,7 +259,7 @@ class SavingsCoachState extends State<SavingsCoach> {
             padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
             decoration: BoxDecoration(
               color: selectedOptionKey == option['key']
-                  ? Colors.blueAccent.withOpacity(0.2)
+                  ? Colors.blueAccent.withValues(alpha: 0.2)
                   : Colors.white,
               border: Border.all(color: Colors.black12),
               borderRadius: BorderRadius.circular(16),
