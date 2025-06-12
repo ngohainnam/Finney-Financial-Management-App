@@ -1160,7 +1160,8 @@ mixin LocaleData {
   static const String deleteAccount = 'deleteAccount';
   static const String deleteAccountConfirm = 'deleteAccountConfirm';
   static const String accountDeleted = 'Account deleted successfully.';
-
+  static const String emailNotRegistered = 'emailNotRegistered';
+ 
   //**************************************************************************** */
   static const Map<String, String> en = {
     greatJob: "🏆 Great Job!",
@@ -2215,6 +2216,7 @@ mixin LocaleData {
     'features': 'Features',
     'prediction': 'Prediction',
     'question': 'Question',
+    emailNotRegistered: 'Email does not exist',
   };
 
   static const Map<String, String> bn = {
@@ -3275,6 +3277,7 @@ mixin LocaleData {
     'reminder': 'রিমাইন্ডার',
 
     'question': 'প্রশ্ন',
+    emailNotRegistered: 'ইমেলটি বিদ্যমান নেই',
   };
 }
 
